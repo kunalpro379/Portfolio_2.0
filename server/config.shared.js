@@ -77,6 +77,8 @@ const CONFIG = {
     ORIGINS: [
       'https://kunalpatil.me',
       'https://www.kunalpatil.me',
+      'https://apiv1.kunalpatil.me',
+      'https://portfolio.kunalpatil.me',
       'https://admin.kunalpatil.me',
       'https://www.admin.kunalpatil.me',
       'http://localhost:5173',
