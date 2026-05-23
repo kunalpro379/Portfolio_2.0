@@ -1,0 +1,28 @@
+{
+  "name": "portfolio-server",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "build": "echo 'No build step required for Node.js server'"
+  },
+  "dependencies": {
+    "@azure/storage-blob": "^12.29.1",
+    "@qdrant/js-client-rest": "^1.16.2",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.6.1",
+    "express": "^4.18.2",
+    "graphql-request": "^7.4.0",
+    "groq-sdk": "^0.37.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.0.0",
+    "multer": "^2.0.2",
+    "node-fetch": "^3.3.2",
+    "youtube-captions-scraper": "^2.0.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}

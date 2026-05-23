@@ -1,0 +1,206 @@
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import './responsive.css';
+import Login from './pages/Login';
+import Dashboard from './pages/Dashboard';
+import Projects from './pages/Projects';
+import CreateProject from './pages/CreateProject';
+import EditProject from './pages/EditProject';
+import ReorderProjects from './pages/ReorderProjects';
+import Blogs from './pages/Blogs';
+import CreateBlog from './pages/CreateBlog';
+import EditBlog from './pages/EditBlog';
+import Documentation from './pages/Documentation';
+import CreateDocumentation from './pages/CreateDocumentation';
+import EditDocumentation from './pages/EditDocumentation';
+import Notes from './pages/Notes';
+import Code from './pages/Code';
+import CodeEditor from './pages/CodeEditor';
+import TodoEditor from './pages/TodoEditor';
+import Views from './pages/Views';
+import AIKnowledgeBase from './pages/AIKnowledgeBase';
+import Layout from './components/Layout';
+import { AuthProvider, useAuth } from './context/AuthContext';
+
+function PrivateRoute({ children }: { children: React.ReactNode }) {
+  const { isAuthenticated, loading } = useAuth();
+  
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <img src="/loading.gif" alt="Loading" className="w-20 h-20 object-contain" />
+      </div>
+    );
+  }
+  
+  return isAuthenticated ? <Layout>{children}</Layout> : <Navigate to="/login" />;
+}
+
+function PrivateRouteNoLayout({ children }: { children: React.ReactNode }) {
+  const { isAuthenticated, loading } = useAuth();
+  
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <img src="/loading.gif" alt="Loading" className="w-20 h-20 object-contain" />
+      </div>
+    );
+  }
+  
+  return isAuthenticated ? <>{children}</> : <Navigate to="/login" />;
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <BrowserRouter
+        future={{
+          v7_startTransition: true,
+          v7_relativeSplatPath: true,
+        }}
+      >
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route
+            path="/dashboard"
+            element={
+              <PrivateRoute>
+                <Dashboard />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/projects"
+            element={
+              <PrivateRoute>
+                <Projects />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/reorder-projects"
+            element={
+              <PrivateRoute>
+                <ReorderProjects />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/create/:projectId"
+            element={
+              <PrivateRouteNoLayout>
+                <CreateProject />
+              </PrivateRouteNoLayout>
+            }
+          />
+          <Route
+            path="/edit/project/:projectId"
+            element={
+              <PrivateRouteNoLayout>
+                <EditProject />
+              </PrivateRouteNoLayout>
+            }
+          />
+          <Route
+            path="/blogs"
+            element={
+              <PrivateRoute>
+                <Blogs />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/blogs/create/:blogId"
+            element={
+              <PrivateRouteNoLayout>
+                <CreateBlog />
+              </PrivateRouteNoLayout>
+            }
+          />
+          <Route
+            path="/blogs/edit/:blogId"
+            element={
+              <PrivateRouteNoLayout>
+                <EditBlog />
+              </PrivateRouteNoLayout>
+            }
+          />
+          <Route
+            path="/documentation"
+            element={
+              <PrivateRoute>
+                <Documentation />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/documentation/create"
+            element={
+              <PrivateRouteNoLayout>
+                <CreateDocumentation />
+              </PrivateRouteNoLayout>
+            }
+          />
+          <Route
+            path="/documentation/edit/:docId"
+            element={
+              <PrivateRouteNoLayout>
+                <EditDocumentation />
+              </PrivateRouteNoLayout>
+            }
+          />
+          <Route
+            path="/notes"
+            element={
+              <PrivateRoute>
+                <Notes />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/code"
+            element={
+              <PrivateRoute>
+                <Code />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/code/:fileId"
+            element={
+              <PrivateRouteNoLayout>
+                <CodeEditor />
+              </PrivateRouteNoLayout>
+            }
+          />
+          <Route
+            path="/notes/todo/:todoId"
+            element={
+              <PrivateRouteNoLayout>
+                <TodoEditor />
+              </PrivateRouteNoLayout>
+            }
+          />
+          <Route
+            path="/views"
+            element={
+              <PrivateRoute>
+                <Views />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/ai-knowledge-base"
+            element={
+              <PrivateRoute>
+                <AIKnowledgeBase />
+              </PrivateRoute>
+            }
+          />
+          <Route path="/" element={<Navigate to="/dashboard" />} />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
+  );
+}
+
+export default App;
