@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import CONFIG from '../../config.shared.js';
+import CONFIG from '../config.shared.js';
 
 /**
  * Database Connection Singleton

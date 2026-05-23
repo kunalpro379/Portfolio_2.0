@@ -5,7 +5,7 @@ import { BlobServiceClient } from '@azure/storage-blob';
 import GuideNote from '../models/GuideNote.js';
 import Password from '../models/Password.js';
 import dbConnection from '../config/database.js';
-import CONFIG from '../../config.shared.js';
+import CONFIG from '../config.shared.js';
 
 const router = express.Router();
 

@@ -1,5 +1,5 @@
 import dotenv from 'dotenv';
-import CONFIG from '../config.shared.js';
+import CONFIG from './config.shared.js';
 import dbConnection from './config/database.js';
 import serverConfig from './config/server.js';
 

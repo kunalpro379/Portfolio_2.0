@@ -3,7 +3,7 @@ import { getSubtitles } from 'youtube-captions-scraper';
 import fetch from 'node-fetch';
 import { QdrantClient } from '@qdrant/js-client-rest';
 import GuideNote from '../models/GuideNote.js';
-import CONFIG from '../../config.shared.js';
+import CONFIG from '../config.shared.js';
 
 const router = express.Router();
 

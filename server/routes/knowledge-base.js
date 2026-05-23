@@ -2,7 +2,7 @@ import express from 'express';
 import multer from 'multer';
 import { BlobServiceClient } from '@azure/storage-blob';
 import { KnowledgeBase } from '../models/KnowledgeBase.js';
-import CONFIG from '../../config.shared.js';
+import CONFIG from '../config.shared.js';
 
 const router = express.Router();
 

@@ -1,9 +1,16 @@
 import { KnowledgeBase } from '../models/KnowledgeBase.js';
 import { BlobServiceClient } from '@azure/storage-blob';
-import { searchKnowledgeBase as vectorSearch } from '../../vectordb.js';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+
+let vectorSearch = null;
+try {
+  const vectorDbModule = await import('../vectordb.js');
+  vectorSearch = vectorDbModule.searchKnowledgeBase;
+} catch {
+  console.warn('vectordb.js not found, AI chat vector search disabled');
+}
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -362,6 +369,10 @@ class AIChatService {
   async searchVectorDatabase(query, limit = 5) {
     try {
       console.log(`Searching vector database for: "${query}"`);
+
+      if (typeof vectorSearch !== 'function') {
+        return [];
+      }
       
       // Use the vector database search function
       const results = await vectorSearch(query, limit);

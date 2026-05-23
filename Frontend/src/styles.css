@@ -116,10 +116,11 @@
     font-size: 16px;
     line-height: 1.55;
     background-image:
-      radial-gradient(circle at 12% 8%, oklch(0.72 0.13 75 / 0.06), transparent 45%),
-      radial-gradient(circle at 88% 92%, oklch(0.6 0.16 35 / 0.05), transparent 50%),
-      radial-gradient(oklch(0.18 0.005 60 / 0.045) 1px, transparent 1px);
-    background-size: auto, auto, 22px 22px;
+      linear-gradient(oklch(0.95 0.01 85 / 0.78), oklch(0.95 0.01 85 / 0.78)),
+      url('/page5.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
     background-attachment: fixed;
   }
   .font-display { font-family: var(--font-display); letter-spacing: -0.025em; font-optical-sizing: auto; }

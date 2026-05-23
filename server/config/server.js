@@ -1,6 +1,6 @@
 import express from 'express';
 import cors from 'cors';
-import CONFIG from '../../config.shared.js';
+import CONFIG from '../config.shared.js';
 
 /**
  * Server Configuration Singleton
