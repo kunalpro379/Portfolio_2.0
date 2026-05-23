@@ -29,7 +29,7 @@ const nav = [
   { label: "HOME", href: "#home" },
   { label: "EXPERIENCE", href: "#lab" },
   { label: "PROJECTS", href: "#work" },
-  { label: "LEARNINGS", href: "#writing" },
+  { label: "LEARNINGS", href: "/learnings" },
   { label: "RESUME", href: "https://notesportfolio.blob.core.windows.net/notes/Resume.kunal.pdf" },
 ];
 
