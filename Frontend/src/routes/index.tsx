@@ -58,7 +58,7 @@ function Header() {
                   href={n.href}
                   target={n.label === "RESUME" ? "_blank" : undefined}
                   rel={n.label === "RESUME" ? "noopener noreferrer" : undefined}
-                  className={`px-6 py-2 text-[12px] font-semibold tracking-wide transition-colors hover:bg-gray-800 ${i === 0 ? "bg-gray-900" : ""}`}
+                  className={`px-6 py-2 text-[12px] font-semibold tracking-wide transition-colors hover:bg-gray-800 ${i === 0 ? "outline outline-2 outline-white outline-offset-[-2px]" : ""}`}
                 >
                   {n.label}
                 </a>
@@ -188,14 +188,24 @@ function Header() {
 
 function Hero() {
   return (
-    <section id="home" className="relative overflow-hidden border-b border-border" style={{ backgroundImage: 'url(/background.png)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}>
+    <section id="home" className="relative overflow-hidden border-b border-border">
+      {/* Texture Background */}
+      <div className="absolute inset-0 z-0 pointer-events-none" style={{
+        backgroundImage: 'url(/page5.png)',
+        backgroundSize: '60px 60px',
+        backgroundPosition: '0 0',
+        backgroundRepeat: 'repeat',
+        opacity: 0.4,
+        filter: 'grayscale(100%) contrast(1.8) brightness(0.2)'
+      }} />
+
       {/* Decorative background overlay */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 bg-background/80">
+      <div aria-hidden className="pointer-events-none absolute inset-0 bg-cream/30 z-[1]">
         <div className="absolute -left-32 top-10 h-96 w-96 rounded-full bg-[oklch(0.72_0.13_75/0.12)] blur-3xl" />
         <div className="absolute -right-24 bottom-0 h-[28rem] w-[28rem] rounded-full bg-[oklch(0.6_0.16_35/0.10)] blur-3xl" />
       </div>
 
-      <div className="relative mx-auto grid max-w-[1400px] grid-cols-1 gap-8 px-6 py-12 lg:grid-cols-[1.4fr_1fr] lg:gap-12 lg:px-10 lg:py-16">
+      <div className="relative z-[2] mx-auto grid max-w-[1400px] grid-cols-1 gap-8 px-6 py-12 lg:grid-cols-[1.4fr_1fr] lg:gap-12 lg:px-10 lg:py-16">
         <div>
           <div className="flex items-center gap-2 label-mono">
             <span className="relative flex h-2 w-2">
@@ -265,7 +275,7 @@ function Hero() {
         </div>
 
         <div className="flex flex-col items-center justify-between gap-6">
-          <div className="relative w-full max-w-[280px]">
+          <div className="relative w-full max-w-[380px]">
             <div className="absolute -inset-4 rounded-full bg-[oklch(0.72_0.13_75/0.18)] blur-2xl" />
             <img src={kunalSketch} alt="Portrait of Kunal Patil" width={600} height={600} className="relative w-full" />
           </div>

@@ -109,20 +109,60 @@
   * { border-color: var(--color-border); }
   html { -webkit-font-smoothing: antialiased; }
   body {
-    background-color: var(--color-background);
-    color: var(--color-foreground);
+    background-color: var(--color-cream);
+    color: var(--color-ink);
     font-family: var(--font-sans);
     font-feature-settings: "ss01", "cv11";
     font-size: 16px;
     line-height: 1.55;
-    background-image:
-      linear-gradient(oklch(0.95 0.01 85 / 0.78), oklch(0.95 0.01 85 / 0.78)),
-      url('/page5.png');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
+    position: relative;
   }
+  
+  body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('/page5.png');
+    background-size: 60px 60px;
+    background-position: 0 0;
+    background-repeat: repeat;
+    opacity: 0.25;
+    filter: grayscale(100%) contrast(1.5) brightness(0.3);
+    z-index: -1;
+    pointer-events: none;
+  }
+
+  /* Shimmer Effect */
+  body::after {
+    content: "";
+    position: fixed;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+      45deg,
+      transparent 30%,
+      rgba(255, 255, 255, 0.03) 50%,
+      transparent 70%
+    );
+    animation: shimmer 8s infinite;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  @keyframes shimmer {
+    0% {
+      transform: translate(-50%, -50%) rotate(0deg);
+    }
+    100% {
+      transform: translate(-50%, -50%) rotate(360deg);
+    }
+  }
+
   .font-display { font-family: var(--font-display); letter-spacing: -0.025em; font-optical-sizing: auto; }
   .font-mono { font-family: var(--font-mono); }
   .font-serif { font-family: var(--font-serif); }
