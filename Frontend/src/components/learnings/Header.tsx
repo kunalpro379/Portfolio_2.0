@@ -20,7 +20,7 @@ export function Header({ activeTab, onTabChange, tabs }: HeaderProps) {
             </span>
             <span className="flex items-baseline gap-3">
               <span className="font-display text-[14px] font-semibold tracking-tight text-foreground">Kunal Patil</span>
-              <span className="label-mono hidden sm:inline text-[11px] text-foreground">AI/ML Engineer</span>
+              <span className="label-mono hidden sm:inline text-[11px] text-foreground border border-border px-2 py-0.5">AI/ML Engineer</span>
             </span>
           </a>
 

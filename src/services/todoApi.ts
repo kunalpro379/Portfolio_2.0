@@ -1,0 +1,297 @@
+import { API_BASE_URL, API_ENDPOINTS } from '@/config/api';
+
+export interface TodoPoint {
+  text: string;
+  status: 'pending' | 'working' | 'resolved';
+  priority?: 'low' | 'medium' | 'high' | 'urgent';
+  assignee?: string;
+  dueDate?: string;
+  completedAt?: string;
+  notes?: string;
+  customFields?: Record<string, string>;
+}
+
+export interface TodoLink {
+  title: string;
+  url: string;
+}
+
+export interface CustomColumn {
+  id: string;
+  name: string;
+  type: 'text' | 'textbox' | 'list' | 'select' | 'date' | 'number';
+  options?: string[];
+  visible: boolean;
+  width: number;
+}
+
+export interface Todo {
+  todoId: string;
+  topic: string;
+  content: string;
+  isPublic?: boolean;
+  points: TodoPoint[];
+  links: TodoLink[];
+  customColumns?: CustomColumn[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface TodoStats {
+  total: number;
+  resolved: number;
+  working: number;
+  pending: number;
+  percentage: number;
+}
+
+export interface PerformanceStats {
+  totalTodos: number;
+  totalPoints: number;
+  resolvedPoints: number;
+  workingPoints: number;
+  pendingPoints: number;
+  overallPercentage: number;
+  completedTodos: number;
+}
+
+export interface CreateTodoData {
+  topic: string;
+  content: string;
+  isPublic?: boolean;
+  points: TodoPoint[];
+  links?: TodoLink[];
+  customColumns?: CustomColumn[];
+}
+
+export interface UpdateTodoData {
+  topic?: string;
+  content?: string;
+  points?: TodoPoint[];
+  links?: TodoLink[];
+  customColumns?: CustomColumn[];
+}
+
+// Get authentication token from localStorage
+const getAuthToken = (): string | null => {
+  return localStorage.getItem('todoAuthToken');
+};
+
+// Set authentication token with expiry
+export const setAuthToken = (persistFor: 'day' | 'always') => {
+  const token = 'authenticated'; // Simple token for demo
+  const expiry = persistFor === 'day' 
+    ? Date.now() + 24 * 60 * 60 * 1000 // 24 hours
+    : Date.now() + 365 * 24 * 60 * 60 * 1000; // 1 year (effectively "always")
+  
+  localStorage.setItem('todoAuthToken', token);
+  localStorage.setItem('todoAuthExpiry', expiry.toString());
+};
+
+// Check if user is authenticated
+export const isAuthenticated = (): boolean => {
+  const token = getAuthToken();
+  const expiry = localStorage.getItem('todoAuthExpiry');
+  
+  if (!token || !expiry) return false;
+  
+  const expiryTime = parseInt(expiry, 10);
+  if (Date.now() > expiryTime) {
+    // Token expired, clear storage
+    clearAuthToken();
+    return false;
+  }
+  
+  return true;
+};
+
+// Clear authentication
+export const clearAuthToken = () => {
+  localStorage.removeItem('todoAuthToken');
+  localStorage.removeItem('todoAuthExpiry');
+};
+
+// Fetch all todos
+export const fetchTodos = async (): Promise<Todo[]> => {
+  try {
+    const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.todos}`);
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch todos');
+    }
+    
+    const data = await response.json();
+    return data.todos || [];
+  } catch (error) {
+    console.error('Error fetching todos:', error);
+    throw error;
+  }
+};
+
+// Fetch single todo by ID (with optional password for private todos)
+export const fetchTodoById = async (todoId: string, password?: string): Promise<Todo> => {
+  try {
+    const url = password 
+      ? `${API_BASE_URL}${API_ENDPOINTS.todos}/${todoId}?password=${encodeURIComponent(password)}`
+      : `${API_BASE_URL}${API_ENDPOINTS.todos}/${todoId}`;
+    
+    const response = await fetch(url);
+    
+    if (response.status === 401) {
+      const data = await response.json();
+      throw new Error(data.isPrivate ? 'PRIVATE_TODO' : 'Unauthorized');
+    }
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch todo');
+    }
+    
+    const data = await response.json();
+    return data.todo;
+  } catch (error) {
+    console.error('Error fetching todo:', error);
+    throw error;
+  }
+};
+
+// Fetch performance stats
+export const fetchPerformanceStats = async (): Promise<PerformanceStats> => {
+  try {
+    const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.todos}/stats/performance`);
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch performance stats');
+    }
+    
+    const data = await response.json();
+    return data; // Return the data directly since the server returns the stats object directly
+  } catch (error) {
+    console.error('Error fetching performance stats:', error);
+    throw error;
+  }
+};
+
+// Create a new todo
+export const createTodo = async (todoData: CreateTodoData): Promise<Todo> => {
+  try {
+    const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.todos}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(todoData),
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to create todo');
+    }
+    
+    const data = await response.json();
+    return data.todo;
+  } catch (error) {
+    console.error('Error creating todo:', error);
+    throw error;
+  }
+};
+
+// Update a todo
+export const updateTodo = async (todoId: string, updateData: UpdateTodoData): Promise<Todo> => {
+  try {
+    const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.todos}/${todoId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(updateData),
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to update todo');
+    }
+    
+    const data = await response.json();
+    return data.todo;
+  } catch (error) {
+    console.error('Error updating todo:', error);
+    throw error;
+  }
+};
+
+// Toggle a point's status (cycles through pending -> working -> done -> pending)
+export const toggleTodoPoint = async (
+  todoId: string,
+  pointIndex: number
+): Promise<Todo> => {
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}${API_ENDPOINTS.todos}/${todoId}/points/${pointIndex}/toggle`,
+      {
+        method: 'PUT',
+      }
+    );
+    
+    if (!response.ok) {
+      throw new Error('Failed to toggle point');
+    }
+    
+    const data = await response.json();
+    return data.todo;
+  } catch (error) {
+    console.error('Error toggling point:', error);
+    throw error;
+  }
+};
+
+// Update a specific point's status
+export const updatePointStatus = async (
+  todoId: string,
+  pointIndex: number,
+  status: 'pending' | 'working' | 'resolved'
+): Promise<Todo> => {
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}${API_ENDPOINTS.todos}/${todoId}/points/${pointIndex}/status`,
+      {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status }),
+      }
+    );
+    
+    if (!response.ok) {
+      throw new Error('Failed to update point status');
+    }
+    
+    const data = await response.json();
+    return data.todo;
+  } catch (error) {
+    console.error('Error updating point status:', error);
+    throw error;
+  }
+};
+
+// Delete a todo (with password confirmation)
+export const deleteTodo = async (todoId: string, password: string): Promise<void> => {
+  try {
+    const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.todos}/${todoId}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ password }),
+    });
+    
+    if (response.status === 401) {
+      throw new Error('Incorrect password');
+    }
+    
+    if (!response.ok) {
+      throw new Error('Failed to delete todo');
+    }
+  } catch (error) {
+    console.error('Error deleting todo:', error);
+    throw error;
+  }
+};

@@ -1,0 +1,789 @@
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { FolderOpen, Plus, ListTodo, Lock, Unlock, BookOpen, Trash2, Code2, X } from 'lucide-react';
+import LoadingSpinner from './LoadingSpinner';
+import TodoCard from './TodoCard';
+import TodoForm from './TodoForm';
+import TodoPasswordModal from './TodoPasswordModal';
+import {
+  fetchGuides,
+  deleteGuide,
+  createGuide,
+  type Guide
+} from '@/services/guideNotesApi';
+import {
+  fetchDSAProjects,
+  createDSAProject,
+  deleteDSAProject,
+  type DSAProject
+} from '@/services/dsaApi';
+import {
+  fetchTodos,
+  fetchTodoById,
+  createTodo,
+  updateTodo,
+  deleteTodo,
+  toggleTodoPoint,
+  fetchPerformanceStats,
+  isAuthenticated,
+  setAuthToken,
+  clearAuthToken,
+  type Todo,
+  type TodoPoint,
+  type TodoLink,
+  type CreateTodoData,
+  type PerformanceStats
+} from '@/services/todoApi';
+
+interface Note {
+  folderId: string;
+  name: string;
+  path: string;
+  parentPath: string;
+  createdAt: string;
+}
+
+interface NotesTabContentProps {
+  notes: Note[];
+  activeSubTab?: 'guide' | 'notes' | 'todo' | 'dsa';
+}
+
+export default function NotesTabContent({ notes, activeSubTab: propActiveSubTab }: NotesTabContentProps) {
+  const navigate = useNavigate();
+  const [activeSubTab, setActiveSubTab] = useState<'guide' | 'notes' | 'todo' | 'dsa'>(propActiveSubTab || 'guide');
+
+  // Update activeSubTab when prop changes
+  useEffect(() => {
+    if (propActiveSubTab) {
+      setActiveSubTab(propActiveSubTab);
+    }
+  }, [propActiveSubTab]);
+  
+  // Guide Notes State
+  const [guides, setGuides] = useState<Guide[]>([]);
+  const [guidesLoading, setGuidesLoading] = useState(false);
+  const [showCreateGuideModal, setShowCreateGuideModal] = useState(false);
+  const [guideFormData, setGuideFormData] = useState({ name: '', topic: '', description: '' });
+  const [creatingGuide, setCreatingGuide] = useState(false);
+
+  // DSA State
+  const [dsaProjects, setDsaProjects] = useState<any[]>([]);
+  const [dsaLoading, setDsaLoading] = useState(false);
+  const [showCreateDSAModal, setShowCreateDSAModal] = useState(false);
+  const [dsaFormData, setDsaFormData] = useState({ name: '', description: '' });
+  const [creatingDSA, setCreatingDSA] = useState(false);
+
+  // Todo State
+  const [todos, setTodos] = useState<Todo[]>([]);
+  const [todosLoading, setTodosLoading] = useState(false);
+  const [performanceStats, setPerformanceStats] = useState<PerformanceStats | null>(null);
+  const [showTodoPasswordModal, setShowTodoPasswordModal] = useState(false);
+  const [showTodoForm, setShowTodoForm] = useState(false);
+  const [todoFormMode, setTodoFormMode] = useState<'create' | 'edit'>('create');
+  const [editingTodo, setEditingTodo] = useState<Todo | null>(null);
+  const [todoPasswordMode, setTodoPasswordMode] = useState<'view' | 'create' | 'edit'>('view');
+  const [todosAuthenticated, setTodosAuthenticated] = useState(isAuthenticated());
+
+  // Load guides
+  useEffect(() => {
+    if (activeSubTab === 'guide') {
+      loadGuides();
+    } else if (activeSubTab === 'dsa') {
+      loadDSAProjects();
+    }
+  }, [activeSubTab]);
+
+  // Load todos - always load, no authentication required for public tasks
+  useEffect(() => {
+    if (activeSubTab === 'todo') {
+      loadTodos();
+    }
+  }, [activeSubTab]);
+
+  const loadGuides = async () => {
+    try {
+      setGuidesLoading(true);
+      const fetchedGuides = await fetchGuides();
+      setGuides(fetchedGuides);
+    } catch (err) {
+      console.error('Error loading guides:', err);
+    } finally {
+      setGuidesLoading(false);
+    }
+  };
+
+  const loadTodos = async () => {
+    try {
+      setTodosLoading(true);
+      const [fetchedTodos, stats] = await Promise.all([
+        fetchTodos(),
+        fetchPerformanceStats()
+      ]);
+      setTodos(fetchedTodos);
+      setPerformanceStats(stats);
+    } catch (err) {
+      console.error('Error loading todos:', err);
+    } finally {
+      setTodosLoading(false);
+    }
+  };
+
+  const handleCreateGuide = () => {
+    setShowCreateGuideModal(true);
+  };
+
+  const handleGuideFormSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!guideFormData.name.trim() || !guideFormData.topic.trim()) {
+      alert('Please fill in all required fields');
+      return;
+    }
+
+    try {
+      setCreatingGuide(true);
+      const newGuide = await createGuide({
+        name: guideFormData.name,
+        topic: guideFormData.topic,
+        description: guideFormData.description
+      });
+      
+      setShowCreateGuideModal(false);
+      setGuideFormData({ name: '', topic: '', description: '' });
+      await loadGuides();
+      
+      // Navigate to the newly created guide
+      navigate(`/learnings/guide/${newGuide.guideId}`);
+    } catch (err) {
+      console.error('Error creating guide:', err);
+      alert('Failed to create guide. Please try again.');
+    } finally {
+      setCreatingGuide(false);
+    }
+  };
+
+  const handleViewGuide = (guide: Guide) => {
+    navigate(`/learnings/guide/${guide.guideId}`);
+  };
+
+  const handleDeleteGuide = async (guideId: string) => {
+    if (!window.confirm('Are you sure you want to delete this guide and all its contents?')) return;
+    
+    try {
+      await deleteGuide(guideId);
+      await loadGuides();
+    } catch (err) {
+      console.error('Error deleting guide:', err);
+      alert('Failed to delete guide');
+    }
+  };
+
+  // DSA Functions
+  const loadDSAProjects = async () => {
+    try {
+      setDsaLoading(true);
+      const projects = await fetchDSAProjects();
+      setDsaProjects(projects);
+    } catch (err) {
+      console.error('Error loading DSA projects:', err);
+    } finally {
+      setDsaLoading(false);
+    }
+  };
+
+  const handleCreateDSA = () => {
+    setShowCreateDSAModal(true);
+  };
+
+  const handleDSAFormSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!dsaFormData.name.trim()) {
+      alert('Please enter a project name');
+      return;
+    }
+
+    try {
+      setCreatingDSA(true);
+      const newProject = await createDSAProject({
+        name: dsaFormData.name,
+        description: dsaFormData.description
+      });
+      
+      setShowCreateDSAModal(false);
+      setDsaFormData({ name: '', description: '' });
+      await loadDSAProjects();
+      
+      // Navigate to the newly created DSA project
+      navigate(`/learnings/dsa/${newProject.dsaId}`);
+    } catch (err) {
+      console.error('Error creating DSA project:', err);
+      alert('Failed to create DSA project. Please try again.');
+    } finally {
+      setCreatingDSA(false);
+    }
+  };
+
+  const handleDeleteDSA = async (dsaId: string) => {
+    if (!window.confirm('Are you sure you want to delete this DSA project and all its files?')) return;
+    
+    try {
+      await deleteDSAProject(dsaId);
+      await loadDSAProjects();
+    } catch (err) {
+      console.error('Error deleting DSA project:', err);
+      alert('Failed to delete DSA project');
+    }
+  };
+
+  // Todo handlers
+  const handleTodoPasswordSuccess = (persistFor: 'day' | 'always') => {
+    setAuthToken(persistFor);
+    setTodosAuthenticated(true);
+    
+    if (todoPasswordMode === 'create') {
+      setShowTodoForm(true);
+      setTodoFormMode('create');
+    } else if (todoPasswordMode === 'edit' && editingTodo) {
+      setShowTodoForm(true);
+      setTodoFormMode('edit');
+    }
+  };
+
+  const handleCreateTodo = () => {
+    if (!todosAuthenticated) {
+      setTodoPasswordMode('create');
+      setShowTodoPasswordModal(true);
+    } else {
+      setTodoFormMode('create');
+      setEditingTodo(null);
+      setShowTodoForm(true);
+    }
+  };
+
+  const handleEditTodo = async (todo: Todo) => {
+    if (!todosAuthenticated) {
+      setTodoPasswordMode('edit');
+      setEditingTodo(todo);
+      setShowTodoPasswordModal(true);
+    } else {
+      try {
+        if (!todo.points || !todo.content) {
+          const fullTodo = await fetchTodoById(todo.todoId);
+          setEditingTodo(fullTodo);
+        } else {
+          setEditingTodo(todo);
+        }
+        setTodoFormMode('edit');
+        setShowTodoForm(true);
+      } catch (err) {
+        console.error('Error fetching todo details:', err);
+        alert('Failed to load todo details. Please try again.');
+      }
+    }
+  };
+
+  const handleTodoSubmit = async (data: { 
+    topic: string; 
+    content: string; 
+    points: TodoPoint[]; 
+    links: TodoLink[]; 
+    isPublic: boolean; 
+    persistFor: 'day' | 'always'; 
+  }) => {
+    try {
+      if (todoFormMode === 'create') {
+        await createTodo({
+          topic: data.topic,
+          content: data.content,
+          points: data.points,
+          links: data.links,
+          isPublic: data.isPublic
+        });
+      } else if (editingTodo) {
+        await updateTodo(editingTodo.todoId, {
+          topic: data.topic,
+          content: data.content,
+          points: data.points,
+          links: data.links
+        });
+      }
+      
+      setShowTodoForm(false);
+      setEditingTodo(null);
+      await loadTodos();
+    } catch (err) {
+      console.error('Error saving task:', err);
+      alert('Failed to save task');
+    }
+  };
+
+  const handleDeleteTodo = async (todoId: string) => {
+    // Navigate to the task detail page where delete with password is handled
+    navigate(`/todo/${todoId}`);
+  };
+
+  const handleToggleTodoPoint = async (todoId: string, pointIndex: number) => {
+    try {
+      await toggleTodoPoint(todoId, pointIndex);
+      await loadTodos();
+    } catch (err) {
+      console.error('Error toggling point:', err);
+      alert('Failed to toggle point');
+    }
+  };
+
+  const handleTodoFormClose = () => {
+    setShowTodoForm(false);
+    setEditingTodo(null);
+    setTodoFormMode('create');
+  };
+
+  const handleLogoutTodos = () => {
+    clearAuthToken();
+    setTodosAuthenticated(false);
+    setTodos([]);
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Guide Tab Content */}
+      {activeSubTab === 'guide' && (
+        <div>
+            <div className="flex items-center justify-between mb-6">
+            <div>
+              <h3 className="text-2xl font-black text-black">Guides</h3>
+              <p className="text-sm text-gray-600 font-medium">Organize your documentation with guides and titles</p>
+            </div>
+            <button
+              onClick={handleCreateGuide}
+                className="flex items-center gap-2 px-4 py-3 bg-black text-white border border-black rounded-none font-semibold hover:bg-gray-800 transition-all shadow-[0_8px_18px_rgba(15,23,42,0.12)]"
+            >
+              <Plus size={20} strokeWidth={2.5} />
+              <span className="hidden sm:inline">New Guide</span>
+            </button>
+          </div>
+
+          {guidesLoading ? (
+            <div className="flex items-center justify-center py-16">
+              <LoadingSpinner size="md" />
+            </div>
+          ) : guides.length === 0 ? (
+            <div className="text-center py-16">
+              <div className="bg-gradient-to-br from-yellow-50 to-amber-50 border border-gray-200 rounded-none p-10 inline-block shadow-[0_12px_28px_rgba(15,23,42,0.06)]">
+                <BookOpen size={48} strokeWidth={2.5} className="mx-auto mb-3 text-yellow-600" />
+                <p className="text-black text-lg font-black mb-2">No guides yet</p>
+                <p className="text-gray-700 text-sm font-medium mb-4">Create your first guide to get started</p>
+                <button
+                  onClick={handleCreateGuide}
+                  className="px-6 py-3 bg-black text-white border border-black rounded-none font-semibold hover:bg-gray-800 transition-all shadow-[0_8px_18px_rgba(15,23,42,0.12)] inline-flex items-center gap-2"
+                >
+                  <Plus size={20} strokeWidth={2.5} />
+                  Create Guide
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4">
+              {guides.map((guide, idx) => {
+                const titleCount = guide.titles.length;
+                
+                return (
+                  <div
+                    key={guide.guideId}
+                    onClick={() => handleViewGuide(guide)}
+                    className="relative aspect-[4/5] cursor-pointer group rounded-none md:rounded-2xl border border-gray-200 bg-white overflow-hidden hover:shadow-[0_12px_28px_rgba(15,23,42,0.08)] transition-all hover:-translate-y-1"
+                    style={{ borderRadius: idx % 2 === 0 ? 0 : 0 }}
+                  >
+                    {/* Delete Button */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteGuide(guide.guideId);
+                      }}
+                      className="absolute top-2 right-2 z-10 p-1.5 bg-red-500 text-white border border-black rounded-none hover:bg-red-600 transition-all opacity-0 group-hover:opacity-100"
+                    >
+                      <Trash2 size={12} strokeWidth={2.5} />
+                    </button>
+
+                    {/* Header with Icon - 40% height - Lavender */}
+                    <div className="relative w-full h-[40%] bg-gradient-to-br from-purple-300 to-purple-400 border-b border-gray-200 flex items-center justify-center">
+                      <BookOpen size={48} strokeWidth={2} className="text-white/90" />
+                    </div>
+                    
+                    {/* Content - 60% height */}
+                    <div className="p-3 h-[60%] flex flex-col">
+                      {/* Topic Badge */}
+                      <div className="mb-1.5">
+                        <span className="px-2 py-0.5 bg-gray-100 border border-gray-200 rounded-none text-[9px] font-black uppercase tracking-wider inline-block">
+                          {guide.topic}
+                        </span>
+                      </div>
+
+                      {/* Title */}
+                      <h3 className="text-xs md:text-sm font-black text-black mb-1.5 line-clamp-2 leading-tight">
+                        {guide.name}
+                      </h3>
+                      
+                      {/* Description */}
+                      {guide.description && (
+                        <p className="text-gray-700 text-[10px] md:text-xs font-medium leading-relaxed line-clamp-2 mb-2 flex-1">
+                          {guide.description}
+                        </p>
+                      )}
+                      
+                      {/* Footer - Date and Title Count */}
+                      <div className="mt-auto space-y-1.5">
+                        <div className="flex items-center justify-between text-[9px] text-gray-600 font-bold">
+                          <span>{new Date(guide.updatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                          <span className="px-2 py-0.5 bg-gray-100 border border-gray-200 rounded-none text-[9px] font-black">
+                            {titleCount} {titleCount === 1 ? 'title' : 'titles'}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Notes Tab Content (Premium File Explorer) */}
+      {activeSubTab === 'notes' && (
+        <div>
+          <div className="mb-6">
+            <h3 className="text-2xl font-black text-black">My Files</h3>
+            <p className="text-sm text-gray-600 font-medium">Browse your file folders</p>
+          </div>
+
+          {notes.length === 0 ? (
+            <div className="text-center py-20">
+              <div className="bg-gradient-to-br from-amber-50 to-stone-50 border border-gray-200 rounded-none p-12 inline-block shadow-[0_12px_28px_rgba(15,23,42,0.06)]">
+                <div className="w-16 h-16 bg-gradient-to-br from-amber-400 to-yellow-500 border border-gray-200 rounded-none flex items-center justify-center mx-auto mb-4">
+                  <FolderOpen size={32} strokeWidth={2.5} className="text-white" />
+                </div>
+                <p className="text-black text-lg font-black mb-2">No file folders yet</p>
+                <p className="text-gray-700 text-sm font-medium">Create your first folder to get started</p>
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4">
+              {notes.map((note, idx) => {
+                const cardAccentClasses = [
+                  'from-sky-500 to-cyan-600',
+                  'from-emerald-500 to-teal-600',
+                  'from-amber-500 to-orange-500',
+                  'from-violet-500 to-fuchsia-600',
+                  'from-rose-500 to-pink-500',
+                  'from-slate-600 to-slate-800'
+                ];
+                const cardBadgeClasses = [
+                  'bg-sky-50 text-sky-700',
+                  'bg-emerald-50 text-emerald-700',
+                  'bg-amber-50 text-amber-700',
+                  'bg-violet-50 text-violet-700',
+                  'bg-rose-50 text-rose-700',
+                  'bg-slate-100 text-slate-700'
+                ];
+                const accentIndex = idx % cardAccentClasses.length;
+                return (
+                  <div
+                    key={note.folderId}
+                    onClick={() => {
+                      if (note.folderId) {
+                        navigate(`/learnings/notes/${note.folderId}`);
+                      }
+                    }}
+                    className="relative aspect-[4/3] cursor-pointer group rounded-none md:rounded-2xl border border-gray-200 bg-white overflow-hidden hover:shadow-[0_12px_28px_rgba(15,23,42,0.08)] transition-all hover:-translate-y-1"
+                    style={{ borderRadius: 0 }}
+                  >
+                    {/* Header with Icon - 50% height */}
+                    <div className={`relative w-full h-[50%] bg-gradient-to-br ${cardAccentClasses[accentIndex]} border-b border-gray-200 flex items-center justify-center`}>
+                      <div className="absolute inset-x-0 bottom-0 h-10 bg-white/10" />
+                      <FolderOpen size={38} strokeWidth={2} className="relative text-white/95" />
+                    </div>
+                    
+                    {/* Content - 50% height */}
+                    <div className="p-3 h-[50%] flex flex-col justify-between bg-white">
+                      {/* Title */}
+                      <h3 className="text-xs md:text-sm font-semibold text-slate-900 line-clamp-2 leading-tight">
+                        {note.name}
+                      </h3>
+                      
+                      {/* Footer - Date */}
+                      <div>
+                        <div className="flex items-center gap-1 text-[9px] text-gray-600 font-semibold">
+                          <svg className="w-3 h-3 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                          </svg>
+                          <span>
+                            {new Date(note.createdAt).toLocaleDateString('en-US', {
+                              month: 'short',
+                              day: 'numeric',
+                              year: 'numeric'
+                            })}
+                          </span>
+                        </div>
+                        <div className="mt-2 flex items-center justify-between gap-2">
+                          <span className={`inline-flex items-center px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wider ${cardBadgeClasses[accentIndex]}`}>
+                            Files
+                          </span>
+                          <span className="text-[9px] font-semibold text-slate-400">Folder</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Todo Tab Content */}
+      {activeSubTab === 'todo' && (
+        <div>
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <div className="p-3 bg-black border-3 border-black rounded-xl">
+                <ListTodo size={28} strokeWidth={2.5} className="text-white" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-black text-black">My Tasks</h2>
+                <p className="text-sm font-medium text-gray-600">
+                  Manage your tasks
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              {todosAuthenticated ? (
+                <>
+                  <button
+                    onClick={handleCreateTodo}
+                    className="flex items-center gap-2 px-4 py-3 bg-black text-white border-3 border-black rounded-xl font-bold hover:bg-gray-800 transition-all shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+                  >
+                    <Plus size={20} strokeWidth={2.5} />
+                    <span className="hidden sm:inline">New Task</span>
+                  </button>
+                  <button
+                    onClick={handleLogoutTodos}
+                    className="flex items-center gap-2 px-4 py-3 bg-red-500 text-white border-3 border-black rounded-xl font-bold hover:bg-red-600 transition-all shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]"
+                    title="Logout from todos"
+                  >
+                    <Lock size={20} strokeWidth={2.5} />
+                  </button>
+                </>
+              ) : (
+                <button
+                  onClick={handleCreateTodo}
+                  className="flex items-center gap-2 px-4 py-3 bg-black text-white border-3 border-black rounded-xl font-bold hover:bg-gray-800 transition-all shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+                >
+                  <Plus size={20} strokeWidth={2.5} />
+                  <span className="hidden sm:inline">New Task</span>
+                </button>
+              )}
+            </div>
+          </div>
+
+          {todosLoading ? (
+            <div className="flex items-center justify-center py-16">
+              <LoadingSpinner size="md" />
+            </div>
+          ) : todos.length === 0 ? (
+            <div className="text-center py-16">
+              <div className="bg-gradient-to-br from-[#FFF8E7] to-[#F5E6D3] border-3 border-black rounded-2xl p-10 inline-block shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
+                <ListTodo size={48} strokeWidth={2.5} className="mx-auto mb-3 text-black" />
+                <p className="text-black text-lg font-black mb-2">No Public Tasks</p>
+                <p className="text-gray-700 text-sm font-medium mb-4">
+                  {todosAuthenticated ? 'Create your first task to get started' : 'No public tasks available'}
+                </p>
+                {todosAuthenticated && (
+                  <button
+                    onClick={handleCreateTodo}
+                    className="px-6 py-3 bg-black text-white border-3 border-black rounded-xl font-bold hover:bg-gray-800 transition-all shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] inline-flex items-center gap-2"
+                  >
+                    <Plus size={20} strokeWidth={2.5} />
+                    Create Task
+                  </button>
+                )}
+                {!todosAuthenticated && (
+                  <button
+                    onClick={() => {
+                      setTodoPasswordMode('view');
+                      setShowTodoPasswordModal(true);
+                    }}
+                    className="inline-flex items-center gap-2 px-6 py-3 text-black underline font-bold hover:text-gray-700 transition-all"
+                  >
+                    <Lock size={16} strokeWidth={2.5} />
+                    View Private Tasks
+                  </button>
+                )}
+              </div>
+            </div>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                {todos.map((todo) => (
+                  <TodoCard
+                    key={todo.todoId}
+                    todo={todo}
+                    onEdit={handleEditTodo}
+                    onDelete={handleDeleteTodo}
+                    onTogglePoint={handleToggleTodoPoint}
+                  />
+                ))}
+              </div>
+              
+              {/* View Private Tasks Link */}
+              {!todosAuthenticated && (
+                <div className="mt-6 text-center">
+                  <button
+                    onClick={() => {
+                      setTodoPasswordMode('view');
+                      setShowTodoPasswordModal(true);
+                    }}
+                    className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-br from-[#FFF8E7] to-[#F5E6D3] border-3 border-black rounded-xl font-bold hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+                  >
+                    <Lock size={20} strokeWidth={2.5} />
+                    View Private Tasks
+                  </button>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      )}
+
+      {/* Modals */}
+      <TodoPasswordModal
+        isOpen={showTodoPasswordModal}
+        onClose={() => setShowTodoPasswordModal(false)}
+        onSuccess={handleTodoPasswordSuccess}
+        mode={todoPasswordMode}
+      />
+
+      <TodoForm
+        isOpen={showTodoForm}
+        onClose={handleTodoFormClose}
+        onSubmit={handleTodoSubmit}
+        initialData={editingTodo ? {
+          todoId: editingTodo.todoId,
+          topic: editingTodo.topic,
+          content: editingTodo.content,
+          points: editingTodo.points,
+          links: editingTodo.links,
+          isPublic: editingTodo.isPublic
+        } : undefined}
+        mode={todoFormMode}
+      />
+
+      {/* Create Guide Drawer */}
+      {showCreateGuideModal && (
+        <div className="fixed inset-0 z-[500]">
+          <button
+            type="button"
+            aria-label="Close create guide drawer"
+            className="absolute inset-0 bg-slate-950/45 backdrop-blur-sm"
+            onClick={() => setShowCreateGuideModal(false)}
+          />
+          <div className="absolute right-0 top-0 h-full w-full max-w-[620px] bg-white shadow-[-24px_0_60px_rgba(15,23,42,0.16)] border-l border-slate-200 flex flex-col">
+            <div className="flex items-start justify-between gap-4 border-b border-slate-200 px-6 py-5">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500 mb-1">Guides</p>
+                <h2 className="text-2xl font-semibold tracking-tight text-slate-900">Create New Guide</h2>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowCreateGuideModal(false)}
+                className="h-10 w-10 flex items-center justify-center rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors"
+              >
+                <X size={18} strokeWidth={2.5} />
+              </button>
+            </div>
+
+            <form onSubmit={handleGuideFormSubmit} className="flex-1 min-h-0 flex flex-col">
+              <div className="flex-1 overflow-y-auto px-6 py-6 space-y-5">
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 mb-2">
+                    Guide Name <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={guideFormData.name}
+                    onChange={(e) => setGuideFormData({ ...guideFormData, name: e.target.value })}
+                    className="w-full px-4 py-3 border border-slate-200 bg-slate-50 text-slate-900 rounded-xl font-medium focus:outline-none focus:border-slate-400 focus:bg-white transition-colors"
+                    placeholder="e.g., React Best Practices"
+                    required
+                    autoFocus
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 mb-2">
+                    Topic <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={guideFormData.topic}
+                    onChange={(e) => setGuideFormData({ ...guideFormData, topic: e.target.value })}
+                    className="w-full px-4 py-3 border border-slate-200 bg-slate-50 text-slate-900 rounded-xl font-medium focus:outline-none focus:border-slate-400 focus:bg-white transition-colors"
+                    placeholder="e.g., Web Development"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 mb-2">
+                    Description
+                  </label>
+                  <textarea
+                    value={guideFormData.description}
+                    onChange={(e) => setGuideFormData({ ...guideFormData, description: e.target.value })}
+                    className="w-full px-4 py-3 border border-slate-200 bg-slate-50 text-slate-900 rounded-xl font-medium focus:outline-none focus:border-slate-400 focus:bg-white transition-colors resize-none min-h-[140px]"
+                    placeholder="Brief description of your guide..."
+                    rows={5}
+                  />
+                </div>
+              </div>
+
+              <div className="border-t border-slate-200 bg-white px-6 py-4">
+                <div className="flex gap-3">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowCreateGuideModal(false);
+                      setGuideFormData({ name: '', topic: '', description: '' });
+                    }}
+                    disabled={creatingGuide}
+                    className="flex-1 px-5 py-3 bg-white border border-slate-200 rounded-xl font-semibold text-slate-700 hover:bg-slate-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={creatingGuide}
+                    className="flex-1 px-5 py-3 bg-slate-900 border border-slate-900 rounded-xl font-semibold text-white hover:bg-slate-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  >
+                    {creatingGuide ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        <span>Creating...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Plus size={18} strokeWidth={2} />
+                        <span>Create Guide</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

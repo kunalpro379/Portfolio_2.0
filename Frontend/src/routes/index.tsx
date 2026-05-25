@@ -246,30 +246,32 @@ function Hero() {
           </p>
 
           <div className="mt-6 flex flex-wrap items-center gap-4">
-            <a href="#work" className="rounded-md bg-foreground px-6 py-3 text-[14px] font-medium text-background transition-colors hover:bg-foreground/90">
-              See My Work
+            <a href="#work" className="rounded-md bg-foreground px-8 py-4 text-[16px] font-semibold text-background transition-colors hover:bg-foreground/90">
+              Explore My Projects & Work
             </a>
-            <a href="#writing" className="rounded-md border-2 border-foreground px-6 py-3 text-[14px] font-medium text-foreground transition-colors hover:bg-foreground hover:text-background">
-              Learn With Me
+            <a href="#writing" className="rounded-md border-2 border-foreground px-8 py-4 text-[16px] font-semibold text-foreground transition-colors hover:bg-foreground hover:text-background">
+              Read My Learnings & Blogs
             </a>
-            <a href="#contact" className="rounded-md border-2 border-foreground px-6 py-3 text-[14px] font-medium text-foreground transition-colors hover:bg-foreground hover:text-background">
-              Contact Me
+            <a href="#contact" className="rounded-md border-2 border-foreground px-8 py-4 text-[16px] font-semibold text-foreground transition-colors hover:bg-foreground hover:text-background">
+              Get In Touch With Me
             </a>
           </div>
 
           <div className="mt-4 flex flex-wrap items-center gap-3">
-            <span className="badge-gold">
-              <span className="h-1.5 w-1.5 rounded-full bg-foreground/70" /> 
-              <span className="text-accent">AI/ML </span>
-              <span className="text-foreground">Engineer</span>
+            <span className="inline-flex items-center border border-border px-3 py-1.5 text-[12px] font-medium text-foreground">
+              <span className="text-foreground">AI/ML Engineer</span>
             </span>
-            <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 text-[12px] font-medium text-foreground/80">
-              <span className="h-1.5 w-1.5 rounded-full bg-[var(--sage)]" /> 
-              <span className="text-foreground">Open to </span>
-              <span className="text-accent font-semibold">opportunities</span>
+            <span className="inline-flex items-center border border-border px-3 py-1.5 text-[12px] font-medium text-foreground">
+              <span className="text-foreground">Open to opportunities</span>
             </span>
-            <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 text-[12px] font-medium text-foreground/80">
-              <span className="text-accent font-semibold">Agentic AI</span>
+            <span className="inline-flex items-center border border-border px-3 py-1.5 text-[12px] font-medium text-foreground">
+              <span className="text-foreground">Agentic AI</span>
+            </span>
+            <span className="inline-flex items-center border border-border px-3 py-1.5 text-[12px] font-medium text-foreground">
+              <span className="text-foreground">Cloud & DevOps</span>
+            </span>
+            <span className="inline-flex items-center border border-border px-3 py-1.5 text-[12px] font-medium text-foreground">
+              <span className="text-foreground">LLM</span>
             </span>
           </div>
         </div>
@@ -490,7 +492,7 @@ function Work() {
         <div className="mt-6 flex flex-wrap items-end justify-between gap-8">
           <h2 className="font-display max-w-3xl text-[clamp(2.25rem,4.5vw,3.75rem)] font-bold leading-[1.05]">
             4 years of building.{" "}
-            <span className="text-muted-foreground">From ideas to production.</span>
+            <span className="text-muted-foreground">""</span>
           </h2>
           <a href="#" className="link-underline text-sm">View all projects ↗</a>
         </div>
@@ -502,50 +504,46 @@ function Work() {
         ) : !projects || projects.length === 0 ? (
           <div className="mt-16 text-center text-muted-foreground">No projects found.</div>
         ) : (
-          <div className="mt-16 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-16 grid grid-cols-1 gap-0 md:grid-cols-2 lg:grid-cols-5">
             {projects.map((project, idx) => (
-              <article key={project._id} className="group relative transition-all">
+              <article key={project._id} className="group relative border border-black/15 bg-transparent transition-all duration-200 hover:border-black hover:shadow-[0_0_0_1px_rgba(0,0,0,0.12)]">
                 <a 
                   href={project.links?.live || project.links?.github || '#'} 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="block"
+                  className="block h-full cursor-pointer"
                 >
-                  <div className="overflow-hidden">
+                  <div className="overflow-hidden border-b border-black/10">
                     {project.cardasset && project.cardasset.length > 0 ? (
                       <img 
                         src={project.cardasset[0]} 
                         alt={project.title} 
                         loading="lazy" 
-                        className="aspect-[16/10] w-full object-cover transition-transform duration-700 group-hover:scale-[1.02]" 
+                        className="aspect-[16/10] w-full object-cover grayscale transition-transform duration-700 group-hover:scale-[1.01] group-hover:grayscale-0" 
                       />
                     ) : (
-                      <div className="aspect-[16/10] w-full bg-gradient-to-br from-accent/20 to-accent/5" />
+                      <div className="aspect-[16/10] w-full bg-white" />
                     )}
                   </div>
-                  <div className="py-4">
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="label-mono text-[11px] text-muted-foreground">{String(idx + 1).padStart(2, '0')} · {project.projectId?.toUpperCase() || 'PROJECT'}</div>
-                      <div className="label-mono text-[11px] text-muted-foreground">{new Date(project.created_at).getFullYear()}</div>
+                  <div className="flex h-full flex-col p-4">
+                    <div className="mb-3 flex items-start justify-between gap-3">
+                      <div className="label-mono text-[10px] uppercase tracking-[0.22em] text-black/55">{String(idx + 1).padStart(2, '0')} · {project.projectId?.toUpperCase() || 'PROJECT'}</div>
+                      <div className="label-mono text-[10px] uppercase tracking-[0.18em] text-black/45">{new Date(project.created_at).getFullYear()}</div>
                     </div>
-                    <h3 className="font-display text-[1.5rem] font-semibold leading-tight mb-3 group-hover:text-accent transition-colors">{project.title}</h3>
-                    <p className="text-[13px] leading-[1.6] text-foreground/60 mb-4 line-clamp-3">{project.description}</p>
-                    <div className="flex flex-wrap gap-2 mb-4">
+                    <h3 className="cursor-pointer font-display text-[1.15rem] font-semibold leading-tight text-black transition-colors group-hover:underline group-hover:decoration-black group-hover:underline-offset-4">{project.title}</h3>
+                    <p className="mt-3 text-[12px] leading-[1.6] text-black/68 line-clamp-4">{project.description}</p>
+                    <div className="mt-4 flex flex-wrap gap-x-3 gap-y-1 text-[10px] uppercase tracking-[0.14em] text-black/55">
                       {project.tags?.slice(0, 4).map((tag) => (
-                        <span key={tag} className="border border-border px-3 py-1 text-[11px] font-medium text-foreground/70 uppercase tracking-wide">
-                          {tag}
-                        </span>
+                        <span key={tag}>{tag}</span>
                       ))}
                     </div>
                     {(project.links?.github || project.links?.live) && (
-                      <div className="flex items-center gap-4 pt-3 border-t border-border">
+                      <div className="mt-4 flex items-center gap-4 border-t border-black/10 pt-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-black/60">
                         {project.links?.github && (
-                          <span className="text-[11px] font-medium text-foreground/60 group-hover:text-accent uppercase tracking-wide transition-colors">
-                            GitHub ↗
-                          </span>
+                          <span className="transition-colors group-hover:text-black group-hover:underline group-hover:underline-offset-4">GitHub ↗</span>
                         )}
                         {project.links?.live && (
-                          <span className="text-[11px] font-medium text-accent uppercase tracking-wide">
+                          <span className="transition-colors group-hover:text-black group-hover:underline group-hover:underline-offset-4">
                             Live Demo →
                           </span>
                         )}

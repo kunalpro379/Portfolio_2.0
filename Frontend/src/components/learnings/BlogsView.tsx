@@ -57,7 +57,7 @@ export function BlogsView({ search }: BlogsViewProps) {
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-0">
       {filteredBlogs.map((item: any, idx: number) => (
         <ContentCard key={item._id || item.id || idx} item={item} type="blogs" />
       ))}
