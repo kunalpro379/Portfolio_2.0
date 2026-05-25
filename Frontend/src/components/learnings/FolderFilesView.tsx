@@ -151,7 +151,7 @@ export function FolderFilesView({ folderId }: FolderFilesViewProps) {
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 rounded-md bg-[#8B4513] px-6 py-3 text-sm font-semibold text-white hover:bg-[#6B3410]"
           >
-            <Download className="h-4 w-4" />
+            <div className="h-4 w-4" />
             Download File
           </a>
         </div>
