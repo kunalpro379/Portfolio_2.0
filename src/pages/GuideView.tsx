@@ -218,8 +218,11 @@ export default function GuideView() {
         }}
       />
 
-      {/* Background Texture Pattern on Top */}
-      <div className="fixed inset-0 z-[2] opacity-20 mix-blend-multiply" style={{ backgroundImage: 'url(/page7.png)', backgroundRepeat: 'repeat', filter: 'grayscale(100%) brightness(0)' }} />
+      {/* Background Texture Patterns - Dual Layer */}
+      {/* Black texture layer (darker, smaller pattern) */}
+      <div className="fixed inset-0 z-[2] opacity-30 mix-blend-multiply" style={{ backgroundImage: 'url(/page7.png)', backgroundRepeat: 'repeat', backgroundSize: '200px', filter: 'grayscale(100%) brightness(0)' }} />
+      {/* White texture layer (bigger pattern) */}
+      <div className="fixed inset-0 z-[3] opacity-15 mix-blend-overlay" style={{ backgroundImage: 'url(/page3.png)', backgroundRepeat: 'repeat', backgroundSize: '400px', filter: 'grayscale(100%) brightness(2) invert(1)' }} />
       
       {/* Header */}
       <div className="max-w-7xl mx-auto mb-8 relative z-[3]">

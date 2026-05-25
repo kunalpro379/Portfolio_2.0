@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { useNavigate } from "@tanstack/react-router";
 import { config } from "@/config/config";
 import { LearningRhythmGrid } from "./LearningRhythmGrid";
 
@@ -16,6 +17,8 @@ interface DocsViewProps {
 }
 
 export function DocsView({ search }: DocsViewProps) {
+  const navigate = useNavigate();
+  
   const { data: docs = [], isLoading } = useQuery({
     queryKey: ["docs"],
     queryFn: fetchDocs,
@@ -36,7 +39,7 @@ export function DocsView({ search }: DocsViewProps) {
         {[1, 2, 3].map((row) => (
           <div key={row} className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             {[1, 2, 3, 4].map((card) => (
-              <div key={card} className="h-72 animate-pulse rounded-[28px] border border-[#8B4513]/10 bg-white/70" />
+              <div key={card} className="h-72 animate-pulse border border-black/10 bg-black/[0.04]" />
             ))}
           </div>
         ))}
@@ -55,5 +58,13 @@ export function DocsView({ search }: DocsViewProps) {
     );
   }
 
-  return <LearningRhythmGrid items={filteredDocs} type="docs" />;
+  return <LearningRhythmGrid 
+    items={filteredDocs} 
+    type="docs" 
+    onItemClick={(item) => {
+      console.log('Doc clicked:', item);
+      console.log('Navigating to:', `/learnings/docs/${item._id}`);
+      navigate({ to: `/learnings/docs/${item._id}` });
+    }}
+  />;
 }

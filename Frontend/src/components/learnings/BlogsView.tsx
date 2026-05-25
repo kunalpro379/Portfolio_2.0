@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { useNavigate } from "@tanstack/react-router";
 import { config } from "@/config/config";
 import { ContentCard } from "./ContentCard";
 
@@ -16,6 +17,8 @@ interface BlogsViewProps {
 }
 
 export function BlogsView({ search }: BlogsViewProps) {
+  const navigate = useNavigate();
+  
   const { data: blogs = [], isLoading } = useQuery({
     queryKey: ["blogs"],
     queryFn: fetchBlogs,
@@ -59,7 +62,12 @@ export function BlogsView({ search }: BlogsViewProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-0">
       {filteredBlogs.map((item: any, idx: number) => (
-        <ContentCard key={item._id || item.id || idx} item={item} type="blogs" />
+        <ContentCard 
+          key={item._id || item.id || idx} 
+          item={item} 
+          type="blogs"
+          onClick={() => navigate({ to: `/learnings/blogs/${item._id}` })}
+        />
       ))}
     </div>
   );

@@ -37,7 +37,55 @@ export function GuideView({ search }: GuideViewProps) {
         {[1, 2, 3].map((row) => (
           <div key={row} className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {[1, 2, 3].map((card) => (
-              <div key={card} className="h-72 animate-pulse rounded-[28px] border border-[#8B4513]/10 bg-white/70" />
+              <div 
+                key={card} 
+                className="h-72 border border-black/10 bg-black/[0.04] relative overflow-hidden"
+                style={{ animationDelay: `${(row - 1) * 3 + card * 0.15}s` }}
+              >
+                {/* Premium shimmer effect */}
+                <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-black/10 to-transparent"></div>
+                
+                {/* Content skeleton */}
+                <div className="p-6 space-y-4">
+                  {/* Badge */}
+                  <div className="h-4 w-16 bg-black/[0.08] relative overflow-hidden">
+                    <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-black/10 to-transparent"></div>
+                  </div>
+                  
+                  {/* Title */}
+                  <div className="space-y-2">
+                    <div className="h-6 w-full bg-black/[0.08] relative overflow-hidden">
+                      <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-black/10 to-transparent"></div>
+                    </div>
+                    <div className="h-6 w-3/4 bg-black/[0.08] relative overflow-hidden">
+                      <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-black/10 to-transparent"></div>
+                    </div>
+                  </div>
+                  
+                  {/* Description */}
+                  <div className="space-y-2">
+                    <div className="h-4 w-full bg-black/[0.08] relative overflow-hidden">
+                      <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-black/10 to-transparent"></div>
+                    </div>
+                    <div className="h-4 w-5/6 bg-black/[0.08] relative overflow-hidden">
+                      <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-black/10 to-transparent"></div>
+                    </div>
+                    <div className="h-4 w-2/3 bg-black/[0.08] relative overflow-hidden">
+                      <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-black/10 to-transparent"></div>
+                    </div>
+                  </div>
+                  
+                  {/* Metadata */}
+                  <div className="flex items-center justify-between pt-4 border-t border-black/10">
+                    <div className="h-4 w-24 bg-black/[0.08] relative overflow-hidden">
+                      <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-black/10 to-transparent"></div>
+                    </div>
+                    <div className="h-6 w-16 bg-black/[0.08] relative overflow-hidden">
+                      <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-black/10 to-transparent"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             ))}
           </div>
         ))}

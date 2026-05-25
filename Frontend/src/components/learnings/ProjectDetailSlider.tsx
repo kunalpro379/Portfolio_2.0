@@ -391,7 +391,7 @@ export function ProjectDetailSlider({ isOpen, onClose, project }: ProjectDetailS
                     <FileText size={15} className="text-[#8B4513]" />
                     <h3 className="font-display text-xs font-bold uppercase tracking-wider text-[#8B4513]">Table of Contents</h3>
                   </div>
-                  <div className="space-y-1 max-h-[300px] overflow-y-auto pr-2">
+                  <div className="space-y-1 pr-2">
                     {headings.map((heading) => (
                       <button
                         key={heading.id}

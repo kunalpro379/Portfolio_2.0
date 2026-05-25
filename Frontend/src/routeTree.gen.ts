@@ -11,6 +11,9 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as LearningsRouteImport } from './routes/learnings'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as LearningsFilesFolderIdRouteImport } from './routes/learnings.files.$folderId'
+import { Route as LearningsDocsDocIdRouteImport } from './routes/learnings.docs.$docId'
+import { Route as LearningsBlogsBlogIdRouteImport } from './routes/learnings.blogs.$blogId'
 
 const LearningsRoute = LearningsRouteImport.update({
   id: '/learnings',
@@ -22,31 +25,71 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LearningsFilesFolderIdRoute = LearningsFilesFolderIdRouteImport.update({
+  id: '/files/$folderId',
+  path: '/files/$folderId',
+  getParentRoute: () => LearningsRoute,
+} as any)
+const LearningsDocsDocIdRoute = LearningsDocsDocIdRouteImport.update({
+  id: '/docs/$docId',
+  path: '/docs/$docId',
+  getParentRoute: () => LearningsRoute,
+} as any)
+const LearningsBlogsBlogIdRoute = LearningsBlogsBlogIdRouteImport.update({
+  id: '/blogs/$blogId',
+  path: '/blogs/$blogId',
+  getParentRoute: () => LearningsRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/learnings': typeof LearningsRoute
+  '/learnings': typeof LearningsRouteWithChildren
+  '/learnings/blogs/$blogId': typeof LearningsBlogsBlogIdRoute
+  '/learnings/docs/$docId': typeof LearningsDocsDocIdRoute
+  '/learnings/files/$folderId': typeof LearningsFilesFolderIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/learnings': typeof LearningsRoute
+  '/learnings': typeof LearningsRouteWithChildren
+  '/learnings/blogs/$blogId': typeof LearningsBlogsBlogIdRoute
+  '/learnings/docs/$docId': typeof LearningsDocsDocIdRoute
+  '/learnings/files/$folderId': typeof LearningsFilesFolderIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/learnings': typeof LearningsRoute
+  '/learnings': typeof LearningsRouteWithChildren
+  '/learnings/blogs/$blogId': typeof LearningsBlogsBlogIdRoute
+  '/learnings/docs/$docId': typeof LearningsDocsDocIdRoute
+  '/learnings/files/$folderId': typeof LearningsFilesFolderIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/learnings'
+  fullPaths:
+    | '/'
+    | '/learnings'
+    | '/learnings/blogs/$blogId'
+    | '/learnings/docs/$docId'
+    | '/learnings/files/$folderId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/learnings'
-  id: '__root__' | '/' | '/learnings'
+  to:
+    | '/'
+    | '/learnings'
+    | '/learnings/blogs/$blogId'
+    | '/learnings/docs/$docId'
+    | '/learnings/files/$folderId'
+  id:
+    | '__root__'
+    | '/'
+    | '/learnings'
+    | '/learnings/blogs/$blogId'
+    | '/learnings/docs/$docId'
+    | '/learnings/files/$folderId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  LearningsRoute: typeof LearningsRoute
+  LearningsRoute: typeof LearningsRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -65,12 +108,49 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/learnings/files/$folderId': {
+      id: '/learnings/files/$folderId'
+      path: '/files/$folderId'
+      fullPath: '/learnings/files/$folderId'
+      preLoaderRoute: typeof LearningsFilesFolderIdRouteImport
+      parentRoute: typeof LearningsRoute
+    }
+    '/learnings/docs/$docId': {
+      id: '/learnings/docs/$docId'
+      path: '/docs/$docId'
+      fullPath: '/learnings/docs/$docId'
+      preLoaderRoute: typeof LearningsDocsDocIdRouteImport
+      parentRoute: typeof LearningsRoute
+    }
+    '/learnings/blogs/$blogId': {
+      id: '/learnings/blogs/$blogId'
+      path: '/blogs/$blogId'
+      fullPath: '/learnings/blogs/$blogId'
+      preLoaderRoute: typeof LearningsBlogsBlogIdRouteImport
+      parentRoute: typeof LearningsRoute
+    }
   }
 }
 
+interface LearningsRouteChildren {
+  LearningsBlogsBlogIdRoute: typeof LearningsBlogsBlogIdRoute
+  LearningsDocsDocIdRoute: typeof LearningsDocsDocIdRoute
+  LearningsFilesFolderIdRoute: typeof LearningsFilesFolderIdRoute
+}
+
+const LearningsRouteChildren: LearningsRouteChildren = {
+  LearningsBlogsBlogIdRoute: LearningsBlogsBlogIdRoute,
+  LearningsDocsDocIdRoute: LearningsDocsDocIdRoute,
+  LearningsFilesFolderIdRoute: LearningsFilesFolderIdRoute,
+}
+
+const LearningsRouteWithChildren = LearningsRoute._addFileChildren(
+  LearningsRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  LearningsRoute: LearningsRoute,
+  LearningsRoute: LearningsRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

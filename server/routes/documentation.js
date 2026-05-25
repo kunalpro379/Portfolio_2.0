@@ -250,8 +250,17 @@ router.get('/:docId', async (req, res) => {
   try {
     const { docId } = req.params;
     
-    // Only return public documentation for client-side requests
-    const doc = await Documentation.findOne({ docId, isPublic: true });
+    // Try to find by docId first, then by _id as fallback
+    let doc = await Documentation.findOne({ docId, isPublic: true });
+    
+    if (!doc) {
+      // Try finding by MongoDB _id
+      doc = await Documentation.findById(docId);
+      if (doc && !doc.isPublic) {
+        return res.status(404).json({ message: 'Documentation not found or not public' });
+      }
+    }
+    
     if (!doc) {
       return res.status(404).json({ message: 'Documentation not found or not public' });
     }
@@ -746,7 +755,17 @@ router.get('/:docId/files/:fileId', async (req, res) => {
   try {
     const { docId, fileId } = req.params;
     
-    const doc = await Documentation.findOne({ docId, isPublic: true });
+    // Try to find by docId first, then by _id as fallback
+    let doc = await Documentation.findOne({ docId, isPublic: true });
+    
+    if (!doc) {
+      // Try finding by MongoDB _id
+      doc = await Documentation.findById(docId);
+      if (doc && !doc.isPublic) {
+        return res.status(404).json({ message: 'Documentation not found or not public' });
+      }
+    }
+    
     if (!doc) {
       return res.status(404).json({ message: 'Documentation not found or not public' });
     }

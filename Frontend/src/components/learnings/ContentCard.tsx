@@ -7,6 +7,7 @@ interface ContentCardProps {
 
 export function ContentCard({ item, type, onClick, displayNumber }: ContentCardProps) {
   const isTextOnly = type === 'docs' || type === 'guide';
+  const isGrayBackground = type === 'docs' || type === 'guide';
 
   const getImage = () => {
     if (type === 'blogs') return item.coverImage || item.assets?.[0]?.url || '';
@@ -45,7 +46,7 @@ export function ContentCard({ item, type, onClick, displayNumber }: ContentCardP
 
   return (
     <article 
-      className={`group relative h-full border border-black/15 bg-transparent transition-all duration-200 hover:border-black hover:shadow-[0_0_0_1px_rgba(0,0,0,0.12)] ${onClick ? 'cursor-pointer' : 'cursor-default'}`}
+      className={`group relative h-full border border-black/15 ${isGrayBackground ? 'bg-gray-100 hover:bg-gray-200' : 'bg-transparent'} transition-all duration-200 hover:border-black hover:shadow-[0_0_0_1px_rgba(0,0,0,0.12)] ${onClick ? 'cursor-pointer' : 'cursor-default'}`}
       onClick={onClick}
     >
       {isTextOnly ? (

@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Outlet, useMatches } from "@tanstack/react-router";
 import { useState } from "react";
 import { Header } from "@/components/learnings/Header";
 import { BlogsView } from "@/components/learnings/BlogsView";
@@ -25,12 +25,31 @@ const tabs = [
 ];
 
 function LearningsPage() {
+  // ALL HOOKS MUST BE AT THE TOP - before any conditional returns
   const [search, setSearch] = useState("");
   const [activeTab, setActiveTab] = useState(() => {
     if (typeof window === "undefined") return "blogs";
     return new URLSearchParams(window.location.search).get("tab") || "blogs";
   });
+  const matches = useMatches();
+  
   const isDiaryTab = activeTab === "diary";
+  
+  // Check if we're on a child route
+  const isOnChildRoute = matches.some(match => 
+    match.routeId === '/learnings/files/$folderId' || 
+    match.routeId === '/learnings/blogs/$blogId' ||
+    match.routeId === '/learnings/docs/$docId'
+  );
+  
+  console.log('LearningsPage - matches:', matches.map(m => m.routeId));
+  console.log('LearningsPage - isOnChildRoute:', isOnChildRoute);
+  
+  // If on child route, just render the outlet
+  if (isOnChildRoute) {
+    console.log('Rendering Outlet for child route');
+    return <Outlet />;
+  }
 
   const getActiveLabel = () => {
     const tab = tabs.find(n => n.value === activeTab);

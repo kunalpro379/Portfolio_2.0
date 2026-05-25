@@ -128,7 +128,14 @@ router.post('/create', async (req, res) => {
 router.get('/:blogId', async (req, res) => {
     try {
         const { blogId } = req.params;
-        const blog = await Blog.findOne({ blogId });
+        
+        // Try to find by blogId first, then by _id as fallback
+        let blog = await Blog.findOne({ blogId });
+        
+        if (!blog) {
+            // Try finding by MongoDB _id
+            blog = await Blog.findById(blogId);
+        }
 
         if (!blog) {
             return res.status(404).json({ message: 'Blog not found' });
@@ -145,7 +152,14 @@ router.get('/:blogId', async (req, res) => {
 router.get('/:blogId/md-content', async (req, res) => {
     try {
         const { blogId } = req.params;
-        const blog = await Blog.findOne({ blogId });
+        
+        // Try to find by blogId first, then by _id as fallback
+        let blog = await Blog.findOne({ blogId });
+        
+        if (!blog) {
+            // Try finding by MongoDB _id
+            blog = await Blog.findById(blogId);
+        }
 
         if (!blog) {
             return res.status(404).json({ message: 'Blog not found' });

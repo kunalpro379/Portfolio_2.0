@@ -502,51 +502,6 @@ export default function Notes() {
 
             {/* Main Content */}
             <div className="grid grid-cols-12 gap-3 sm:gap-4 md:gap-5 lg:gap-6">
-              {/* Folders Section */}
-              <div className="col-span-12">
-                <div className="bg-white border-2 sm:border-3 lg:border-4 border-black rounded-lg sm:rounded-xl lg:rounded-2xl p-3 sm:p-4 lg:p-6 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] sm:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] lg:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
-                  <h2 className="text-lg sm:text-xl lg:text-2xl font-black text-black mb-3 sm:mb-4 lg:mb-6" style={{ fontFamily: 'Comic Sans MS, cursive' }}>
-                    Folders
-                  </h2>
-
-                  {folders.length === 0 ? (
-                    <div className="text-center py-6 sm:py-8 lg:py-12 border-2 lg:border-3 border-dashed border-black rounded-lg lg:rounded-xl">
-                      <Folder className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 text-gray-400 mx-auto mb-2 lg:mb-3" strokeWidth={2} />
-                      <p className="text-xs sm:text-sm lg:text-base text-gray-600 font-medium">No folders here</p>
-                      <p className="text-[10px] sm:text-xs lg:text-sm text-gray-500 mt-1">Create a new folder to get started</p>
-                    </div>
-                  ) : (
-                    <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3 lg:gap-4">
-                      {folders.map((folder) => (
-                        <div
-                          key={folder._id}
-                          className="bg-yellow-50 border-2 lg:border-3 border-black rounded-lg lg:rounded-xl p-2.5 sm:p-3 lg:p-4 hover:bg-yellow-100 transition cursor-pointer shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] lg:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:translate-x-[1px] active:translate-y-[1px] sm:hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] lg:hover:shadow-[5px_5px_0px_0px_rgba(0,0,0,1)] sm:hover:translate-x-[-1px] sm:hover:translate-y-[-1px] lg:hover:translate-x-[-2px] lg:hover:translate-y-[-2px]"
-                        >
-                          <div className="flex items-start justify-between gap-1.5 sm:gap-2">
-                            <div
-                              onClick={() => navigateToFolder(folder.path)}
-                              className="flex-1 min-w-0"
-                            >
-                              <Folder className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 text-black mb-1 sm:mb-1.5 lg:mb-2" strokeWidth={2.5} />
-                              <h3 className="font-black text-black text-xs sm:text-sm lg:text-base break-words line-clamp-2">{folder.name}</h3>
-                            </div>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                deleteFolder(folder.folderId);
-                              }}
-                              className="p-1 sm:p-1.5 lg:p-2 bg-red-100 border-2 border-black rounded-md lg:rounded-lg hover:bg-red-200 transition flex-shrink-0"
-                            >
-                              <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 lg:w-5 lg:h-5 text-black" strokeWidth={2.5} />
-                            </button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-
               {/* Files Section */}
               {currentPath && (
                 <div className="col-span-12">

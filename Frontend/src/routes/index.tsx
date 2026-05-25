@@ -35,15 +35,22 @@ const nav = [
 
 function Header() {
   const [isContactOpen, setIsContactOpen] = useState(false);
+  const [isAvatarOpen, setIsAvatarOpen] = useState(false);
 
   return (
     <>
       <header className="sticky top-0 z-50 border-b border-border bg-white backdrop-blur-md">
         <div className="mx-auto flex h-14 max-w-[1400px] items-center justify-between px-6 lg:px-10">
           <a href="#home" className="flex items-center gap-3">
-            <span className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-secondary">
-              <img src={kunalSketch} alt="" className="h-full w-full object-cover" />
-            </span>
+            <button 
+              onClick={(e) => {
+                e.preventDefault();
+                setIsAvatarOpen(true);
+              }}
+              className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-secondary cursor-pointer hover:ring-2 hover:ring-accent transition-all"
+            >
+              <img src="/kunalgta.png" alt="" className="h-full w-full object-cover" />
+            </button>
             <span className="flex items-baseline gap-3">
               <span className="font-display text-[14px] font-semibold tracking-tight text-foreground">Kunal Patil</span>
               <span className="label-mono hidden sm:inline text-[11px] text-foreground">AI/ML Engineer</span>
@@ -182,6 +189,33 @@ function Header() {
           onClick={() => setIsContactOpen(false)}
         />
       )}
+
+      {/* Avatar Modal */}
+      {isAvatarOpen && (
+        <>
+          <div 
+            className="fixed inset-0 bg-black/80 z-[100] flex items-center justify-center p-4"
+            onClick={() => setIsAvatarOpen(false)}
+          >
+            <div className="relative max-w-2xl w-full">
+              <button 
+                onClick={() => setIsAvatarOpen(false)}
+                className="absolute -top-12 right-0 text-white hover:text-accent transition-colors"
+              >
+                <svg className="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+              <img 
+                src="/kunalgta.png" 
+                alt="Kunal Patil" 
+                className="w-full h-auto rounded-lg shadow-2xl"
+                onClick={(e) => e.stopPropagation()}
+              />
+            </div>
+          </div>
+        </>
+      )}
     </>
   );
 }
@@ -189,16 +223,6 @@ function Header() {
 function Hero() {
   return (
     <section id="home" className="relative overflow-hidden border-b border-border">
-      {/* Texture Background */}
-      <div className="absolute inset-0 z-0 pointer-events-none" style={{
-        backgroundImage: 'url(/page5.png)',
-        backgroundSize: '60px 60px',
-        backgroundPosition: '0 0',
-        backgroundRepeat: 'repeat',
-        opacity: 0.4,
-        filter: 'grayscale(100%) contrast(1.8) brightness(0.2)'
-      }} />
-
       {/* Decorative background overlay */}
       <div aria-hidden className="pointer-events-none absolute inset-0 bg-cream/30 z-[1]">
         <div className="absolute -left-32 top-10 h-96 w-96 rounded-full bg-[oklch(0.72_0.13_75/0.12)] blur-3xl" />
@@ -246,7 +270,7 @@ function Hero() {
           </p>
 
           <div className="mt-6 flex flex-wrap items-center gap-4">
-            <a href="#work" className="rounded-md bg-foreground px-8 py-4 text-[16px] font-semibold text-background transition-colors hover:bg-foreground/90">
+            <a href="#work" className="rounded-md bg-foreground px-8 py-4 text-[16px] font-semibold text-background transition-colors hover:bg-[#8B4513]">
               Explore My Projects & Work
             </a>
             <a href="#writing" className="rounded-md border-2 border-foreground px-8 py-4 text-[16px] font-semibold text-foreground transition-colors hover:bg-foreground hover:text-background">
@@ -846,8 +870,13 @@ function Life() {
       <div className="mx-auto max-w-[1400px] px-6 py-24 lg:px-10">
         <SectionLabel index="05" title="Projects" kicker="" />
         <div className="mt-12 grid grid-cols-1 gap-12 md:grid-cols-[1fr_1.5fr] md:items-center">
-          <div className="relative overflow-hidden">
-            <img src="/debate.png" alt="AI Battleground Debate Platform" loading="lazy" className="w-full object-cover" />
+          <div className="relative overflow-hidden border border-black/10 max-w-xs">
+            <img 
+              src="/debate.png" 
+              alt="AI Battleground Debate Platform" 
+              loading="lazy" 
+              className="w-full h-auto object-contain grayscale transition-transform duration-700 hover:scale-[1.01] hover:grayscale-0" 
+            />
           </div>
           <div>
             <h3 className="font-display text-[2rem] font-semibold mb-4">AI Battleground</h3>

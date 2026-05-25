@@ -95,7 +95,19 @@ router.get('/folders', async (req, res) => {
     const query = parentPath ? { parentPath } : { parentPath: '' };
 
     const folders = await Folder.find(query).sort({ createdAt: -1 });
-    res.json({ folders });
+    
+    // Add file count for each folder
+    const foldersWithCounts = await Promise.all(
+      folders.map(async (folder) => {
+        const fileCount = await File.countDocuments({ folderPath: folder.path });
+        return {
+          ...folder.toObject(),
+          fileCount
+        };
+      })
+    );
+    
+    res.json({ folders: foldersWithCounts });
   } catch (error) {
     console.error('Get folders error:', error);
     res.status(500).json({ message: 'Server error' });

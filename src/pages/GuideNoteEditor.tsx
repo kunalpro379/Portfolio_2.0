@@ -575,8 +575,11 @@ export default function GuideNoteEditorPage() {
           }}
         />
 
-        {/* Background Texture Pattern on Top */}
-        <div className="fixed inset-0 z-[2] opacity-20 mix-blend-multiply" style={{ backgroundImage: 'url(/page7.png)', backgroundRepeat: 'repeat', filter: 'grayscale(100%) brightness(0)' }} />
+        {/* Background Texture Patterns - Dual Layer */}
+        {/* Black texture layer (darker, smaller pattern) */}
+        <div className="fixed inset-0 z-[2] opacity-30 mix-blend-multiply" style={{ backgroundImage: 'url(/page7.png)', backgroundRepeat: 'repeat', backgroundSize: '200px', filter: 'grayscale(100%) brightness(0)' }} />
+        {/* White texture layer (bigger pattern) */}
+        <div className="fixed inset-0 z-[3] opacity-15 mix-blend-overlay" style={{ backgroundImage: 'url(/page3.png)', backgroundRepeat: 'repeat', backgroundSize: '400px', filter: 'grayscale(100%) brightness(2) invert(1)' }} />
         
         {/* Simple Header */}
         <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200 px-3 py-2 md:px-6 md:py-3 flex-shrink-0 flex items-center justify-between sticky top-0 z-30">

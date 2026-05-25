@@ -21,9 +21,10 @@ function chunkByPattern(items: any[]) {
 interface LearningRhythmGridProps {
   items: any[];
   type: 'docs' | 'guide';
+  onItemClick?: (item: any) => void;
 }
 
-export function LearningRhythmGrid({ items, type }: LearningRhythmGridProps) {
+export function LearningRhythmGrid({ items, type, onItemClick }: LearningRhythmGridProps) {
   const rows = chunkByPattern(items);
   let runningIndex = 0;
 
@@ -50,6 +51,7 @@ export function LearningRhythmGrid({ items, type }: LearningRhythmGridProps) {
                   item={item}
                   type={type}
                   displayNumber={rowStartIndex + itemIndex + 1}
+                  onClick={onItemClick ? () => onItemClick(item) : undefined}
                 />
               ))}
             </div>
