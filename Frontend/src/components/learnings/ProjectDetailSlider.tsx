@@ -2,7 +2,7 @@ import { useEffect, useState, useMemo, useRef } from "react";
 import { marked } from "marked";
 import mermaid from "mermaid";
 import { config } from "@/config/config";
-import { Github, ExternalLink, ArrowLeft, FileText, Tag, Link as LinkIcon, Image as ImageIcon, X } from 'lucide-react';
+import { Github, ExternalLink, ArrowLeft, FileText, Tag, Link as LinkIcon, ChevronLeft, ChevronRight, X } from 'lucide-react';
 
 interface ProjectDetailSliderProps {
   isOpen: boolean;
@@ -95,6 +95,7 @@ export function ProjectDetailSlider({ isOpen, onClose, project }: ProjectDetailS
   const [markdownContent, setMarkdownContent] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [activeSection, setActiveSection] = useState<string>('');
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const markdownContainerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -250,8 +251,17 @@ export function ProjectDetailSlider({ isOpen, onClose, project }: ProjectDetailS
     if (element) {
       element.scrollIntoView({ behavior: 'smooth', block: 'start' });
       setActiveSection(headingId);
+      if (typeof window !== 'undefined' && window.innerWidth < 768) {
+        setSidebarOpen(false);
+      }
     }
   };
+
+  useEffect(() => {
+    if (isOpen) {
+      setSidebarOpen(window.innerWidth >= 768);
+    }
+  }, [isOpen, project?.projectId]);
 
   useEffect(() => {
     const container = document.getElementById('project-slider-content');
@@ -305,127 +315,167 @@ export function ProjectDetailSlider({ isOpen, onClose, project }: ProjectDetailS
         />
       )}
 
-      {/* Slider */}
-      <div className={`fixed inset-y-0 right-0 z-[101] w-full max-w-full transform transition-transform duration-500 ease-out sm:max-w-6xl ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}>
-        <div className="h-full bg-[#FDFBF7] shadow-2xl flex flex-col overflow-hidden">
-          {/* Header */}
-          <div className="sticky top-0 z-10 bg-[#FDFBF7] border-b-2 border-[#8B4513]/20 px-8 py-4 flex items-center justify-between flex-shrink-0">
+      {/* Panel — full screen on mobile (like blog detail), drawer sidebar from left */}
+      <div className={`fixed inset-0 z-[101] w-full transform transition-transform duration-500 ease-out md:inset-y-0 md:left-auto md:right-0 md:max-w-6xl ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+        <div className="flex h-full flex-col overflow-hidden bg-white shadow-2xl md:bg-[#FDFBF7]">
+          {/* Header — compact on mobile */}
+          <div className="sticky top-0 z-10 flex shrink-0 items-center justify-between border-b border-[#8B4513]/20 bg-white px-3 py-3 md:border-b-2 md:bg-[#FDFBF7] md:px-8 md:py-4">
             <button
+              type="button"
               onClick={onClose}
-              className="flex items-center gap-2 text-[#8B4513] hover:text-[#2C1810] font-bold text-sm transition-colors cursor-pointer"
+              className="flex cursor-pointer items-center gap-1.5 text-xs font-semibold text-black transition-colors hover:text-[#8B4513] md:gap-2 md:text-sm md:font-bold md:text-[#8B4513] md:hover:text-[#2C1810]"
             >
-              <ArrowLeft size={18} strokeWidth={2.5} />
+              <ArrowLeft size={16} strokeWidth={2.5} className="md:h-[18px] md:w-[18px]" />
               <span>Back to Projects</span>
             </button>
-            <button 
+            <button
+              type="button"
               onClick={onClose}
-              className="w-10 h-10 flex items-center justify-center border border-[#8B4513]/20 text-[#8B4513] hover:bg-[#8B4513] hover:text-white transition-colors rounded-full cursor-pointer"
+              className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border border-[#8B4513]/20 text-[#8B4513] transition-colors hover:bg-[#8B4513] hover:text-white md:h-10 md:w-10"
             >
               <X size={18} strokeWidth={2.5} />
             </button>
           </div>
 
-          {/* Body Container */}
-          <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
-            {/* Sidebar */}
-            <div className="scrollbar-none w-full md:w-80 bg-[#FDFBF7] border-b-2 md:border-b-0 md:border-r-2 border-[#8B4513]/20 overflow-y-auto p-8 space-y-6 flex-shrink-0">
-              {/* Project Card */}
-              <div className="bg-[#8B4513]/5 border-2 border-[#8B4513]/25 rounded-xl p-6">
-                <div className="mb-3">
-                  <span className="px-3 py-1 bg-[#8B4513]/10 border border-[#8B4513]/20 rounded-md text-xs font-bold text-[#8B4513] uppercase">
-                    {project.tags?.[0] || 'Project'}
-                  </span>
+          <div className="relative flex min-h-0 flex-1 flex-row overflow-hidden">
+            {sidebarOpen && (
+              <button
+                type="button"
+                aria-label="Close sidebar"
+                className="absolute inset-0 z-20 bg-black/40 md:hidden"
+                onClick={() => setSidebarOpen(false)}
+              />
+            )}
+
+            {/* Left sidebar — drawer on mobile, column on desktop (matches BlogDetailView) */}
+            <aside
+              className={`absolute inset-y-0 left-0 z-30 h-full shrink-0 border-r border-[#8B4513]/30 bg-[#FFF8F0] shadow-xl transition-all duration-300 ease-in-out md:relative md:shadow-none ${
+                sidebarOpen ? "w-[280px] translate-x-0 md:w-80" : "w-0 -translate-x-full overflow-hidden md:translate-x-0"
+              }`}
+            >
+              <div className="scrollbar-none h-full w-[280px] space-y-4 overflow-y-auto p-4 md:w-full md:space-y-6 md:p-6">
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="mb-1 flex items-center gap-1.5 text-xs font-semibold text-black hover:text-[#8B4513] md:hidden"
+                >
+                  <ArrowLeft className="h-3.5 w-3.5" />
+                  Back to Projects
+                </button>
+
+                <div className="rounded-xl border-2 border-[#8B4513]/25 bg-[#8B4513]/5 p-4 md:p-6">
+                  <div className="mb-2">
+                    <span className="rounded-lg border border-[#8B4513]/30 bg-[#8B4513]/10 px-2.5 py-1 text-[10px] font-bold uppercase text-[#8B4513] md:rounded-md md:px-3 md:text-xs">
+                      {project.tags?.[0] || "Project"}
+                    </span>
+                  </div>
+                  <h2 className="font-display text-lg font-bold leading-tight text-black md:mb-2 md:text-2xl md:text-[#2C1810]">
+                    {project.title || project.name}
+                  </h2>
+                  {project.tagline && (
+                    <p className="mt-1 text-xs leading-relaxed text-black/70 md:text-foreground/75">{project.tagline}</p>
+                  )}
                 </div>
-                <h2 className="font-display text-2xl font-bold text-[#2C1810] mb-2 leading-tight">
-                  {project.title || project.name}
-                </h2>
-                {project.tagline && (
-                  <p className="text-xs text-foreground/75 font-medium leading-relaxed">{project.tagline}</p>
+
+                {getTags().length > 0 && (
+                  <div>
+                    <div className="mb-2 flex items-center gap-2">
+                      <Tag className="h-3.5 w-3.5 text-[#8B4513]" />
+                      <h3 className="text-xs font-bold uppercase text-[#8B4513]">Tech Stack</h3>
+                    </div>
+                    <div className="flex flex-wrap gap-1.5 md:gap-2">
+                      {getTags().map((tech: string, idx: number) => (
+                        <span
+                          key={idx}
+                          className="rounded border border-[#8B4513]/30 bg-white px-2 py-1 text-[10px] font-semibold text-black md:rounded-md md:px-3 md:text-[11px] md:text-[#2C1810]"
+                        >
+                          {tech}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {getLinks().length > 0 && (
+                  <div>
+                    <div className="mb-2 flex items-center gap-2">
+                      <LinkIcon className="h-3.5 w-3.5 text-[#8B4513]" />
+                      <h3 className="text-xs font-bold uppercase text-[#8B4513]">Links</h3>
+                    </div>
+                    <div className="space-y-1.5 md:space-y-2">
+                      {getLinks().map((link: any, idx: number) => (
+                        <a
+                          key={idx}
+                          href={link.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="group flex items-center gap-2 rounded-lg border border-[#8B4513]/30 bg-white p-2 transition-all hover:bg-[#8B4513]/10 md:border-[#8B4513]/20 md:p-3 md:hover:bg-[#8B4513]/5"
+                        >
+                          {link.name.toLowerCase().includes("github") ? (
+                            <Github size={12} className="text-[#8B4513] md:h-[15px] md:w-[15px]" />
+                          ) : (
+                            <ExternalLink size={12} className="text-[#8B4513] md:h-[15px] md:w-[15px]" />
+                          )}
+                          <span className="flex-1 truncate text-xs font-semibold text-black group-hover:text-[#8B4513] md:text-[13px] md:font-bold md:text-[#2C1810]">
+                            {link.name}
+                          </span>
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {headings.length > 0 && (
+                  <div>
+                    <div className="mb-2 flex items-center gap-2">
+                      <FileText className="h-3.5 w-3.5 text-[#8B4513]" />
+                      <h3 className="text-xs font-bold uppercase">Contents</h3>
+                    </div>
+                    <div className="space-y-1">
+                      {headings.map((heading) => (
+                        <button
+                          key={heading.id}
+                          type="button"
+                          onClick={() => scrollToSection(heading.id)}
+                          className={`w-full cursor-pointer rounded-lg p-2 text-left text-xs transition-all ${
+                            activeSection === heading.id
+                              ? "border border-[#8B4513] bg-[#8B4513]/20 font-bold text-[#8B4513]"
+                              : "hover:bg-[#8B4513]/10 text-[#3A3A3A]"
+                          }`}
+                          style={{ paddingLeft: `${heading.level * 8 + 8}px` }}
+                        >
+                          {heading.text}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                 )}
               </div>
+            </aside>
 
-              {/* Tech Stack */}
-              {getTags().length > 0 && (
-                <div>
-                  <div className="flex items-center gap-2 mb-3">
-                    <Tag size={15} className="text-[#8B4513]" />
-                    <h3 className="font-display text-xs font-bold uppercase tracking-wider text-[#8B4513]">Tech Stack</h3>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {getTags().map((tech: string, idx: number) => (
-                      <span
-                        key={idx}
-                        className="px-3 py-1 text-[11px] bg-white border border-[#8B4513]/20 rounded-md font-medium text-[#2C1810]"
-                      >
-                        {tech}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
+            <button
+              type="button"
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              aria-label={sidebarOpen ? "Minimize sidebar" : "Open sidebar"}
+              className={`absolute top-1/2 z-40 -translate-y-1/2 rounded-r-lg bg-[#8B4513] p-2 text-white shadow-lg transition-all duration-300 hover:bg-[#6B3410] ${
+                sidebarOpen ? "left-[280px] md:left-[calc(20rem-1px)]" : "left-0"
+              }`}
+            >
+              {sidebarOpen ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+            </button>
 
-              {/* Links */}
-              {getLinks().length > 0 && (
-                <div>
-                  <div className="flex items-center gap-2 mb-3">
-                    <LinkIcon size={15} className="text-[#8B4513]" />
-                    <h3 className="font-display text-xs font-bold uppercase tracking-wider text-[#8B4513]">Links</h3>
-                  </div>
-                  <div className="space-y-2">
-                    {getLinks().map((link: any, idx: number) => (
-                      <a
-                        key={idx}
-                        href={link.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-2 p-3 bg-white border border-[#8B4513]/20 rounded-lg hover:bg-[#8B4513]/5 hover:border-[#8B4513]/50 transition-all group"
-                      >
-                        {link.name.toLowerCase().includes('github') ? (
-                          <Github size={15} className="text-[#8B4513]" />
-                        ) : (
-                          <ExternalLink size={15} className="text-[#8B4513]" />
-                        )}
-                        <span className="text-[13px] font-bold text-[#2C1810] truncate flex-1 group-hover:text-[#8B4513]">{link.name}</span>
-                      </a>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Table of Contents */}
-              {headings.length > 0 && (
-                <div>
-                  <div className="flex items-center gap-2 mb-3">
-                    <FileText size={15} className="text-[#8B4513]" />
-                    <h3 className="font-display text-xs font-bold uppercase tracking-wider text-[#8B4513]">Table of Contents</h3>
-                  </div>
-                  <div className="space-y-1 pr-2">
-                    {headings.map((heading) => (
-                      <button
-                        key={heading.id}
-                        onClick={() => scrollToSection(heading.id)}
-                        className={`w-full text-left py-1.5 px-3 rounded-md transition-all text-xs font-medium hover:bg-[#8B4513]/5 cursor-pointer ${
-                          activeSection === heading.id 
-                            ? 'bg-[#8B4513]/10 border border-[#8B4513]/30 text-[#8B4513] font-bold shadow-sm' 
-                            : 'text-[#3A3A3A]'
-                        }`}
-                        style={{ paddingLeft: `${heading.level * 10}px` }}
-                      >
-                        {heading.text}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Main Content Area */}
-            <div id="project-slider-content" className="scrollbar-none flex-1 overflow-y-auto bg-white px-6 py-8 md:px-10 md:py-12 scroll-smooth">
+            {/* Main content */}
+            <div
+              id="project-slider-content"
+              className="scrollbar-none min-w-0 flex-1 overflow-y-auto scroll-smooth bg-white px-3 py-4 md:px-10 md:py-12"
+            >
               {/* About This Project */}
               {(project.description || project.shortDescription) && (
-                <div className="mx-auto mb-10 max-w-4xl pb-8 border-b border-[#8B4513]/15">
-                  <h3 className="font-display text-xl font-bold text-[#2C1810] mb-3">About This Project</h3>
-                  <p className="font-serif text-[1.15rem] leading-[1.8] text-[#3A3A3A] italic">
+                <div className="mx-auto mb-6 max-w-4xl border-b border-[#8B4513]/15 pb-6 md:mb-10 md:pb-8">
+                  <h3 className="mb-2 font-display text-lg font-bold text-black md:mb-3 md:text-xl md:text-[#2C1810]">
+                    About This Project
+                  </h3>
+                  <p className="text-sm leading-relaxed text-black/80 md:font-serif md:text-[1.15rem] md:leading-[1.8] md:text-[#3A3A3A] md:italic">
                     {project.description || project.shortDescription}
                   </p>
                 </div>
@@ -440,10 +490,10 @@ export function ProjectDetailSlider({ isOpen, onClose, project }: ProjectDetailS
                   </div>
                 </div>
               ) : markdownContent ? (
-                <article className="mx-auto w-full max-w-4xl">
+                <article className="prose prose-slate mx-auto w-full max-w-none md:max-w-4xl md:prose-lg premium-markdown">
                   <div
                     ref={markdownContainerRef}
-                    className="premium-markdown prose prose-slate prose-lg max-w-none"
+                    className="max-w-none"
                     dangerouslySetInnerHTML={{ __html: renderedMarkdown }}
                   />
                 </article>
@@ -455,11 +505,11 @@ export function ProjectDetailSlider({ isOpen, onClose, project }: ProjectDetailS
 
               {/* Project Assets / Screenshots */}
               {project.assets && project.assets.length > 0 && (
-                <div className="mt-16 pt-10 border-t border-[#8B4513]/20">
-                  <h3 className="font-display text-2xl font-bold text-[#2C1810] mb-6 uppercase tracking-wider">
+                <div className="mt-8 border-t border-[#8B4513]/20 pt-8 md:mt-16 md:pt-10">
+                  <h3 className="mb-4 font-display text-lg font-bold uppercase tracking-wider text-black md:mb-6 md:text-2xl md:text-[#2C1810]">
                     Project Screenshots & Assets
                   </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6">
                     {project.assets.map((asset: any, idx: number) => {
                       const assetUrl = typeof asset === 'string' ? asset : asset.url;
                       const assetName = typeof asset === 'string' ? `Asset ${idx + 1}` : (asset.name || asset.filename);

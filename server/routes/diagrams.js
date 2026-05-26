@@ -242,6 +242,35 @@ router.get('/viewer/:viewerId', async (req, res) => {
   }
 });
 
+// Verify TODO_PASSWORD for create / update / delete
+async function verifyDiagramPassword(password) {
+  if (!password || typeof password !== 'string') {
+    return false;
+  }
+  return Password.verifyPassword('TODO_PASSWORD', password);
+}
+
+// POST verify password (for edit/create gates without mutating data)
+router.post('/verify-password', async (req, res) => {
+  try {
+    const { password } = req.body;
+    const isValid = await verifyDiagramPassword(password);
+    if (!isValid) {
+      return res.status(401).json({
+        success: false,
+        message: 'Incorrect password'
+      });
+    }
+    res.json({ success: true, message: 'Password verified' });
+  } catch (error) {
+    console.error('Error verifying diagram password:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to verify password'
+    });
+  }
+});
+
 // Helper function to convert stream to buffer
 async function streamToBuffer(readableStream) {
   return new Promise((resolve, reject) => {
@@ -256,15 +285,23 @@ async function streamToBuffer(readableStream) {
   });
 }
 
-// POST create new canvas
+// POST create new canvas (password required)
 router.post('/', async (req, res) => {
   try {
-    const { name, isPublic, data } = req.body;
+    const { name, isPublic, data, password } = req.body;
 
     if (!name) {
       return res.status(400).json({
         success: false,
         message: 'Canvas name is required'
+      });
+    }
+
+    const isValid = await verifyDiagramPassword(password);
+    if (!isValid) {
+      return res.status(401).json({
+        success: false,
+        message: 'Incorrect password'
       });
     }
 
@@ -335,7 +372,7 @@ router.post('/', async (req, res) => {
   }
 });
 
-// PUT update canvas (public)
+// PUT update canvas (password required)
 router.put('/:canvasId', async (req, res) => {
   try {
     let { canvasId } = req.params;
@@ -352,7 +389,15 @@ router.put('/:canvasId', async (req, res) => {
       });
     }
     
-    const { data, name, isPublic } = req.body;
+    const { data, name, isPublic, password } = req.body;
+
+    const isValid = await verifyDiagramPassword(password);
+    if (!isValid) {
+      return res.status(401).json({
+        success: false,
+        message: 'Incorrect password'
+      });
+    }
 
     const canvas = await Diagram.findOne({ canvasId });
 
@@ -416,8 +461,8 @@ router.put('/:canvasId', async (req, res) => {
   }
 });
 
-// DELETE canvas (requires authentication)
-router.delete('/:canvasId', authenticateToken, async (req, res) => {
+// DELETE canvas (password required)
+router.delete('/:canvasId', async (req, res) => {
   try {
     let { canvasId } = req.params;
     
@@ -430,6 +475,15 @@ router.delete('/:canvasId', authenticateToken, async (req, res) => {
       return res.status(400).json({
         success: false,
         message: 'Invalid canvas ID'
+      });
+    }
+
+    const { password } = req.body;
+    const isValid = await verifyDiagramPassword(password);
+    if (!isValid) {
+      return res.status(401).json({
+        success: false,
+        message: 'Incorrect password'
       });
     }
 

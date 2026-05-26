@@ -6,4 +6,10 @@ import { tanstackRouter } from "@tanstack/router-plugin/vite";
 
 export default defineConfig({
   plugins: [tanstackRouter(), react(), tailwindcss(), tsconfigPaths()],
+  resolve: {
+    dedupe: ["react", "react-dom", "react/jsx-runtime"],
+  },
+  optimizeDeps: {
+    include: ["@excalidraw/excalidraw"],
+  },
 });

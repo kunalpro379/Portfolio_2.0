@@ -1,0 +1,66 @@
+/* Mobile Excalidraw Optimizations */
+
+@media (max-width: 768px) {
+  .excalidraw {
+    touch-action: none !important;
+    -webkit-touch-callout: none !important;
+    -webkit-user-select: none !important;
+    user-select: none !important;
+    -webkit-tap-highlight-color: transparent !important;
+  }
+
+  .excalidraw canvas {
+    touch-action: none !important;
+    -webkit-touch-callout: none !important;
+    -webkit-user-select: none !important;
+    user-select: none !important;
+  }
+
+  .excalidraw * {
+    -webkit-touch-callout: none !important;
+    -webkit-user-select: none !important;
+    user-select: none !important;
+  }
+
+  .excalidraw .App-menu,
+  .excalidraw .App-toolbar {
+    touch-action: manipulation !important;
+  }
+
+  .excalidraw .scroll-parent {
+    -webkit-overflow-scrolling: touch !important;
+    overflow: hidden !important;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .excalidraw,
+  .excalidraw canvas {
+    touch-action: pan-x pan-y pinch-zoom !important;
+  }
+}
+
+.excalidraw .App-canvas {
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+  user-select: none !important;
+}
+
+@supports (-webkit-touch-callout: none) {
+  .excalidraw {
+    height: 100vh !important;
+    height: -webkit-fill-available !important;
+  }
+}
+
+@media (pointer: coarse) {
+  .excalidraw,
+  .excalidraw canvas {
+    touch-action: none !important;
+  }
+
+  .excalidraw .App-canvas canvas {
+    touch-action: pinch-zoom !important;
+  }
+}
