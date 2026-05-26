@@ -469,7 +469,8 @@ function Work() {
   return (
     <section id="work" className="border-b border-border">
       <div className="page-container py-16 sm:py-24">
-        <SectionLabel index="02" title="Projects" kicker="Selected work" />
+        {/* Other Projects Section */}
+        <SectionLabel index="02" title="Projects" kicker="More work" />
         <div className="mt-6 flex flex-wrap items-end justify-between gap-8">
           <h2 className="font-display max-w-3xl text-[clamp(2.25rem,4.5vw,3.75rem)] font-bold leading-[1.05]">
             4 years of building.{" "}
@@ -817,7 +818,7 @@ function Writing() {
             <span className="text-white/40">/</span>
             <span className="text-[12px] text-white sm:text-[14px]">Readings</span>
           </div>
-          <h2 className="font-display text-[clamp(2.25rem,7vw,6rem)] font-bold leading-[1] text-white">
+          <h2 className="font-display text-[clamp(1.75rem,5vw,3.5rem)] font-bold leading-[1] text-white">
             Readings
           </h2>
         </div>
@@ -890,28 +891,75 @@ function Writing() {
 }
 
 function Life() {
+  const featuredProjects = [
+    {
+      id: "curve-catch",
+      title: "Curve Catch Game",
+      description:
+        "Star Catch is a fun physics-based puzzle game where balls travel across mathematical curves and dynamic paths. Your goal is to guide the ball, collect every glowing star, and complete each level using logic, timing, and precision. Every curve changes the movement, making each level a unique challenge blending math, strategy, and arcade gameplay.",
+      image: "/game.png",
+      link: "/game",
+      ctaLabel: "Play Game",
+    },
+    {
+      id: "ai-battleground",
+      title: "AI Battleground",
+      description:
+        "An advanced AI agent competition platform where multiple AI models compete in real-time strategic battles. Features include multi-agent coordination, reinforcement learning, and live performance analytics. Built with cutting-edge ML frameworks and scalable cloud infrastructure.",
+      image: "/debate.png",
+      link: "/ai-battleground",
+      ctaLabel: "Explore Project",
+    },
+  ];
+
   return (
     <section id="life" className="border-b border-border">
-      <div className="page-container py-16 sm:py-24">
-        <SectionLabel index="05" title="Projects" kicker="" />
-        <div className="mt-8 grid grid-cols-1 gap-6 sm:mt-12 sm:gap-12 md:grid-cols-[1fr_1.5fr] md:items-center">
-          <div className="relative mr-auto w-full max-w-[200px] overflow-hidden border border-black/10 sm:max-w-xs">
-            <img 
-              src="/debate.png" 
-              alt="AI Battleground Debate Platform" 
-              loading="lazy" 
-              className="h-auto w-full object-contain grayscale transition-transform duration-700 hover:scale-[1.01] hover:grayscale-0" 
-            />
-          </div>
-          <div>
-            <h3 className="font-display mb-3 text-[1.35rem] font-semibold sm:mb-4 sm:text-[2rem]">AI Battleground</h3>
-            <p className="text-[14px] leading-[1.6] text-foreground/80 sm:text-[16px] sm:leading-[1.7]">
-              Battleground is an AI-powered multi-agent debate platform where two intelligent AI teams engage in structured argumentative battles on dynamic topics. The system simulates real-time debates with multiple AI personas, role-based reasoning, live dialogue streaming, scoring mechanisms, and a judge model that evaluates logical consistency, rebuttal strength, ethical reasoning, and overall performance to declare the winning team.
-            </p>
-            <a href="#" className="mt-6 inline-block rounded-md bg-accent px-6 py-3 text-[14px] font-semibold text-background transition-colors hover:bg-accent/90">
-              Read More →
-            </a>
-          </div>
+      <div className="page-container py-8 sm:py-12">
+        <div className="space-y-12 sm:space-y-16">
+          {featuredProjects.map((featured, idx) => (
+            <article
+              key={featured.id}
+              className={`grid grid-cols-1 items-center gap-8 ${
+                idx % 2 === 0
+                  ? "lg:grid-cols-[1fr_300px] lg:gap-12"
+                  : "lg:grid-cols-[300px_1fr] lg:gap-12"
+              }`}
+            >
+              <div className={`flex flex-col justify-center ${idx % 2 === 0 ? "" : "lg:order-2"}`}>
+                <div className="label-mono text-xs uppercase tracking-wider text-accent">Featured Project</div>
+                <h3 className="font-display mt-3 text-[clamp(1.5rem,3vw,2rem)] font-bold leading-[1.1] tracking-tight text-foreground">
+                  {featured.title}
+                </h3>
+                <p className="mt-4 text-[17px] leading-[1.65] text-foreground/75">{featured.description}</p>
+                <div className="mt-6">
+                  <a
+                    href={featured.link}
+                    className="inline-flex items-center gap-2 bg-foreground px-5 py-2 text-xs font-bold uppercase tracking-wider text-background transition-all hover:bg-foreground/90"
+                  >
+                    <span>{featured.id === "curve-catch" ? "Play Game" : featured.ctaLabel}</span>
+                    <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </a>
+                </div>
+              </div>
+
+              <div className={`flex items-center justify-center ${idx % 2 === 0 ? "" : "lg:order-1"}`}>
+                <a href={featured.link} className="group block">
+                  <img
+                    src={featured.image}
+                    alt={featured.title}
+                    loading="eager"
+                    className="h-auto w-full max-h-[250px] object-contain grayscale transition-all duration-700 group-hover:scale-105 group-hover:grayscale-0"
+                    onError={(e) => {
+                      console.error(`Failed to load image: ${featured.image}`);
+                      e.currentTarget.src = "/placeholder.png";
+                    }}
+                  />
+                </a>
+              </div>
+            </article>
+          ))}
         </div>
       </div>
     </section>
@@ -920,11 +968,11 @@ function Life() {
 
 function Contact() {
   return (
-    <section id="contact" className="border-b border-border">
-      <div className="page-container py-20 sm:py-28">
-        <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
-          <div>
-            <h2 className="font-display text-[clamp(3rem,7vw,6.5rem)] font-bold leading-[0.95]">
+    <section id="contact" className="relative overflow-hidden border-b border-border">
+      <div className="page-container relative py-20 sm:py-28">
+        <div className="grid grid-cols-1 items-center gap-16 lg:grid-cols-[minmax(0,1fr)_auto] lg:gap-10">
+          <div className="relative z-10 max-w-xl">
+            <h2 className="font-display text-[clamp(2.35rem,5.5vw,5rem)] font-bold leading-[0.95]">
               Got an<br />
               <span className="text-accent">interesting<br />problem?</span><br />
               Let's talk about it.
@@ -936,75 +984,101 @@ function Contact() {
               kunaldp379@gmail.com →
             </a>
 
-            <div className="mt-8">
-              <p className="label-mono mb-4 text-[11px] text-muted-foreground">CONNECT</p>
-              <SocialLinks variant="plain" />
+            <div className="mt-7">
+              <p className="label-mono mb-3 text-[9px] tracking-[0.18em] text-muted-foreground sm:text-[10px]">
+                CONNECT
+              </p>
+              <SocialLinks variant="plain" size="xl" />
             </div>
           </div>
 
-          <div className="mt-10 lg:mt-0">
-            <h3 className="font-display mb-2 text-[1.35rem] font-semibold sm:text-[1.75rem]">Contact Information</h3>
-            <p className="mb-6 text-[13px] text-foreground/70 sm:text-[14px]">
-              If you have any questions, feel free to get in touch.
-            </p>
+          {/* White circle — offset from right; strong contrast vs cream page */}
+          <div className="relative z-10 flex justify-center lg:mr-6 lg:justify-end xl:mr-14">
+            <div
+              className="relative flex aspect-square w-[min(100%,19.5rem)] shrink-0 flex-col items-center justify-center rounded-full border-[1.5px] border-black/12 bg-[#ffffff] text-center text-[#1a1a1a] sm:w-[22rem] md:w-[24rem] lg:w-[27rem] xl:w-[30rem]"
+              style={{
+                boxShadow:
+                  "0 28px 90px -16px rgba(0,0,0,0.38), 0 12px 32px -8px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,1)",
+              }}
+            >
+              <span
+                aria-hidden
+                className="pointer-events-none absolute -inset-1 rounded-full border border-black/[0.06]"
+              />
+              <span
+                aria-hidden
+                className="pointer-events-none absolute inset-4 rounded-full border border-dashed border-black/[0.08] sm:inset-5"
+              />
 
-            <div className="space-y-4 sm:space-y-5">
-              <div>
-                <div className="label-mono mb-1 text-[10px] text-accent sm:text-[11px]">PHONE</div>
-                <a href="tel:+919892885090" className="text-[15px] font-medium hover:text-accent sm:text-[16px]">
-                  +91 9892885090
-                </a>
-              </div>
+              <div className="flex max-h-[86%] w-[78%] flex-col items-center justify-center gap-3.5 sm:w-[76%] sm:gap-4">
+                <div>
+                  <h3 className="font-display text-[1.05rem] font-semibold leading-tight sm:text-[1.2rem]">
+                    Contact Information
+                  </h3>
+                  <p className="mt-1.5 text-[10px] leading-snug text-black/55 sm:text-[11px]">
+                    If you have any questions, feel free to get in touch.
+                  </p>
+                </div>
 
-              <div>
-                <div className="label-mono mb-1 text-[10px] text-accent sm:text-[11px]">EMAIL</div>
-                <a href="mailto:kunaldp379@gmail.com" className="break-all text-[15px] font-medium hover:text-accent sm:text-[16px]">
-                  kunaldp379@gmail.com
-                </a>
-              </div>
+                <div className="h-px w-14 bg-black/12" />
 
-              <div>
-                <div className="label-mono mb-1 text-[10px] text-accent sm:text-[11px]">LOCATION</div>
-                <p className="text-[15px] font-medium sm:text-[16px]">Mumbai, Maharashtra, India</p>
-              </div>
+                <div className="w-full space-y-3 text-left sm:space-y-3.5">
+                  <div>
+                    <div className="label-mono mb-0.5 text-[9px] tracking-wider text-[#b85c38] sm:text-[10px]">PHONE</div>
+                    <a href="tel:+919892885090" className="text-[11px] font-medium hover:text-[#b85c38] sm:text-[12px]">
+                      +91 9892885090
+                    </a>
+                  </div>
+                  <div>
+                    <div className="label-mono mb-0.5 text-[9px] tracking-wider text-[#b85c38] sm:text-[10px]">EMAIL</div>
+                    <a
+                      href="mailto:kunaldp379@gmail.com"
+                      className="break-all text-[11px] font-medium hover:text-[#b85c38] sm:text-[12px]"
+                    >
+                      kunaldp379@gmail.com
+                    </a>
+                  </div>
+                  <div>
+                    <div className="label-mono mb-0.5 text-[9px] tracking-wider text-[#b85c38] sm:text-[10px]">LOCATION</div>
+                    <p className="text-[11px] font-medium sm:text-[12px]">Mumbai, Maharashtra, India</p>
+                  </div>
+                  <div>
+                    <div className="label-mono mb-0.5 text-[9px] tracking-wider text-[#b85c38] sm:text-[10px]">AVAILABILITY</div>
+                    <p className="text-[11px] font-medium sm:text-[12px]">Monday – Sunday</p>
+                    <p className="text-[10px] text-black/55 sm:text-[11px]">10:00 AM – 10:00 PM</p>
+                  </div>
+                  <div>
+                    <div className="label-mono mb-0.5 text-[9px] tracking-wider text-[#b85c38] sm:text-[10px]">GITHUB</div>
+                    <a
+                      href="https://github.com/kunalpro379"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[11px] font-medium hover:text-[#b85c38] sm:text-[12px]"
+                    >
+                      github.com/kunalpro379
+                    </a>
+                  </div>
+                  <div>
+                    <div className="label-mono mb-0.5 text-[9px] tracking-wider text-[#b85c38] sm:text-[10px]">RESUME</div>
+                    <a
+                      href="https://notesportfolio.blob.core.windows.net/notes/Resume.kunal.pdf"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[11px] font-semibold text-[#b85c38] hover:underline sm:text-[12px]"
+                    >
+                      View Resume →
+                    </a>
+                  </div>
+                </div>
 
-              <div>
-                <div className="label-mono mb-1 text-[10px] text-accent sm:text-[11px]">AVAILABILITY</div>
-                <p className="text-[15px] font-medium sm:text-[16px]">Monday - Sunday</p>
-                <p className="text-[13px] text-foreground/70 sm:text-[14px]">10:00 AM - 10:00 PM</p>
-              </div>
-
-              <div>
-                <div className="label-mono mb-1 text-[10px] text-accent sm:text-[11px]">GITHUB</div>
-                <a
-                  href="https://github.com/kunalpro379"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-[15px] font-medium hover:text-accent sm:text-[16px]"
-                >
-                  github.com/kunalpro379
-                </a>
-              </div>
-
-              <div>
-                <div className="label-mono mb-1 text-[10px] text-accent sm:text-[11px]">RESUME</div>
-                <a
-                  href="https://notesportfolio.blob.core.windows.net/notes/Resume.kunal.pdf"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-[15px] font-medium text-accent hover:underline sm:text-[16px]"
-                >
-                  View Resume →
-                </a>
+                <p className="border-l-2 border-[#b85c38]/50 pl-3 text-left text-[9px] leading-[1.5] text-black/70 sm:text-[10px]">
+                  <span className="font-semibold text-[#b85c38]">Open for full-time roles</span> in AI/ML, DevOps, and Backend
+                  Development. Also available for{" "}
+                  <span className="font-semibold text-black/85">freelance projects</span> and{" "}
+                  <span className="font-semibold text-black/85">remote work</span>.
+                </p>
               </div>
             </div>
-
-            <p className="mt-6 border-l-4 border-accent pl-4 text-[13px] leading-[1.6] text-foreground/85 sm:text-[14px]">
-              <span className="font-semibold text-accent">Open for full-time roles</span> in AI/ML, DevOps, and
-              Backend Development. Also available for{" "}
-              <span className="font-semibold text-foreground">freelance projects</span> and{" "}
-              <span className="font-semibold text-foreground">remote work</span>.
-            </p>
           </div>
         </div>
       </div>

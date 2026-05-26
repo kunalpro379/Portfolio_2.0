@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as LearningsRouteImport } from './routes/learnings'
+import { Route as GameRouteImport } from './routes/game'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ArchitectureCanvasIdRouteImport } from './routes/architecture.$canvasId'
 import { Route as ArchitectureCanvasIdIndexRouteImport } from './routes/architecture.$canvasId.index'
@@ -22,6 +23,11 @@ import { Route as ArchitectureCanvasIdEditRouteImport } from './routes/architect
 const LearningsRoute = LearningsRouteImport.update({
   id: '/learnings',
   path: '/learnings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GameRoute = GameRouteImport.update({
+  id: '/game',
+  path: '/game',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -70,6 +76,7 @@ const ArchitectureCanvasIdEditRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/game': typeof GameRoute
   '/learnings': typeof LearningsRouteWithChildren
   '/architecture/$canvasId': typeof ArchitectureCanvasIdRouteWithChildren
   '/architecture/$canvasId/edit': typeof ArchitectureCanvasIdEditRoute
@@ -81,6 +88,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/game': typeof GameRoute
   '/learnings': typeof LearningsRouteWithChildren
   '/architecture/$canvasId/edit': typeof ArchitectureCanvasIdEditRoute
   '/architecture/view/$viewerId': typeof ArchitectureViewViewerIdRoute
@@ -92,6 +100,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/game': typeof GameRoute
   '/learnings': typeof LearningsRouteWithChildren
   '/architecture/$canvasId': typeof ArchitectureCanvasIdRouteWithChildren
   '/architecture/$canvasId/edit': typeof ArchitectureCanvasIdEditRoute
@@ -105,6 +114,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/game'
     | '/learnings'
     | '/architecture/$canvasId'
     | '/architecture/$canvasId/edit'
@@ -116,6 +126,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/game'
     | '/learnings'
     | '/architecture/$canvasId/edit'
     | '/architecture/view/$viewerId'
@@ -126,6 +137,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/game'
     | '/learnings'
     | '/architecture/$canvasId'
     | '/architecture/$canvasId/edit'
@@ -138,6 +150,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  GameRoute: typeof GameRoute
   LearningsRoute: typeof LearningsRouteWithChildren
   ArchitectureCanvasIdRoute: typeof ArchitectureCanvasIdRouteWithChildren
   ArchitectureViewViewerIdRoute: typeof ArchitectureViewViewerIdRoute
@@ -150,6 +163,13 @@ declare module '@tanstack/react-router' {
       path: '/learnings'
       fullPath: '/learnings'
       preLoaderRoute: typeof LearningsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/game': {
+      id: '/game'
+      path: '/game'
+      fullPath: '/game'
+      preLoaderRoute: typeof GameRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -242,6 +262,7 @@ const ArchitectureCanvasIdRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  GameRoute: GameRoute,
   LearningsRoute: LearningsRouteWithChildren,
   ArchitectureCanvasIdRoute: ArchitectureCanvasIdRouteWithChildren,
   ArchitectureViewViewerIdRoute: ArchitectureViewViewerIdRoute,

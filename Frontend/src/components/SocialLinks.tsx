@@ -62,16 +62,18 @@ const socialLinks: SocialLink[] = [
 ];
 
 type SocialLinksProps = {
-  size?: "md" | "lg";
+  size?: "md" | "lg" | "xl";
   variant?: "boxed" | "plain";
 };
 
 export function SocialLinks({ size = "lg", variant = "boxed" }: SocialLinksProps) {
   const iconSize =
     variant === "plain"
-      ? size === "lg"
-        ? "h-8 w-8 sm:h-9 sm:w-9"
-        : "h-7 w-7 sm:h-8 sm:w-8"
+      ? size === "xl"
+        ? "h-10 w-10 sm:h-11 sm:w-11"
+        : size === "lg"
+          ? "h-8 w-8 sm:h-9 sm:w-9"
+          : "h-7 w-7 sm:h-8 sm:w-8"
       : size === "lg"
         ? "h-6 w-6"
         : "h-5 w-5";
@@ -79,7 +81,9 @@ export function SocialLinks({ size = "lg", variant = "boxed" }: SocialLinksProps
 
   if (variant === "plain") {
     return (
-      <div className="flex flex-wrap items-center gap-5 sm:gap-6">
+      <div
+        className={`flex flex-wrap items-center ${size === "xl" ? "gap-6 sm:gap-7" : "gap-5 sm:gap-6"}`}
+      >
         {socialLinks.map(({ label, href, Icon, brandColor, external }) => (
           <a
             key={label}
