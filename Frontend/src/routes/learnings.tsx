@@ -83,17 +83,17 @@ function LearningsPage() {
     <main className={isDiaryTab ? "flex h-screen flex-col overflow-hidden" : "min-h-screen"}>
       <Header activeTab={activeTab} onTabChange={setActiveTab} tabs={tabs} />
       {isDiaryTab ? (
-        <div className="h-full min-h-0 overflow-hidden px-2 py-0 lg:px-3">
+        <div className="h-full min-h-0 overflow-hidden px-0 py-0 lg:px-3">
           {renderContent()}
         </div>
       ) : (
-        <div className="mx-auto max-w-[1400px] px-6 py-2 lg:px-10">
-          <div className="mb-3 flex items-center justify-between gap-4">
-            <h1 className="font-display text-[3.5rem] font-bold leading-tight text-[#8B4513] whitespace-nowrap">
+        <div className="page-container py-2 sm:py-3">
+          <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+            <h1 className="font-display text-[1.75rem] font-bold leading-tight text-[#8B4513] sm:text-[3.5rem]">
               {getActiveLabel()}
             </h1>
 
-            <div className="relative flex-1 max-w-2xl">
+            <div className="relative w-full sm:max-w-2xl sm:flex-1">
               <svg className="absolute left-5 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-black/55" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
@@ -102,7 +102,7 @@ function LearningsPage() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search blogs, docs, guides..."
-                className="h-12 w-full rounded-full border-2 border-black bg-white pl-14 pr-5 text-[14px] font-medium text-black placeholder:text-black/35 transition-all focus:outline-none focus:ring-0 hover:shadow-[3px_3px_0_0_rgba(0,0,0,0.08)]"
+                className="h-10 w-full rounded-full border-2 border-black bg-white pl-11 pr-4 text-[12px] font-medium text-black placeholder:text-black/35 transition-all focus:outline-none focus:ring-0 hover:shadow-[3px_3px_0_0_rgba(0,0,0,0.08)] sm:h-12 sm:pl-14 sm:pr-5 sm:text-[14px]"
               />
             </div>
           </div>

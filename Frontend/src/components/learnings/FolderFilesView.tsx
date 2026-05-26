@@ -1,9 +1,21 @@
-import { useQuery } from '@tanstack/react-query';
-import { useState } from 'react';
-import { useNavigate } from '@tanstack/react-router';
-import { ArrowLeft, FileText, File, FileImage, FileVideo, FileArchive, ChevronLeft, ChevronRight } from 'lucide-react';
-import { Header } from './Header';
-import { config } from '@/config/config';
+import { useQuery } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
+import { useNavigate } from "@tanstack/react-router";
+import {
+  ArrowLeft,
+  FileText,
+  File,
+  FileImage,
+  FileVideo,
+  FileArchive,
+  ChevronLeft,
+  ChevronRight,
+  Download,
+  Presentation,
+} from "lucide-react";
+import { Header } from "./Header";
+import { config } from "@/config/config";
+import { PremiumLoader } from "./PremiumLoader";
 
 interface FileData {
   _id: string;
@@ -17,24 +29,44 @@ interface FileData {
   content?: string;
 }
 
-interface FilesResponse {
-  files: FileData[];
-}
-
 interface FolderFilesViewProps {
   folderId: string;
 }
 
 const tabs = [
-  { label: "Blogs", value: "blogs", bold: true },
+  { label: "Blogs", value: "blogs" },
   { label: "Docs", value: "docs" },
   { label: "Guide", value: "guide" },
-  { label: "Files", value: "files" },
+  { label: "Files", value: "files", bold: true },
   { label: "Diary", value: "diary" },
   { label: "Code", value: "code" },
   { label: "Architectures", value: "architectures" },
   { label: "Projects", value: "projects" },
 ];
+
+function formatFileSize(bytes: number) {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+function formatFileDate(dateStr: string) {
+  return new Date(dateStr).toLocaleDateString("en-US", {
+    month: "numeric",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
+function getFileIcon(filename: string, fileType: string) {
+  const lower = filename.toLowerCase();
+  if (fileType?.startsWith("image/")) return FileImage;
+  if (fileType?.startsWith("video/")) return FileVideo;
+  if (lower.endsWith(".pdf") || fileType?.includes("pdf")) return FileText;
+  if (lower.endsWith(".pptx") || lower.endsWith(".ppt")) return Presentation;
+  if (lower.endsWith(".zip") || lower.endsWith(".rar")) return FileArchive;
+  return File;
+}
 
 export function FolderFilesView({ folderId }: FolderFilesViewProps) {
   const navigate = useNavigate();
@@ -42,58 +74,54 @@ export function FolderFilesView({ folderId }: FolderFilesViewProps) {
   const [activeTab] = useState("files");
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
-  console.log('FolderFilesView rendered with folderId:', folderId);
-  console.log('API URL:', config.apiUrl);
-
   const handleTabChange = (tab: string) => {
-    navigate({ to: '/learnings', search: { tab } });
+    navigate({ to: "/learnings", search: { tab } });
   };
 
-  // Fetch folder with files
   const { data: folderData, isLoading, error } = useQuery({
-    queryKey: ['folder-details', folderId],
+    queryKey: ["folder-details", folderId],
     queryFn: async () => {
-      const url = `${config.apiUrl}/notes/folders/${folderId}`;
-      console.log('Fetching folder details from:', url);
-      const response = await fetch(url);
-      if (!response.ok) {
-        console.error('Failed to fetch folder:', response.status, response.statusText);
-        throw new Error('Failed to fetch folder');
-      }
+      const response = await fetch(`${config.apiUrl}/notes/folders/${folderId}`);
+      if (!response.ok) throw new Error("Failed to fetch folder");
       const result = await response.json();
-      console.log('Folder response:', result);
       return result.folder;
     },
   });
 
-  const data = folderData ? { files: folderData.files || [] } : undefined;
+  const files: FileData[] = folderData?.files ?? [];
 
-  console.log('Component state:', { isLoading, error, filesCount: data?.files?.length, folderData });
+  const sortedFiles = [...files].sort(
+    (a, b) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime(),
+  );
 
-  const getFileIcon = (fileType: string) => {
-    if (!fileType) return <File className="h-5 w-5" />;
-    if (fileType.startsWith('image/')) return <FileImage className="h-5 w-5" />;
-    if (fileType.startsWith('video/')) return <FileVideo className="h-5 w-5" />;
-    if (fileType.includes('pdf')) return <FileText className="h-5 w-5" />;
-    if (fileType.includes('zip') || fileType.includes('rar')) return <FileArchive className="h-5 w-5" />;
-    return <File className="h-5 w-5" />;
-  };
+  useEffect(() => {
+    if (sortedFiles.length === 0) {
+      setSelectedFileId(null);
+      return;
+    }
+    setSelectedFileId((prev) => {
+      if (prev && sortedFiles.some((f) => f.fileId === prev)) return prev;
+      return sortedFiles[0].fileId;
+    });
+  }, [folderId, folderData]);
 
-  const formatFileSize = (bytes: number) => {
-    if (bytes < 1024) return bytes + ' B';
-    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
-    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
-  };
-
-  const selectedFile = data?.files.find((f: FileData) => f.fileId === selectedFileId);
+  const selectedFile = sortedFiles.find((f) => f.fileId === selectedFileId);
 
   const renderFilePreview = () => {
+    if (isLoading) {
+      return (
+        <div className="flex h-full items-center justify-center">
+          <PremiumLoader />
+        </div>
+      );
+    }
+
     if (!selectedFile) {
       return (
         <div className="flex h-full items-center justify-center text-foreground/40">
           <div className="text-center">
-            <FileText className="mx-auto h-16 w-16 mb-4 opacity-20" />
-            <p className="text-lg">Select a file to preview</p>
+            <FileText className="mx-auto mb-4 h-16 w-16 opacity-20" />
+            <p className="text-lg font-medium">Select a file to preview</p>
           </div>
         </div>
       );
@@ -101,49 +129,42 @@ export function FolderFilesView({ folderId }: FolderFilesViewProps) {
 
     const { fileType, cloudinaryUrl, filename } = selectedFile;
 
-    if (fileType && fileType.startsWith('image/')) {
+    if (fileType?.startsWith("image/")) {
       return (
-        <div className="h-full overflow-auto p-6">
+        <div className="h-full overflow-auto p-4 sm:p-6">
           <img src={cloudinaryUrl} alt={filename} className="mx-auto max-w-full" />
         </div>
       );
     }
 
-    if (fileType === 'application/pdf') {
+    if (fileType === "application/pdf") {
       return (
-        <iframe
-          src={cloudinaryUrl}
-          className="h-full w-full border-0"
-          title={filename}
-        />
+        <iframe src={cloudinaryUrl} className="h-full w-full border-0" title={filename} />
       );
     }
 
-    if (fileType && fileType.startsWith('video/')) {
+    if (fileType?.startsWith("video/")) {
       return (
         <div className="flex h-full items-center justify-center p-6">
-          <video controls className="max-w-full max-h-full">
+          <video controls className="max-h-full max-w-full">
             <source src={cloudinaryUrl} type={fileType} />
           </video>
         </div>
       );
     }
 
-    if (fileType && (fileType.startsWith('text/') || fileType.includes('json'))) {
+    if (fileType?.startsWith("text/") || fileType?.includes("json")) {
       return (
-        <iframe
-          src={cloudinaryUrl}
-          className="h-full w-full border-0"
-          title={filename}
-        />
+        <iframe src={cloudinaryUrl} className="h-full w-full border-0" title={filename} />
       );
     }
 
     return (
       <div className="flex h-full items-center justify-center text-foreground/60">
-        <div className="text-center">
-          <File className="mx-auto h-16 w-16 mb-4 opacity-40" />
-          <p className="text-lg mb-4">Preview not available for this file type</p>
+        <div className="text-center px-6">
+          <File className="mx-auto mb-4 h-16 w-16 opacity-40" />
+          <p className="mb-1 text-lg font-semibold text-black">{filename}</p>
+          <p className="mb-6 text-sm text-black/50">Preview not available for this file type</p>
           <a
             href={cloudinaryUrl}
             download
@@ -151,8 +172,8 @@ export function FolderFilesView({ folderId }: FolderFilesViewProps) {
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 rounded-md bg-[#8B4513] px-6 py-3 text-sm font-semibold text-white hover:bg-[#6B3410]"
           >
-            <div className="h-4 w-4" />
-            Download File
+            <Download className="h-4 w-4" />
+            Download file
           </a>
         </div>
       </div>
@@ -160,87 +181,115 @@ export function FolderFilesView({ folderId }: FolderFilesViewProps) {
   };
 
   return (
-    <div className="h-screen flex flex-col bg-white overflow-hidden">
+    <div className="flex h-screen flex-col overflow-hidden bg-white">
       <Header activeTab={activeTab} onTabChange={handleTabChange} tabs={tabs} />
-      
-      <div className="flex-1 flex flex-col md:flex-row overflow-hidden min-h-0 relative">
-        {/* Left Sidebar - File List (1/5 width) - Scrollable with slide animation */}
-        <div 
-          className={`border-r border-[#8B4513]/30 bg-[#FFF8F0] overflow-y-auto transition-all duration-300 ease-in-out ${
-            sidebarOpen ? 'w-full md:w-1/5' : 'w-0'
+
+      <div className="relative flex min-h-0 flex-1 flex-row overflow-hidden">
+        {sidebarOpen && (
+          <button
+            type="button"
+            aria-label="Close file list"
+            className="absolute inset-0 z-20 bg-black/40 md:hidden"
+            onClick={() => setSidebarOpen(false)}
+          />
+        )}
+
+        <aside
+          className={`absolute inset-y-0 left-0 z-30 flex h-full shrink-0 flex-col border-r border-[#8B4513]/25 bg-[#FFF8F0] shadow-xl transition-all duration-300 ease-in-out md:relative md:shadow-none ${
+            sidebarOpen
+              ? "w-[min(88vw,300px)] translate-x-0 md:w-[min(320px,28vw)]"
+              : "w-0 -translate-x-full overflow-hidden md:translate-x-0"
           }`}
-          style={{ flexShrink: 0 }}
         >
-          <div className={`${sidebarOpen ? 'opacity-100' : 'opacity-0'} transition-opacity duration-300`}>
-            <div className="sticky top-0 z-10 bg-[#FFF8F0] border-b border-[#8B4513]/30 px-4 py-3">
+          <div className="flex h-full w-[min(88vw,300px)] flex-col md:w-full">
+            <div className="shrink-0 border-b border-[#8B4513]/20 bg-[#FFF8F0] px-4 py-3">
               <button
-                onClick={() => navigate({ to: '/learnings' })}
-                className="flex items-center gap-1.5 text-black hover:text-[#8B4513] font-semibold text-xs mb-2"
+                type="button"
+                onClick={() => navigate({ to: "/learnings", search: { tab: "files" } })}
+                className="mb-2 flex items-center gap-1.5 text-xs font-semibold text-black transition-colors hover:text-[#8B4513]"
               >
                 <ArrowLeft className="h-3.5 w-3.5" />
                 Back to Folders
               </button>
-              <h2 className="font-display text-lg font-bold text-black">
-                {folderData?.name || 'Loading...'}
+              <h2 className="font-display text-base font-bold leading-tight text-black sm:text-lg">
+                {folderData?.name ?? "Loading…"}
               </h2>
-              <p className="text-xs text-black/60 mt-0.5">
-                {data?.files.length || 0} files
+              <p className="mt-0.5 text-[11px] font-medium text-black/55">
+                {isLoading ? "…" : `${sortedFiles.length} file${sortedFiles.length === 1 ? "" : "s"}`}
               </p>
             </div>
 
-            {isLoading ? (
-              <div className="p-4 space-y-2">
-                {[1, 2, 3, 4, 5].map((i) => (
-                  <div key={i} className="h-14 animate-pulse bg-[#8B4513]/10 rounded-lg" />
-                ))}
-              </div>
-            ) : error ? (
-              <div className="p-4 text-center text-red-600">
-                <p className="font-semibold text-xs">Failed to load files</p>
-              </div>
-            ) : !data?.files || data.files.length === 0 ? (
-              <div className="p-4 text-center text-black/60">
-                <FileText className="mx-auto h-10 w-10 mb-2 opacity-30" />
-                <p className="font-medium text-xs">No files in this folder</p>
-              </div>
-            ) : (
-              <div className="p-3 space-y-1.5">
-                {data.files.map((file: FileData) => (
-                  <button
-                    key={file._id}
-                    onClick={() => setSelectedFileId(file.fileId)}
-                    className={`w-full text-left p-3 rounded-lg transition-all duration-200 cursor-pointer ${
-                      selectedFileId === file.fileId
-                        ? 'bg-[#8B4513]/20 border-2 border-[#8B4513]'
-                        : 'bg-transparent hover:bg-[#8B4513]/10'
-                    }`}
-                  >
-                    <div className="flex items-start gap-2">
-                      <div className={`mt-0.5 ${selectedFileId === file.fileId ? 'text-[#8B4513]' : 'text-black/60'}`}>
-                        {getFileIcon(file.fileType)}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-xs text-black truncate leading-tight">
-                          {file.filename}
-                        </h3>
-                        <p className="text-[10px] text-black/50 mt-0.5">
-                          {formatFileSize(file.size)} • {new Date(file.uploadedAt).toLocaleDateString()}
-                        </p>
-                      </div>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            )}
+            <div className="scrollbar-none min-h-0 flex-1 overflow-y-auto">
+              {isLoading ? (
+                <div className="space-y-2 p-3">
+                  {Array.from({ length: 6 }).map((_, i) => (
+                    <div key={i} className="h-14 animate-pulse rounded-md bg-[#8B4513]/10" />
+                  ))}
+                </div>
+              ) : error ? (
+                <div className="p-4 text-center text-sm font-semibold text-red-600">
+                  Failed to load files
+                </div>
+              ) : sortedFiles.length === 0 ? (
+                <div className="p-6 text-center text-black/55">
+                  <FileText className="mx-auto mb-2 h-10 w-10 opacity-30" />
+                  <p className="text-xs font-medium">No files in this folder</p>
+                </div>
+              ) : (
+                <ul className="divide-y divide-[#8B4513]/12 p-2">
+                  {sortedFiles.map((file) => {
+                    const Icon = getFileIcon(file.filename, file.fileType);
+                    const isActive = selectedFileId === file.fileId;
+                    return (
+                      <li key={file._id}>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedFileId(file.fileId);
+                            if (window.innerWidth < 768) setSidebarOpen(false);
+                          }}
+                          className={`flex w-full items-start gap-3 rounded-md px-3 py-3 text-left transition-all ${
+                            isActive
+                              ? "bg-white shadow-[inset_3px_0_0_0_#8B4513] ring-1 ring-[#8B4513]/20"
+                              : "hover:bg-white/70"
+                          }`}
+                        >
+                          <span
+                            className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center border ${
+                              isActive
+                                ? "border-[#8B4513]/30 bg-[#8B4513]/10 text-[#8B4513]"
+                                : "border-black/10 bg-white text-black/50"
+                            }`}
+                          >
+                            <Icon className="h-4 w-4" strokeWidth={2} />
+                          </span>
+                          <span className="min-w-0 flex-1">
+                            <span className="block text-[13px] font-semibold leading-snug text-black">
+                              {file.filename}
+                            </span>
+                            <span className="mt-1 block text-[11px] text-black/50">
+                              {formatFileSize(file.size)} • {formatFileDate(file.uploadedAt)}
+                            </span>
+                          </span>
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </div>
           </div>
-        </div>
+        </aside>
 
-        {/* Toggle Button - Fixed on left side of preview */}
         <button
+          type="button"
           onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="absolute left-0 top-1/2 -translate-y-1/2 z-20 bg-[#8B4513] text-white p-2 rounded-r-lg shadow-lg hover:bg-[#6B3410] transition-all duration-200"
-          style={{ left: sidebarOpen ? 'calc(20% - 1px)' : '0' }}
-          title={sidebarOpen ? 'Hide sidebar' : 'Show sidebar'}
+          aria-label={sidebarOpen ? "Minimize file list" : "Open file list"}
+          className={`absolute top-1/2 z-40 -translate-y-1/2 rounded-r-lg bg-[#8B4513] p-2 text-white shadow-lg transition-all duration-300 hover:bg-[#6B3410] ${
+            sidebarOpen
+              ? "left-[min(88vw,300px)] md:left-[min(320px,28vw)]"
+              : "left-0"
+          }`}
         >
           {sidebarOpen ? (
             <ChevronLeft className="h-4 w-4" />
@@ -249,11 +298,28 @@ export function FolderFilesView({ folderId }: FolderFilesViewProps) {
           )}
         </button>
 
-        {/* Right Section - File Preview (4/5 width) - Fixed */}
-        <div className="flex-1 bg-white overflow-hidden flex flex-col">
-          <div className="flex-1 overflow-hidden">
-            {renderFilePreview()}
-          </div>
+        <div className="flex min-w-0 flex-1 flex-col overflow-hidden bg-white">
+          {selectedFile && (
+            <div className="flex shrink-0 items-center justify-between gap-3 border-b border-black/10 px-4 py-2.5 sm:px-6">
+              <div className="min-w-0">
+                <p className="truncate text-sm font-semibold text-black">{selectedFile.filename}</p>
+                <p className="text-[11px] text-black/50">
+                  {formatFileSize(selectedFile.size)} • {formatFileDate(selectedFile.uploadedAt)}
+                </p>
+              </div>
+              <a
+                href={selectedFile.cloudinaryUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                download
+                className="flex shrink-0 items-center gap-1.5 rounded-md border border-black/15 px-3 py-1.5 text-[11px] font-semibold text-black transition-colors hover:border-[#8B4513]/40 hover:bg-[#FFF8F0]"
+              >
+                <Download className="h-3.5 w-3.5" />
+                Download
+              </a>
+            </div>
+          )}
+          <div className="min-h-0 flex-1 overflow-hidden">{renderFilePreview()}</div>
         </div>
       </div>
     </div>

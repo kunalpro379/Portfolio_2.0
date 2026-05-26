@@ -63,11 +63,38 @@ const socialLinks: SocialLink[] = [
 
 type SocialLinksProps = {
   size?: "md" | "lg";
+  variant?: "boxed" | "plain";
 };
 
-export function SocialLinks({ size = "lg" }: SocialLinksProps) {
-  const iconSize = size === "lg" ? "h-6 w-6" : "h-5 w-5";
+export function SocialLinks({ size = "lg", variant = "boxed" }: SocialLinksProps) {
+  const iconSize =
+    variant === "plain"
+      ? size === "lg"
+        ? "h-8 w-8 sm:h-9 sm:w-9"
+        : "h-7 w-7 sm:h-8 sm:w-8"
+      : size === "lg"
+        ? "h-6 w-6"
+        : "h-5 w-5";
   const boxSize = size === "lg" ? "h-12 w-12 sm:h-14 sm:w-14" : "h-11 w-11";
+
+  if (variant === "plain") {
+    return (
+      <div className="flex flex-wrap items-center gap-5 sm:gap-6">
+        {socialLinks.map(({ label, href, Icon, brandColor, external }) => (
+          <a
+            key={label}
+            href={href}
+            target={external || href.startsWith("http") ? "_blank" : undefined}
+            rel={external || href.startsWith("http") ? "noopener noreferrer" : undefined}
+            aria-label={label}
+            className="transition-transform duration-200 hover:scale-110"
+          >
+            <Icon className={iconSize} style={{ color: brandColor }} aria-hidden />
+          </a>
+        ))}
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-wrap gap-3 sm:gap-4">

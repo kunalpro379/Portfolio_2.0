@@ -168,15 +168,23 @@ export function BlogDetailView({ blogId }: BlogDetailViewProps) {
     <div className="h-screen flex flex-col bg-white overflow-hidden">
       <Header activeTab={activeTab} onTabChange={handleTabChange} tabs={tabs} />
       
-      <div className="flex-1 flex flex-col md:flex-row overflow-hidden min-h-0 relative">
-        {/* Left Sidebar - Blog Info */}
-        <div 
-          className={`border-r border-[#8B4513]/30 bg-[#FFF8F0] overflow-y-auto transition-all duration-300 ease-in-out ${
-            sidebarOpen ? 'w-full md:w-1/5' : 'w-0'
+      <div className="relative flex min-h-0 flex-1 flex-row overflow-hidden">
+        {sidebarOpen && (
+          <button
+            type="button"
+            aria-label="Close sidebar"
+            className="absolute inset-0 z-20 bg-black/40 md:hidden"
+            onClick={() => setSidebarOpen(false)}
+          />
+        )}
+
+        {/* Left sidebar — drawer on mobile, column on desktop */}
+        <aside
+          className={`absolute inset-y-0 left-0 z-30 h-full shrink-0 border-r border-[#8B4513]/30 bg-[#FFF8F0] shadow-xl transition-all duration-300 ease-in-out md:relative md:shadow-none ${
+            sidebarOpen ? "w-[280px] translate-x-0 md:w-1/5" : "w-0 -translate-x-full overflow-hidden md:translate-x-0"
           }`}
-          style={{ flexShrink: 0 }}
         >
-          <div className={`${sidebarOpen ? 'opacity-100' : 'opacity-0'} transition-opacity duration-300 p-4 space-y-4`}>
+          <div className="h-full w-[280px] overflow-y-auto p-4 space-y-4 md:w-full">
             <button
               onClick={() => navigate({ to: '/learnings' })}
               className="flex items-center gap-1.5 text-black hover:text-[#8B4513] font-semibold text-xs mb-3"
@@ -283,19 +291,20 @@ export function BlogDetailView({ blogId }: BlogDetailViewProps) {
               </div>
             )}
           </div>
-        </div>
+        </aside>
 
-        {/* Toggle Button */}
         <button
+          type="button"
           onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="absolute left-0 top-1/2 -translate-y-1/2 z-20 bg-[#8B4513] text-white p-2 rounded-r-lg shadow-lg hover:bg-[#6B3410] transition-all duration-200"
-          style={{ left: sidebarOpen ? 'calc(20% - 1px)' : '0' }}
+          aria-label={sidebarOpen ? "Minimize sidebar" : "Open sidebar"}
+          className={`absolute top-1/2 z-40 -translate-y-1/2 rounded-r-lg bg-[#8B4513] p-2 text-white shadow-lg transition-all duration-300 hover:bg-[#6B3410] ${
+            sidebarOpen ? "left-[280px] md:left-[calc(20%-1px)]" : "left-0"
+          }`}
         >
           {sidebarOpen ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
         </button>
 
-        {/* Right Section - Markdown Content */}
-        <div className="flex-1 bg-white overflow-y-auto">
+        <div className="min-w-0 flex-1 overflow-y-auto bg-white">
           <div className="max-w-5xl mx-auto px-3 py-4">
             <article className="prose prose-slate max-w-none">
               {content ? (

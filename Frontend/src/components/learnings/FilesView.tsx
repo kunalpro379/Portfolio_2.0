@@ -1,8 +1,8 @@
-import { useQuery } from '@tanstack/react-query';
-import { Folder } from 'lucide-react';
-import { useMemo } from 'react';
-import { Link } from '@tanstack/react-router';
-import { config } from '@/config/config';
+import { useQuery } from "@tanstack/react-query";
+import { Folder, ChevronRight } from "lucide-react";
+import { useMemo } from "react";
+import { Link } from "@tanstack/react-router";
+import { config } from "@/config/config";
 
 interface FolderData {
   _id: string;
@@ -22,35 +22,44 @@ interface FilesViewProps {
   search?: string;
 }
 
-export function FilesView({ search = '' }: FilesViewProps) {
-  // Fetch folders from API
+function formatFolderDate(dateStr: string) {
+  return new Date(dateStr).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
+export function FilesView({ search = "" }: FilesViewProps) {
   const { data, isLoading, error } = useQuery<FoldersResponse>({
-    queryKey: ['folders'],
+    queryKey: ["folders"],
     queryFn: async () => {
       const response = await fetch(`${config.apiUrl}/notes/folders`);
-      if (!response.ok) {
-        throw new Error('Failed to fetch folders');
-      }
+      if (!response.ok) throw new Error("Failed to fetch folders");
       return response.json();
     },
   });
 
-  // Filter folders based on search
   const filteredFolders = useMemo(() => {
     if (!data?.folders) return [];
-    
-    if (!search) return data.folders;
-    
-    return data.folders.filter((folder) =>
-      folder.name.toLowerCase().includes(search.toLowerCase())
+    const list = search
+      ? data.folders.filter((folder) =>
+          folder.name.toLowerCase().includes(search.toLowerCase()),
+        )
+      : [...data.folders];
+    return list.sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
     );
   }, [data?.folders, search]);
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
-        {[1, 2, 3, 4, 5].map((item) => (
-          <div key={item} className="h-32 animate-pulse border-b border-black/10 bg-black/5" />
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+        {Array.from({ length: 10 }).map((_, i) => (
+          <div
+            key={i}
+            className="h-[108px] animate-pulse border border-black/10 bg-black/[0.04]"
+          />
         ))}
       </div>
     );
@@ -68,6 +77,7 @@ export function FilesView({ search = '' }: FilesViewProps) {
   if (filteredFolders.length === 0) {
     return (
       <div className="py-20 text-center">
+        <Folder className="mx-auto mb-4 h-12 w-12 text-black/15" strokeWidth={1.5} />
         <p className="text-xl text-foreground/60">No folders found</p>
         {search && <p className="mt-2 text-sm text-foreground/40">Try a different search term</p>}
       </div>
@@ -75,42 +85,36 @@ export function FilesView({ search = '' }: FilesViewProps) {
   }
 
   return (
-    <div className="space-y-5">
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
-        {filteredFolders.map((folder) => {
-          const createdDate = new Date(folder.createdAt).toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric',
-          });
+    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+      {filteredFolders.map((folder) => (
+        <Link
+          key={folder._id}
+          to="/learnings/files/$folderId"
+          params={{ folderId: folder.folderId }}
+          className="group flex min-h-[108px] flex-col justify-between border border-black/12 bg-white p-3.5 transition-all duration-200 hover:border-[#8B4513]/45 hover:bg-[#FFF8F0] hover:shadow-[4px_4px_0_0_rgba(139,69,19,0.1)] sm:p-4"
+        >
+          <div className="flex items-start gap-2.5 sm:gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center border border-[#8B4513]/20 bg-[#FFF8F0] text-[#8B4513] transition-colors group-hover:border-[#8B4513]/40 group-hover:bg-[#8B4513]/10 sm:h-11 sm:w-11">
+              <Folder className="h-5 w-5 sm:h-6 sm:w-6" strokeWidth={1.75} />
+            </div>
+            <div className="min-w-0 flex-1">
+              <h3 className="line-clamp-2 font-display text-[13px] font-bold leading-snug text-black transition-colors group-hover:text-[#8B4513] sm:text-[15px]">
+                {folder.name}
+              </h3>
+              <span className="label-mono mt-1.5 inline-block text-[8px] font-semibold uppercase tracking-[0.2em] text-black/40 sm:text-[9px]">
+                Folder
+              </span>
+            </div>
+          </div>
 
-          return (
-            <Link
-              key={folder._id}
-              to="/learnings/files/$folderId"
-              params={{ folderId: folder.folderId }}
-              className="group cursor-pointer border-b border-black/10 pb-4 pr-3 transition-all duration-200 hover:border-[#8B4513]/35 hover:bg-[#8B4513]/5 hover:pl-3 hover:pr-2 block"
-            >
-              <div className="mb-3 flex items-center gap-3">
-                <div className="flex h-11 w-11 items-center justify-center border border-black/10 bg-white text-black transition-all duration-200 group-hover:border-[#8B4513]/35 group-hover:bg-[#8B4513]/8 group-hover:text-[#8B4513] group-hover:shadow-[0_8px_18px_rgba(139,69,19,0.08)]">
-                  <Folder className="h-6 w-6" strokeWidth={1.8} />
-                </div>
-                <div className="min-w-0">
-                  <h3 className="truncate cursor-pointer text-[15px] font-semibold leading-tight text-black transition-colors group-hover:text-[#111111] group-hover:underline group-hover:underline-offset-4">
-                    {folder.name}
-                  </h3>
-                  <p className="text-[11px] uppercase tracking-[0.18em] text-black/45">Folder</p>
-                </div>
-              </div>
-
-              <div className="space-y-1 text-[12px] text-black/65">
-                <div>{createdDate}</div>
-                <div className="font-medium text-black">{folder.path}</div>
-              </div>
-            </Link>
-          );
-        })}
-      </div>
+          <div className="mt-3 flex items-center justify-between gap-2 border-t border-black/8 pt-2.5">
+            <span className="text-[11px] font-medium text-black/55 sm:text-[12px]">
+              {formatFolderDate(folder.createdAt)}
+            </span>
+            <ChevronRight className="h-3.5 w-3.5 shrink-0 text-black/25 transition-transform group-hover:translate-x-0.5 group-hover:text-[#8B4513]" />
+          </div>
+        </Link>
+      ))}
     </div>
   );
 }

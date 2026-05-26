@@ -50,8 +50,8 @@ export function ContentCard({ item, type, onClick, displayNumber }: ContentCardP
       onClick={onClick}
     >
       {isTextOnly ? (
-        <div className="relative flex h-full flex-col p-4">
-          <div className="flex items-center gap-3 text-[10px] uppercase tracking-[0.18em] text-black/55 mb-3">
+        <div className="relative flex h-full flex-col p-2.5 sm:p-4">
+          <div className="mb-2 flex items-center gap-2 text-[8px] uppercase tracking-[0.14em] text-black/55 sm:mb-3 sm:gap-3 sm:text-[10px] sm:tracking-[0.18em]">
             {typeof displayNumber === 'number' && (
               <span className="inline-flex items-center justify-center font-bold text-black/80">
                 {String(displayNumber).padStart(2, '0')}
@@ -63,11 +63,11 @@ export function ContentCard({ item, type, onClick, displayNumber }: ContentCardP
             )}
           </div>
 
-          <h3 className="mb-2 font-display text-[1.15rem] font-semibold leading-tight text-black transition-colors duration-200 group-hover:underline group-hover:decoration-black group-hover:underline-offset-4">
+          <h3 className="mb-1.5 font-display text-[0.58rem] font-semibold leading-tight text-black transition-colors duration-200 group-hover:underline group-hover:decoration-black group-hover:underline-offset-4 sm:mb-2 sm:text-[1.15rem]">
             {getTitle()}
           </h3>
 
-          <p className="text-[12px] leading-[1.6] text-black/68 line-clamp-3">
+          <p className="text-[10px] leading-[1.5] text-black/68 line-clamp-3 sm:text-[12px] sm:leading-[1.6]">
             {getDescription()}
           </p>
 
@@ -85,30 +85,30 @@ export function ContentCard({ item, type, onClick, displayNumber }: ContentCardP
                 src={getImage()} 
                 alt={getTitle()} 
                 loading="lazy" 
-                className="aspect-[16/10] w-full object-cover grayscale transition-transform duration-700 group-hover:scale-[1.01] group-hover:grayscale-0" 
+                className="aspect-[4/3] w-full object-cover grayscale transition-transform duration-700 group-hover:scale-[1.01] group-hover:grayscale-0 sm:aspect-[16/10]" 
               />
             ) : (
-              <div className="aspect-[16/10] w-full bg-white" />
+              <div className="aspect-[4/3] w-full bg-white sm:aspect-[16/10]" />
             )}
           </div>
 
-          <div className="flex flex-1 flex-col p-4">
-            <div className="mb-3 flex items-start justify-between gap-3">
-              <div className="label-mono text-[10px] uppercase tracking-[0.22em] text-black/55">{type.toUpperCase()}</div>
+          <div className="flex flex-1 flex-col p-2.5 sm:p-4">
+            <div className="mb-2 flex items-start justify-between gap-2 sm:mb-3 sm:gap-3">
+              <div className="label-mono text-[8px] uppercase tracking-[0.14em] text-black/55 sm:text-[10px] sm:tracking-[0.22em]">{type.toUpperCase()}</div>
               {dateLabel && (
-                <div className="label-mono text-[10px] uppercase tracking-[0.18em] text-black/45">{dateLabel}</div>
+                <div className="label-mono shrink-0 text-[8px] uppercase tracking-[0.12em] text-black/45 sm:text-[10px] sm:tracking-[0.18em]">{dateLabel}</div>
               )}
             </div>
 
-            <h3 className="cursor-pointer font-display text-[1.15rem] font-semibold leading-tight text-black transition-colors group-hover:underline group-hover:decoration-black group-hover:underline-offset-4">
+            <h3 className="cursor-pointer font-display text-[0.58rem] font-semibold leading-tight text-black transition-colors group-hover:underline group-hover:decoration-black group-hover:underline-offset-4 sm:text-[1.15rem]">
               {getTitle()}
             </h3>
             
-            <p className="mt-3 text-[12px] leading-[1.6] text-black/68 line-clamp-3">
+            <p className="mt-1.5 text-[10px] leading-[1.5] text-black/68 line-clamp-3 sm:mt-3 sm:text-[12px] sm:leading-[1.6]">
               {getDescription()}
             </p>
 
-            <div className="mt-4 flex flex-wrap gap-x-3 gap-y-1 text-[10px] uppercase tracking-[0.14em] text-black/55">
+            <div className="mt-2 flex flex-wrap gap-x-1.5 gap-y-1 text-[8px] uppercase tracking-[0.12em] text-black/55 sm:mt-4 sm:gap-x-3 sm:text-[10px] sm:tracking-[0.14em]">
               {getTags().slice(0, 4).map((tag: string, idx: number) => (
                 <span key={idx}>{tag}</span>
               ))}

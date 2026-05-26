@@ -423,7 +423,7 @@ export function DiaryView() {
   }, []);
 
   return (
-    <div className="w-full h-full flex flex-col items-start px-2 md:px-3 lg:px-4 pt-0 pb-0 flex-1 min-h-0 overflow-hidden" style={{ zIndex: 30 }}>
+    <div className="flex h-full min-h-0 w-full flex-1 flex-col items-stretch overflow-hidden px-0 pt-0 pb-0 md:px-3 lg:px-4" style={{ zIndex: 30 }}>
       <style>{`\
         @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap');\
 \
@@ -501,47 +501,112 @@ export function DiaryView() {
         }\
       `}</style>
 
-      <div className="md:hidden w-full bg-white px-2 py-1 -mt-px rounded-none border-t border-gray-200 shrink-0">
-        <div className="flex w-full items-center gap-2">
-          <button onClick={() => goToDate("prev")} className="h-8 w-8 flex items-center justify-center rounded-none border border-gray-200 text-gray-700 shrink-0 bg-white" aria-label="Previous date">
-            <ChevronLeft className="w-4 h-4" strokeWidth={2} />
+      <div className="md:hidden w-full shrink-0 border-b-2 border-black bg-white">
+        <div className="grid w-full grid-cols-[44px_minmax(0,1fr)_44px_44px_44px_44px] items-stretch border-b border-black/15">
+          <button
+            type="button"
+            onClick={() => goToDate("prev")}
+            className="flex h-11 items-center justify-center border-r border-black/15 bg-white text-gray-800"
+            aria-label="Previous date"
+          >
+            <ChevronLeft className="h-4 w-4" strokeWidth={2} />
           </button>
 
-          <div className="flex items-center gap-2 flex-1 min-w-0">
-            <span className="whitespace-nowrap font-bold diary-mono text-sm text-gray-800 truncate">{pageTitle}</span>
-            <button type="button" onClick={() => setActiveSide("left")} className={`h-8 w-8 shrink-0 rounded-none border border-gray-200 flex items-center justify-center bg-white text-gray-800 ${activeSide === "left" ? "font-bold bg-gray-100" : ""}`} aria-label="Select left page">L</button>
-            <button type="button" onClick={() => setActiveSide("right")} className={`h-8 w-8 shrink-0 rounded-none border border-gray-200 flex items-center justify-center bg-white text-gray-800 ${activeSide === "right" ? "font-bold bg-gray-100" : ""}`} aria-label="Select right page">R</button>
-          </div>
+          <label className="relative flex h-11 min-w-0 items-center justify-center border-r border-black/15 bg-white px-1">
+            <span className="pointer-events-none absolute left-2 top-1 text-[8px] font-bold uppercase tracking-wider text-gray-400 diary-mono">Date</span>
+            <input
+              ref={dateInputRef}
+              type="date"
+              value={date}
+              onChange={(e) => syncDateInput(e.target.value)}
+              className="diary-mono h-full w-full min-w-0 border-0 bg-transparent pt-3 text-center text-[13px] font-bold text-gray-900 focus:outline-none"
+            />
+          </label>
 
-          <button onClick={() => goToDate("next")} className="h-8 w-8 flex items-center justify-center rounded-none border border-gray-200 text-gray-700 shrink-0 bg-white" aria-label="Next date">
-            <ChevronRight className="w-4 h-4" strokeWidth={2} />
+          <button
+            type="button"
+            onClick={() => setActiveSide("left")}
+            className={`flex h-11 items-center justify-center border-r border-black/15 diary-mono text-sm font-bold ${
+              activeSide === "left" ? "bg-black text-white" : "bg-white text-gray-800"
+            }`}
+            aria-label="Left page"
+          >
+            L
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveSide("right")}
+            className={`flex h-11 items-center justify-center border-r border-black/15 diary-mono text-sm font-bold ${
+              activeSide === "right" ? "bg-black text-white" : "bg-white text-gray-800"
+            }`}
+            aria-label="Right page"
+          >
+            R
           </button>
 
-          <button onClick={() => {
-            const input = dateInputRef.current;
-            if (!input) return;
-            try {
-              (input as HTMLInputElement & { showPicker?: () => void }).showPicker?.();
-              input.focus();
-            } catch {
-              input.focus();
-            }
-          }} className="ml-2 h-8 w-8 flex items-center justify-center rounded-none bg-[#8fb0ff] text-white shrink-0" aria-label="Open date picker" title="Pick a date">
-            <Calendar className="w-4 h-4" strokeWidth={2} />
+          <button
+            type="button"
+            onClick={() => goToDate("next")}
+            className="flex h-11 items-center justify-center border-r border-black/15 bg-white text-gray-800"
+            aria-label="Next date"
+          >
+            <ChevronRight className="h-4 w-4" strokeWidth={2} />
           </button>
-          <input ref={dateInputRef} type="date" value={date} onChange={(e) => syncDateInput(e.target.value)} className="sr-only" />
+
+          <button
+            type="button"
+            onClick={openExportModal}
+            className="flex h-11 items-center justify-center bg-[#8fb0ff] text-white"
+            aria-label="Download PDF"
+            title="Download PDF"
+          >
+            <Download className="h-4 w-4" strokeWidth={2} />
+          </button>
         </div>
 
-        <div className="mt-2 grid w-full grid-cols-5 gap-2">
-          <button onMouseDown={(e) => { e.preventDefault(); preserveSelection(activeSide); }} onClick={() => execCommand("bold")} className="h-8 rounded-none border border-gray-200 bg-white text-gray-800 font-medium diary-mono text-sm">B</button>
-          <button onMouseDown={(e) => { e.preventDefault(); preserveSelection(activeSide); }} onClick={() => execCommand("italic")} className="h-8 rounded-none border border-gray-200 bg-white text-gray-800 font-medium diary-mono text-sm">I</button>
-          <button onMouseDown={(e) => { e.preventDefault(); preserveSelection(activeSide); }} onClick={insertBullet} className="h-8 rounded-none border border-gray-200 bg-white text-gray-800 font-medium diary-mono text-lg">•</button>
-          <button onMouseDown={(e) => { e.preventDefault(); preserveSelection(activeSide); }} onClick={insertLine} className="h-8 rounded-none border border-gray-200 bg-white text-gray-800 font-medium diary-mono text-lg">—</button>
-          <select value={activeSide === "left" ? leftFontSize : rightFontSize} onChange={(e) => {
-            const value = Number(e.target.value);
-            if (activeSide === "left") setLeftFontSize(value);
-            else setRightFontSize(value);
-          }} className="h-8 rounded-none border border-gray-200 bg-white text-center font-medium diary-mono text-sm">
+        <div className="grid w-full grid-cols-10 divide-x divide-black/15">
+          <button
+            type="button"
+            onMouseDown={(e) => { e.preventDefault(); preserveSelection(activeSide); }}
+            onClick={() => execCommand("bold")}
+            className="flex h-10 items-center justify-center bg-white diary-mono text-sm font-bold text-gray-800"
+          >
+            B
+          </button>
+          <button
+            type="button"
+            onMouseDown={(e) => { e.preventDefault(); preserveSelection(activeSide); }}
+            onClick={() => execCommand("italic")}
+            className="flex h-10 items-center justify-center bg-white diary-mono text-sm font-bold text-gray-800"
+          >
+            I
+          </button>
+          <button
+            type="button"
+            onMouseDown={(e) => { e.preventDefault(); preserveSelection(activeSide); }}
+            onClick={insertBullet}
+            className="flex h-10 items-center justify-center bg-white diary-mono text-lg font-bold text-gray-800"
+          >
+            •
+          </button>
+          <button
+            type="button"
+            onMouseDown={(e) => { e.preventDefault(); preserveSelection(activeSide); }}
+            onClick={insertLine}
+            className="flex h-10 items-center justify-center bg-white diary-mono text-lg font-bold text-gray-800"
+          >
+            —
+          </button>
+          <select
+            value={activeSide === "left" ? leftFontSize : rightFontSize}
+            onChange={(e) => {
+              const value = Number(e.target.value);
+              if (activeSide === "left") setLeftFontSize(value);
+              else setRightFontSize(value);
+            }}
+            className="h-10 w-full border-0 bg-white text-center diary-mono text-xs font-bold text-gray-800 focus:outline-none"
+            aria-label="Font size"
+          >
             <option value={12}>12</option>
             <option value={14}>14</option>
             <option value={16}>16</option>
@@ -549,12 +614,20 @@ export function DiaryView() {
             <option value={20}>20</option>
             <option value={22}>22</option>
           </select>
-          <div className="col-span-5 grid grid-cols-5 gap-2">
-            <button onClick={() => setTextAlign("left")} className="h-8 rounded-none border border-gray-200 bg-white text-gray-800 flex items-center justify-center" title="Align left"><AlignLeft className="w-4 h-4" strokeWidth={2} /></button>
-            <button onClick={() => setTextAlign("center")} className="h-8 rounded-none border border-gray-200 bg-white text-gray-800 flex items-center justify-center" title="Align center"><AlignCenter className="w-4 h-4" strokeWidth={2} /></button>
-            <button onClick={() => setTextAlign("right")} className="h-8 rounded-none border border-gray-200 bg-white text-gray-800 flex items-center justify-center" title="Align right"><AlignRight className="w-4 h-4" strokeWidth={2} /></button>
-            <button onClick={clearCurrentPage} className="h-8 rounded-none border border-gray-200 bg-white text-red-600 flex items-center justify-center" title="Delete"><Trash2 className="w-4 h-4" strokeWidth={2} /></button>
-            <div className="h-8 rounded-none border border-gray-200 bg-white flex items-center justify-center text-[11px] font-medium text-gray-500 diary-mono">{loadingDate ? "Loading" : saving ? "Saving" : "Saved"}</div>
+          <button type="button" onClick={() => setTextAlign("left")} className="flex h-10 items-center justify-center bg-white text-gray-800" title="Align left">
+            <AlignLeft className="h-4 w-4" strokeWidth={2} />
+          </button>
+          <button type="button" onClick={() => setTextAlign("center")} className="flex h-10 items-center justify-center bg-white text-gray-800" title="Align center">
+            <AlignCenter className="h-4 w-4" strokeWidth={2} />
+          </button>
+          <button type="button" onClick={() => setTextAlign("right")} className="flex h-10 items-center justify-center bg-white text-gray-800" title="Align right">
+            <AlignRight className="h-4 w-4" strokeWidth={2} />
+          </button>
+          <button type="button" onClick={clearCurrentPage} className="flex h-10 items-center justify-center bg-white text-red-600" title="Delete">
+            <Trash2 className="h-4 w-4" strokeWidth={2} />
+          </button>
+          <div className="flex h-10 items-center justify-center bg-[#f3f3f3] px-1 text-center diary-mono text-[10px] font-bold uppercase tracking-wide text-gray-600">
+            {loadingDate ? "Load" : saving ? "Save" : "Saved"}
           </div>
         </div>
       </div>
@@ -635,9 +708,9 @@ export function DiaryView() {
         </div>
       )}
 
-      <div className="w-full max-w-[1400px] diary-container overflow-hidden flex-1 min-h-0 mx-auto">
-        <div className="w-full h-full min-h-0 flex flex-col gap-0">
-          <div className={`editor-card flex flex-col flex-1 min-h-0 p-4 ${activeSide === "left" ? "editor-card-left" : "editor-card-right"}`} style={{ borderRadius: 0 }}>
+      <div className="diary-container mx-auto flex min-h-0 w-full max-w-[1400px] flex-1 overflow-hidden md:max-w-[1400px]">
+        <div className="flex h-full min-h-0 w-full flex-col gap-0">
+          <div className={`editor-card flex min-h-0 flex-1 flex-col p-3 md:p-4 ${activeSide === "left" ? "editor-card-left" : "editor-card-right"}`} style={{ borderRadius: 0 }}>
             <div className="flex-1 min-h-0 overflow-hidden">
               <div
                 ref={activeSide === "left" ? leftEditorRef : rightEditorRef}

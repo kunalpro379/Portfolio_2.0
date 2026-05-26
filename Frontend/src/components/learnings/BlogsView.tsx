@@ -35,7 +35,7 @@ export function BlogsView({ search }: BlogsViewProps) {
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 gap-0 md:grid-cols-3 lg:grid-cols-5">
         {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((i) => (
           <div key={i} className="animate-pulse">
             <div className="aspect-[16/10] bg-black/10 mb-4"></div>
@@ -60,7 +60,7 @@ export function BlogsView({ search }: BlogsViewProps) {
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-0">
+    <div className="grid grid-cols-2 gap-0 md:grid-cols-3 lg:grid-cols-5">
       {filteredBlogs.map((item: any, idx: number) => (
         <ContentCard 
           key={item._id || item.id || idx} 

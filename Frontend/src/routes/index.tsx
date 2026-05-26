@@ -511,32 +511,45 @@ function Work() {
                         <div className="aspect-[4/3] w-full bg-white sm:aspect-[16/10]" />
                       )}
                     </div>
-                    <div className="flex h-full flex-col p-2 sm:p-4">
-                      <div className="mb-1.5 flex items-start justify-between gap-1 sm:mb-3 sm:gap-3">
-                        <div className="label-mono text-[8px] uppercase tracking-[0.14em] text-black/55 sm:text-[10px] sm:tracking-[0.22em]">
-                          {String(idx + 1).padStart(2, "0")}
+                    <div className="flex h-full flex-col p-2.5 sm:p-4">
+                      <div className="mb-2 flex items-start justify-between gap-2 sm:mb-3 sm:gap-3">
+                        <div className="label-mono text-[8px] uppercase leading-tight tracking-[0.14em] text-black/55 sm:text-[10px] sm:tracking-[0.22em]">
+                          {String(idx + 1).padStart(2, "0")} ·{" "}
+                          {project.projectId?.toUpperCase() || "PROJECT"}
                         </div>
                         {year && (
-                          <div className="label-mono text-[8px] uppercase tracking-[0.12em] text-black/45 sm:text-[10px]">
+                          <div className="label-mono shrink-0 text-[8px] uppercase tracking-[0.12em] text-black/45 sm:text-[10px]">
                             {new Date(year).getFullYear()}
                           </div>
                         )}
                       </div>
-                      <h3 className="font-display text-[11px] font-semibold leading-tight text-black transition-colors group-hover:underline group-hover:decoration-black group-hover:underline-offset-2 sm:text-[1.15rem] sm:group-hover:underline-offset-4">
+                      <h3 className="font-display text-[12px] font-semibold leading-tight text-black transition-colors group-hover:underline group-hover:decoration-black group-hover:underline-offset-2 sm:text-[1.15rem] sm:group-hover:underline-offset-4">
                         {project.title}
                       </h3>
-                      <p className="mt-1.5 hidden text-[12px] leading-[1.6] text-black/68 line-clamp-3 sm:mt-3 sm:block sm:line-clamp-4">
-                        {project.description}
-                      </p>
-                      <div className="mt-2 hidden flex-wrap gap-x-2 gap-y-1 text-[10px] uppercase tracking-[0.14em] text-black/55 sm:mt-4 sm:flex">
-                        {project.tags?.slice(0, 3).map((tag) => (
-                          <span key={tag}>{tag}</span>
-                        ))}
-                      </div>
+                      {project.description && (
+                        <p className="mt-2 text-[10px] leading-[1.55] text-black/68 line-clamp-4 sm:mt-3 sm:text-[12px] sm:leading-[1.6]">
+                          {project.description}
+                        </p>
+                      )}
+                      {project.tags && project.tags.length > 0 && (
+                        <div className="mt-2 flex flex-wrap gap-x-1.5 gap-y-1 text-[8px] uppercase tracking-[0.12em] text-black/55 sm:mt-4 sm:gap-x-3 sm:text-[10px] sm:tracking-[0.14em]">
+                          {project.tags.slice(0, 4).map((tag) => (
+                            <span key={tag}>{tag}</span>
+                          ))}
+                        </div>
+                      )}
                       {(links?.github || links?.live) && (
-                        <div className="mt-2 hidden items-center gap-3 border-t border-black/10 pt-2 text-[9px] font-semibold uppercase tracking-[0.14em] text-black/60 sm:mt-4 sm:flex sm:pt-3 sm:text-[10px]">
-                          {links?.github && <span>GitHub ↗</span>}
-                          {links?.live && <span>Live →</span>}
+                        <div className="mt-auto flex items-center gap-2 border-t border-black/10 pt-2 text-[8px] font-semibold uppercase tracking-[0.12em] text-black/60 sm:mt-4 sm:gap-4 sm:pt-3 sm:text-[10px] sm:tracking-[0.18em]">
+                          {links?.github && (
+                            <span className="transition-colors group-hover:text-black group-hover:underline group-hover:underline-offset-2 sm:group-hover:underline-offset-4">
+                              GitHub ↗
+                            </span>
+                          )}
+                          {links?.live && (
+                            <span className="transition-colors group-hover:text-black group-hover:underline group-hover:underline-offset-2 sm:group-hover:underline-offset-4">
+                              Live Demo →
+                            </span>
+                          )}
                         </div>
                       )}
                     </div>
@@ -798,13 +811,13 @@ function Writing() {
   return (
     <section id="writing" className="border-b border-white/10 bg-black text-white">
       <div className="page-container py-16 sm:py-24">
-        <div className="mb-16">
-          <div className="label-mono mb-8 flex items-center gap-3 text-white/70">
-            <span className="text-[14px] text-white">04</span>
+        <div className="mb-10 sm:mb-16">
+          <div className="label-mono mb-6 flex items-center gap-3 text-white/70 sm:mb-8">
+            <span className="text-[12px] text-white sm:text-[14px]">04</span>
             <span className="text-white/40">/</span>
-            <span className="text-[14px] text-white">Readings</span>
+            <span className="text-[12px] text-white sm:text-[14px]">Readings</span>
           </div>
-          <h2 className="font-display text-[clamp(3.5rem,7vw,6rem)] font-bold leading-[1] text-white">
+          <h2 className="font-display text-[clamp(2.25rem,7vw,6rem)] font-bold leading-[1] text-white">
             Readings
           </h2>
         </div>
@@ -816,19 +829,21 @@ function Writing() {
         ) : (
           <>
             {/* Top 2 Blogs - Large Cards */}
-        <div className="mb-12">
-          <div className="grid grid-cols-1 gap-12 md:grid-cols-2">
+        <div className="mb-8 sm:mb-12">
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 md:gap-12">
             {topBlogs.map((blog: any) => (
-              <article key={blog._id} className="border-t border-white/20 pt-8">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="label-mono text-[12px] text-white/60 uppercase tracking-wider">{blog.subject || 'Blog'}</div>
-                  <div className="label-mono text-[12px] text-white/50">{new Date(blog.datetime || blog.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}</div>
+              <article key={blog._id} className="border-t border-white/20 pt-5 sm:pt-8">
+                <div className="mb-3 flex items-center justify-between sm:mb-4">
+                  <div className="label-mono text-[10px] uppercase tracking-wider text-white/60 sm:text-[12px]">{blog.subject || "Blog"}</div>
+                  <div className="label-mono text-[10px] text-white/50 sm:text-[12px]">{new Date(blog.datetime || blog.created_at).toLocaleDateString("en-US", { month: "short", year: "numeric" })}</div>
                 </div>
-                <h3 className="font-display text-[2rem] font-bold leading-[1.2] text-white mb-4 hover:text-white/80 transition-colors cursor-pointer">{blog.title}</h3>
-                <p className="text-[15px] leading-[1.7] text-white/70 line-clamp-2 mb-5">{blog.shortDescription || blog.description || 'Read more about this topic...'}</p>
-                <div className="flex flex-wrap items-center gap-3">
+                <h3 className="font-display mb-3 cursor-pointer text-[1.25rem] font-bold leading-[1.2] text-white transition-colors hover:text-white/80 sm:mb-4 sm:text-[2rem]">{blog.title}</h3>
+                <p className="mb-4 line-clamp-2 text-[13px] leading-[1.6] text-white/70 sm:mb-5 sm:text-[15px] sm:leading-[1.7]">{blog.shortDescription || blog.description || "Read more about this topic..."}</p>
+                <div className="flex flex-wrap items-center gap-2">
                   {blog.tags?.slice(0, 4).map((tag: string) => (
-                    <span key={tag} className="label-mono text-[11px] text-white/50 uppercase tracking-wider">{tag}</span>
+                    <span key={tag} className="label-mono rounded-sm border border-white/30 px-2 py-0.5 text-[9px] uppercase tracking-wider text-white/85 sm:text-[11px]">
+                      {tag}
+                    </span>
                   ))}
                 </div>
               </article>
@@ -841,20 +856,22 @@ function Writing() {
           <div className="grid grid-cols-2 gap-3 sm:gap-6 lg:grid-cols-4">
             {bottomBlogs.map((blog: any) => (
               <article key={blog._id} className="cursor-pointer rounded-lg bg-white p-3 text-black transition-shadow hover:shadow-xl sm:p-6">
-                <div className="mb-4">
-                  <span className="inline-block bg-black text-white px-3 py-1 text-[10px] font-semibold uppercase tracking-wide">
-                    {blog.subject || 'BLOG'}
+                <div className="mb-3 sm:mb-4">
+                  <span className="inline-block rounded-sm border border-black/15 bg-black px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-white sm:px-3 sm:py-1 sm:text-[10px]">
+                    {blog.subject || "BLOG"}
                   </span>
                 </div>
-                <h3 className="font-display mb-2 text-[0.9rem] font-semibold leading-tight hover:text-black/70 transition-colors sm:mb-3 sm:text-[1.25rem]">
+                <h3 className="font-display mb-2 text-[0.85rem] font-semibold leading-tight transition-colors hover:text-black/70 sm:mb-3 sm:text-[1.25rem]">
                   {blog.title}
                 </h3>
-                <p className="mb-2 line-clamp-2 text-[11px] leading-snug text-black/70 sm:mb-4 sm:line-clamp-3 sm:text-[13px] sm:leading-[1.6]">
-                  {blog.shortDescription || blog.description || 'Explore this blog...'}
+                <p className="mb-2 line-clamp-2 text-[10px] leading-snug text-black/70 sm:mb-4 sm:line-clamp-3 sm:text-[13px] sm:leading-[1.6]">
+                  {blog.shortDescription || blog.description || "Explore this blog..."}
                 </p>
-                <div className="flex flex-wrap gap-2 mb-4">
+                <div className="mb-3 flex flex-wrap gap-1.5 sm:mb-4 sm:gap-2">
                   {blog.tags?.slice(0, 3).map((tag: string) => (
-                    <span key={tag} className="text-[10px] text-black/60 uppercase tracking-wide">{tag}</span>
+                    <span key={tag} className="rounded-sm border border-black/20 px-1.5 py-0.5 text-[8px] uppercase tracking-wide text-black/70 sm:px-2 sm:text-[10px]">
+                      {tag}
+                    </span>
                   ))}
                 </div>
                 <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-wide text-black/80">
@@ -901,7 +918,7 @@ function Life() {
   );
 }
 
-function Contact({ onContactClick }: { onContactClick: () => void }) {
+function Contact() {
   return (
     <section id="contact" className="border-b border-border">
       <div className="page-container py-20 sm:py-28">
@@ -921,60 +938,73 @@ function Contact({ onContactClick }: { onContactClick: () => void }) {
 
             <div className="mt-8">
               <p className="label-mono mb-4 text-[11px] text-muted-foreground">CONNECT</p>
-              <SocialLinks />
+              <SocialLinks variant="plain" />
             </div>
           </div>
 
-          {/* Contact Information Card */}
-          <div className="flex items-center">
-            <button
-              type="button"
-              onClick={onContactClick}
-              className="card-premium w-full rounded-xl p-8 text-left transition-shadow hover:shadow-[var(--shadow-premium)]"
-            >
-              <h3 className="font-display text-[1.75rem] font-semibold mb-4">Contact Information</h3>
-              <p className="text-[14px] text-foreground/70 mb-6">If you have any questions, feel free to get in touch with us.</p>
-              
-              <div className="space-y-5">
-                <div>
-                  <div className="label-mono text-accent mb-1">PHONE</div>
-                  <a href="tel:+919892885090" className="text-[16px] font-medium hover:text-accent">+91 9892885090</a>
-                </div>
-                
-                <div>
-                  <div className="label-mono text-accent mb-1">EMAIL</div>
-                  <a href="mailto:kunaldp379@gmail.com" className="text-[16px] font-medium hover:text-accent break-all">kunaldp379@gmail.com</a>
-                </div>
-                
-                <div>
-                  <div className="label-mono text-accent mb-1">LOCATION</div>
-                  <p className="text-[16px] font-medium">Mumbai, Maharashtra, India</p>
-                </div>
-                
-                <div>
-                  <div className="label-mono text-accent mb-1">AVAILABILITY</div>
-                  <p className="text-[16px] font-medium">Monday - Sunday</p>
-                  <p className="text-[14px] text-foreground/70">10:00 AM - 10:00 PM</p>
-                </div>
-                
-                <div>
-                  <div className="label-mono text-accent mb-1">GITHUB</div>
-                  <a href="https://github.com/kunalpro379" target="_blank" rel="noopener noreferrer" className="text-[16px] font-medium hover:text-accent">github.com/kunalpro379</a>
-                </div>
-                
-                <div>
-                  <div className="label-mono text-accent mb-1">RESUME</div>
-                  <a href="https://notesportfolio.blob.core.windows.net/notes/Resume.kunal.pdf" target="_blank" rel="noopener noreferrer" className="text-[16px] font-medium text-accent hover:underline">View Resume →</a>
-                </div>
+          <div className="mt-10 lg:mt-0">
+            <h3 className="font-display mb-2 text-[1.35rem] font-semibold sm:text-[1.75rem]">Contact Information</h3>
+            <p className="mb-6 text-[13px] text-foreground/70 sm:text-[14px]">
+              If you have any questions, feel free to get in touch.
+            </p>
+
+            <div className="space-y-4 sm:space-y-5">
+              <div>
+                <div className="label-mono mb-1 text-[10px] text-accent sm:text-[11px]">PHONE</div>
+                <a href="tel:+919892885090" className="text-[15px] font-medium hover:text-accent sm:text-[16px]">
+                  +91 9892885090
+                </a>
               </div>
 
-              <div className="mt-6 p-4 bg-accent/10 border-l-4 border-accent rounded">
-                <p className="text-[14px] leading-[1.6] text-foreground">
-                  <span className="font-semibold text-accent">Open for full-time roles</span> in AI/ML, DevOps, and Backend Development. Also available for <span className="font-semibold">freelance projects</span> and <span className="font-semibold">remote work opportunities</span>.
-                </p>
+              <div>
+                <div className="label-mono mb-1 text-[10px] text-accent sm:text-[11px]">EMAIL</div>
+                <a href="mailto:kunaldp379@gmail.com" className="break-all text-[15px] font-medium hover:text-accent sm:text-[16px]">
+                  kunaldp379@gmail.com
+                </a>
               </div>
-              <p className="mt-6 text-[13px] font-semibold text-foreground/70">Tap to open contact panel →</p>
-            </button>
+
+              <div>
+                <div className="label-mono mb-1 text-[10px] text-accent sm:text-[11px]">LOCATION</div>
+                <p className="text-[15px] font-medium sm:text-[16px]">Mumbai, Maharashtra, India</p>
+              </div>
+
+              <div>
+                <div className="label-mono mb-1 text-[10px] text-accent sm:text-[11px]">AVAILABILITY</div>
+                <p className="text-[15px] font-medium sm:text-[16px]">Monday - Sunday</p>
+                <p className="text-[13px] text-foreground/70 sm:text-[14px]">10:00 AM - 10:00 PM</p>
+              </div>
+
+              <div>
+                <div className="label-mono mb-1 text-[10px] text-accent sm:text-[11px]">GITHUB</div>
+                <a
+                  href="https://github.com/kunalpro379"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[15px] font-medium hover:text-accent sm:text-[16px]"
+                >
+                  github.com/kunalpro379
+                </a>
+              </div>
+
+              <div>
+                <div className="label-mono mb-1 text-[10px] text-accent sm:text-[11px]">RESUME</div>
+                <a
+                  href="https://notesportfolio.blob.core.windows.net/notes/Resume.kunal.pdf"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[15px] font-medium text-accent hover:underline sm:text-[16px]"
+                >
+                  View Resume →
+                </a>
+              </div>
+            </div>
+
+            <p className="mt-6 border-l-4 border-accent pl-4 text-[13px] leading-[1.6] text-foreground/85 sm:text-[14px]">
+              <span className="font-semibold text-accent">Open for full-time roles</span> in AI/ML, DevOps, and
+              Backend Development. Also available for{" "}
+              <span className="font-semibold text-foreground">freelance projects</span> and{" "}
+              <span className="font-semibold text-foreground">remote work</span>.
+            </p>
           </div>
         </div>
       </div>
@@ -997,7 +1027,7 @@ function Index() {
       <Life />
       <Writing />
       <Testimonials />
-      <Contact onContactClick={openContact} />
+      <Contact />
       <SiteFooter />
       <ContactSidebar isOpen={isContactOpen} onClose={() => setIsContactOpen(false)} />
     </main>

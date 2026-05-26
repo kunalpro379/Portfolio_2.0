@@ -31,18 +31,18 @@ const TECH_STACK: TechItem[] = [
 export function TechStackStrip() {
   return (
     <div className="relative border-t border-border bg-[var(--cream-soft)]/60">
-      <div className="page-container flex flex-wrap items-center justify-between gap-4 py-4 sm:gap-6 sm:py-5">
-        <span className="label-mono text-foreground">Tech Stack</span>
+      <div className="page-container flex flex-wrap items-center gap-x-3 gap-y-3 py-3 sm:justify-between sm:gap-x-6 sm:gap-y-4 sm:py-5">
+        <span className="label-mono w-full text-[11px] text-foreground sm:w-auto sm:text-[13px]">Tech Stack</span>
 
         {TECH_STACK.map(({ label, Icon, color, mutedLabel }) => (
-          <div key={label} className="flex flex-col items-center gap-2">
+          <div key={label} className="flex flex-col items-center gap-1 sm:gap-2">
             <Icon
-              className="h-10 w-10"
+              className="h-7 w-7 sm:h-10 sm:w-10"
               style={{ color }}
               aria-hidden
             />
             <span
-              className={`font-display text-[17px] font-semibold tracking-tight ${
+              className={`font-display text-[11px] font-semibold tracking-tight sm:text-[17px] ${
                 mutedLabel ? "text-foreground/70" : "text-accent"
               }`}
             >
