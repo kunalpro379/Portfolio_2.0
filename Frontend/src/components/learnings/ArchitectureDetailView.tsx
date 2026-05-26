@@ -146,6 +146,7 @@ export function ArchitectureDetailView({ canvasId, viewerId, mode }: Architectur
         }
       >
         <ExcalidrawCanvas
+          key={isViewOnly ? `view-${meta.canvasId}` : `edit-${meta.canvasId}`}
           canvasId={meta.canvasId}
           canvasName={meta.name}
           viewerId={meta.viewerId}

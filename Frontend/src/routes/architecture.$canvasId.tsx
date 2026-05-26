@@ -1,11 +1,9 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { ArchitectureDetailView } from "@/components/learnings/ArchitectureDetailView";
+import { createFileRoute, Outlet } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/architecture/$canvasId")({
-  component: ArchitectureViewPage,
+  component: ArchitectureLayout,
 });
 
-function ArchitectureViewPage() {
-  const { canvasId } = Route.useParams();
-  return <ArchitectureDetailView canvasId={canvasId} mode="view" />;
+function ArchitectureLayout() {
+  return <Outlet />;
 }

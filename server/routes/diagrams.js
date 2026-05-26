@@ -84,6 +84,13 @@ function generateViewerId() {
   return `viewer_${crypto.randomBytes(16).toString('hex')}`;
 }
 
+async function verifyDiagramPassword(password) {
+  if (!password || typeof password !== 'string') {
+    return false;
+  }
+  return Password.verifyPassword('TODO_PASSWORD', password);
+}
+
 // GET all canvases
 router.get('/', async (req, res) => {
   try {
@@ -109,6 +116,27 @@ router.get('/', async (req, res) => {
     res.json({
       success: true,
       canvases: []
+    });
+  }
+});
+
+// POST verify password — must be before /:canvasId routes
+router.post('/verify-password', async (req, res) => {
+  try {
+    const { password } = req.body;
+    const isValid = await verifyDiagramPassword(password);
+    if (!isValid) {
+      return res.status(401).json({
+        success: false,
+        message: 'Incorrect password'
+      });
+    }
+    res.json({ success: true, message: 'Password verified' });
+  } catch (error) {
+    console.error('Error verifying diagram password:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to verify password'
     });
   }
 });
@@ -238,35 +266,6 @@ router.get('/viewer/:viewerId', async (req, res) => {
       success: false,
       message: 'Failed to fetch canvas',
       error: error.message
-    });
-  }
-});
-
-// Verify TODO_PASSWORD for create / update / delete
-async function verifyDiagramPassword(password) {
-  if (!password || typeof password !== 'string') {
-    return false;
-  }
-  return Password.verifyPassword('TODO_PASSWORD', password);
-}
-
-// POST verify password (for edit/create gates without mutating data)
-router.post('/verify-password', async (req, res) => {
-  try {
-    const { password } = req.body;
-    const isValid = await verifyDiagramPassword(password);
-    if (!isValid) {
-      return res.status(401).json({
-        success: false,
-        message: 'Incorrect password'
-      });
-    }
-    res.json({ success: true, message: 'Password verified' });
-  } catch (error) {
-    console.error('Error verifying diagram password:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to verify password'
     });
   }
 });

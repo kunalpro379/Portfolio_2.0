@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as LearningsRouteImport } from './routes/learnings'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ArchitectureCanvasIdRouteImport } from './routes/architecture.$canvasId'
+import { Route as ArchitectureCanvasIdIndexRouteImport } from './routes/architecture.$canvasId.index'
 import { Route as LearningsFilesFolderIdRouteImport } from './routes/learnings.files.$folderId'
 import { Route as LearningsDocsDocIdRouteImport } from './routes/learnings.docs.$docId'
 import { Route as LearningsBlogsBlogIdRouteImport } from './routes/learnings.blogs.$blogId'
@@ -33,6 +34,12 @@ const ArchitectureCanvasIdRoute = ArchitectureCanvasIdRouteImport.update({
   path: '/architecture/$canvasId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ArchitectureCanvasIdIndexRoute =
+  ArchitectureCanvasIdIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => ArchitectureCanvasIdRoute,
+  } as any)
 const LearningsFilesFolderIdRoute = LearningsFilesFolderIdRouteImport.update({
   id: '/files/$folderId',
   path: '/files/$folderId',
@@ -70,16 +77,17 @@ export interface FileRoutesByFullPath {
   '/learnings/blogs/$blogId': typeof LearningsBlogsBlogIdRoute
   '/learnings/docs/$docId': typeof LearningsDocsDocIdRoute
   '/learnings/files/$folderId': typeof LearningsFilesFolderIdRoute
+  '/architecture/$canvasId/': typeof ArchitectureCanvasIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/learnings': typeof LearningsRouteWithChildren
-  '/architecture/$canvasId': typeof ArchitectureCanvasIdRouteWithChildren
   '/architecture/$canvasId/edit': typeof ArchitectureCanvasIdEditRoute
   '/architecture/view/$viewerId': typeof ArchitectureViewViewerIdRoute
   '/learnings/blogs/$blogId': typeof LearningsBlogsBlogIdRoute
   '/learnings/docs/$docId': typeof LearningsDocsDocIdRoute
   '/learnings/files/$folderId': typeof LearningsFilesFolderIdRoute
+  '/architecture/$canvasId': typeof ArchitectureCanvasIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -91,6 +99,7 @@ export interface FileRoutesById {
   '/learnings/blogs/$blogId': typeof LearningsBlogsBlogIdRoute
   '/learnings/docs/$docId': typeof LearningsDocsDocIdRoute
   '/learnings/files/$folderId': typeof LearningsFilesFolderIdRoute
+  '/architecture/$canvasId/': typeof ArchitectureCanvasIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -103,16 +112,17 @@ export interface FileRouteTypes {
     | '/learnings/blogs/$blogId'
     | '/learnings/docs/$docId'
     | '/learnings/files/$folderId'
+    | '/architecture/$canvasId/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/learnings'
-    | '/architecture/$canvasId'
     | '/architecture/$canvasId/edit'
     | '/architecture/view/$viewerId'
     | '/learnings/blogs/$blogId'
     | '/learnings/docs/$docId'
     | '/learnings/files/$folderId'
+    | '/architecture/$canvasId'
   id:
     | '__root__'
     | '/'
@@ -123,6 +133,7 @@ export interface FileRouteTypes {
     | '/learnings/blogs/$blogId'
     | '/learnings/docs/$docId'
     | '/learnings/files/$folderId'
+    | '/architecture/$canvasId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -154,6 +165,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/architecture/$canvasId'
       preLoaderRoute: typeof ArchitectureCanvasIdRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/architecture/$canvasId/': {
+      id: '/architecture/$canvasId/'
+      path: '/'
+      fullPath: '/architecture/$canvasId/'
+      preLoaderRoute: typeof ArchitectureCanvasIdIndexRouteImport
+      parentRoute: typeof ArchitectureCanvasIdRoute
     }
     '/learnings/files/$folderId': {
       id: '/learnings/files/$folderId'
@@ -211,10 +229,12 @@ const LearningsRouteWithChildren = LearningsRoute._addFileChildren(
 
 interface ArchitectureCanvasIdRouteChildren {
   ArchitectureCanvasIdEditRoute: typeof ArchitectureCanvasIdEditRoute
+  ArchitectureCanvasIdIndexRoute: typeof ArchitectureCanvasIdIndexRoute
 }
 
 const ArchitectureCanvasIdRouteChildren: ArchitectureCanvasIdRouteChildren = {
   ArchitectureCanvasIdEditRoute: ArchitectureCanvasIdEditRoute,
+  ArchitectureCanvasIdIndexRoute: ArchitectureCanvasIdIndexRoute,
 }
 
 const ArchitectureCanvasIdRouteWithChildren =
