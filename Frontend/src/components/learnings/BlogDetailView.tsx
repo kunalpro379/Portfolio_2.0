@@ -6,6 +6,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Header } from './Header';
 import { config } from '@/config/config';
+import { PremiumLoader } from './PremiumLoader';
 
 interface Blog {
   blogId: string;
@@ -138,12 +139,7 @@ export function BlogDetailView({ blogId }: BlogDetailViewProps) {
       <div className="h-screen flex flex-col bg-white">
         <Header activeTab={activeTab} onTabChange={handleTabChange} tabs={tabs} />
         <div className="flex-1 flex items-center justify-center">
-          <div className="text-center">
-            <div className="animate-pulse space-y-3">
-              <div className="h-8 w-64 bg-black/10 rounded mx-auto"></div>
-              <div className="h-4 w-48 bg-black/10 rounded mx-auto"></div>
-            </div>
-          </div>
+          <PremiumLoader />
         </div>
       </div>
     );

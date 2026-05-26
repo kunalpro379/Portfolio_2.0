@@ -1,11 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import { ArrowLeft, Calendar, Clock, FileText, Image as ImageIcon, Paperclip, ChevronLeft, ChevronRight } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Header } from './Header';
 import { config } from '@/config/config';
+import { PremiumLoader, PremiumLoaderFullScreen } from './PremiumLoader';
 
 interface DocFile {
   fileId: string;
@@ -74,29 +75,35 @@ export function DocDetailView({ docId }: DocDetailViewProps) {
   });
 
   // Fetch file content when a file is selected
-  const { data: fileContent } = useQuery({
+  const { data: fileContent, isLoading: isLoadingContent, error: contentError } = useQuery({
     queryKey: ['doc-file-content', selectedFile?.fileId],
     queryFn: async () => {
       if (!selectedFile || !doc) return '';
       // Fetch through server API to avoid CORS issues
       const url = `${config.apiUrl}/documentation/${doc._id}/files/${selectedFile.fileId}`;
+      console.log('Fetching file content from:', url);
       const response = await fetch(url);
-      if (!response.ok) return '';
+      if (!response.ok) {
+        console.error('Failed to fetch file content:', response.status);
+        throw new Error('Failed to fetch file content');
+      }
       const data = await response.json();
-      return data.content || '';
+      console.log('File content received:', data);
+      return data.file?.content || data.content || '';
     },
     enabled: !!selectedFile && selectedFile.type === 'markdown' && !!doc,
+    retry: 2,
   });
 
   // Auto-select first markdown file when doc loads
-  useState(() => {
+  useEffect(() => {
     if (doc && doc.files.length > 0 && !selectedFile) {
       const firstMarkdown = doc.files.find(f => f.type === 'markdown');
       if (firstMarkdown) {
         setSelectedFile(firstMarkdown);
       }
     }
-  });
+  }, [doc, selectedFile]);
 
   // Custom markdown components
   const components = {
@@ -123,12 +130,7 @@ export function DocDetailView({ docId }: DocDetailViewProps) {
       <div className="h-screen flex flex-col bg-white">
         <Header activeTab={activeTab} onTabChange={handleTabChange} tabs={tabs} />
         <div className="flex-1 flex items-center justify-center">
-          <div className="text-center">
-            <div className="animate-pulse space-y-3">
-              <div className="h-8 w-64 bg-black/10 rounded mx-auto"></div>
-              <div className="h-4 w-48 bg-black/10 rounded mx-auto"></div>
-            </div>
-          </div>
+          <PremiumLoader />
         </div>
       </div>
     );
@@ -280,7 +282,15 @@ export function DocDetailView({ docId }: DocDetailViewProps) {
           <div className="max-w-5xl mx-auto px-3 py-4">
             {selectedFile?.type === 'markdown' ? (
               <article className="prose prose-slate max-w-none">
-                {fileContent ? (
+                {contentError ? (
+                  <div className="text-center py-12">
+                    <FileText className="mx-auto h-12 w-12 mb-3 opacity-20 text-red-500" />
+                    <p className="text-red-600 mb-2">Failed to load content</p>
+                    <p className="text-xs text-black/40">Please try again later</p>
+                  </div>
+                ) : isLoadingContent ? (
+                  <PremiumLoaderFullScreen showText={true} />
+                ) : fileContent ? (
                   <ReactMarkdown 
                     remarkPlugins={[remarkGfm]}
                     components={components}
@@ -290,7 +300,7 @@ export function DocDetailView({ docId }: DocDetailViewProps) {
                 ) : (
                   <div className="text-center py-12">
                     <FileText className="mx-auto h-12 w-12 mb-3 opacity-20" />
-                    <p className="text-black/60">Loading content...</p>
+                    <p className="text-black/60">No content available</p>
                   </div>
                 )}
               </article>

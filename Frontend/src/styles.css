@@ -222,3 +222,25 @@
     content:""; flex:1; height:1px; background: var(--color-border);
   }
 }
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@layer components {
+  .page-container {
+    @apply mx-auto max-w-[1400px] px-3 sm:px-6 lg:px-10;
+  }
+}
+
+@layer utilities {
+  .scrollbar-none {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+}

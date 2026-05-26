@@ -285,7 +285,15 @@ export function ProjectDetailSlider({ isOpen, onClose, project }: ProjectDetailS
   if (!project) return null;
 
   const getTags = () => project.tags || [];
-  const getLinks = () => project.links || [];
+  const getLinks = () => {
+    const links = project.links;
+    if (!links) return [];
+    if (Array.isArray(links)) return links;
+    return [
+      links.github ? { name: "GitHub", url: links.github } : null,
+      links.live ? { name: "Live Demo", url: links.live } : null,
+    ].filter(Boolean);
+  };
 
   return (
     <>
@@ -298,7 +306,7 @@ export function ProjectDetailSlider({ isOpen, onClose, project }: ProjectDetailS
       )}
 
       {/* Slider */}
-      <div className={`fixed inset-y-0 right-0 z-[101] w-full max-w-6xl transform transition-transform duration-500 ease-out ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+      <div className={`fixed inset-y-0 right-0 z-[101] w-full max-w-full transform transition-transform duration-500 ease-out sm:max-w-6xl ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}>
         <div className="h-full bg-[#FDFBF7] shadow-2xl flex flex-col overflow-hidden">
           {/* Header */}
           <div className="sticky top-0 z-10 bg-[#FDFBF7] border-b-2 border-[#8B4513]/20 px-8 py-4 flex items-center justify-between flex-shrink-0">
@@ -320,7 +328,7 @@ export function ProjectDetailSlider({ isOpen, onClose, project }: ProjectDetailS
           {/* Body Container */}
           <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
             {/* Sidebar */}
-            <div className="w-full md:w-80 bg-[#FDFBF7] border-b-2 md:border-b-0 md:border-r-2 border-[#8B4513]/20 overflow-y-auto p-8 space-y-6 flex-shrink-0">
+            <div className="scrollbar-none w-full md:w-80 bg-[#FDFBF7] border-b-2 md:border-b-0 md:border-r-2 border-[#8B4513]/20 overflow-y-auto p-8 space-y-6 flex-shrink-0">
               {/* Project Card */}
               <div className="bg-[#8B4513]/5 border-2 border-[#8B4513]/25 rounded-xl p-6">
                 <div className="mb-3">
@@ -412,7 +420,7 @@ export function ProjectDetailSlider({ isOpen, onClose, project }: ProjectDetailS
             </div>
 
             {/* Main Content Area */}
-            <div id="project-slider-content" className="flex-1 overflow-y-auto bg-white px-6 py-8 md:px-10 md:py-12 scroll-smooth">
+            <div id="project-slider-content" className="scrollbar-none flex-1 overflow-y-auto bg-white px-6 py-8 md:px-10 md:py-12 scroll-smooth">
               {/* About This Project */}
               {(project.description || project.shortDescription) && (
                 <div className="mx-auto mb-10 max-w-4xl pb-8 border-b border-[#8B4513]/15">
