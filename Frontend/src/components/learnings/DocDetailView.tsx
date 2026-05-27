@@ -297,7 +297,7 @@ export function DocDetailView({ docId }: DocDetailViewProps) {
                     <p className="text-xs text-black/40">Please try again later</p>
                   </div>
                 ) : isLoadingContent ? (
-                  <PremiumLoaderFullScreen showText={true} />
+                  <PremiumLoaderFullScreen />
                 ) : fileContent ? (
                   <ReactMarkdown 
                     remarkPlugins={[remarkGfm]}

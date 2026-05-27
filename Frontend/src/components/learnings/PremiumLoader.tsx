@@ -17,7 +17,6 @@ export function PremiumLoader({ showText = false }: { showText?: boolean }) {
     return (
       <div className="flex flex-col items-center justify-center gap-4">
         <div className="w-16 h-16 border-4 border-[#8B4513]/20 border-t-[#8B4513] rounded-full animate-spin"></div>
-        {showText && <span className="text-lg font-semibold text-[#8B4513]">Loading</span>}
       </div>
     );
   }
@@ -31,17 +30,6 @@ export function PremiumLoader({ showText = false }: { showText?: boolean }) {
           autoplay={true}
         />
       </div>
-      
-      {showText && (
-        <div className="flex items-center gap-2">
-          <span className="text-lg font-semibold text-[#8B4513]">Loading</span>
-          <div className="flex gap-1">
-            <span className="w-2 h-2 bg-[#8B4513] rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
-            <span className="w-2 h-2 bg-[#8B4513] rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
-            <span className="w-2 h-2 bg-[#8B4513] rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

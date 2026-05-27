@@ -6,7 +6,7 @@ const passwordSchema = new mongoose.Schema({
     type: String,
     required: true,
     unique: true,
-    enum: ['TODO_PASSWORD'] // Can add more keys like 'GUIDE_PASSWORD' etc.
+    enum: ['TODO_PASSWORD', 'ARCHITECTURE_PASSWORD']
   },
   hashedPassword: {
     type: String,

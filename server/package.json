@@ -5,7 +5,8 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "build": "echo 'No build step required for Node.js server'"
+    "build": "echo 'No build step required for Node.js server'",
+    "seed:architecture-password": "node scripts/seedArchitecturePassword.js"
   },
   "dependencies": {
     "@azure/storage-blob": "^12.29.1",

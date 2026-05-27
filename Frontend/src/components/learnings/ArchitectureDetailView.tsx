@@ -113,7 +113,7 @@ export function ArchitectureDetailView({ canvasId, viewerId, mode }: Architectur
   if (loading) {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#FFF8F0]">
-        <PremiumLoaderFullScreen showText />
+        <PremiumLoaderFullScreen />
       </div>
     );
   }
@@ -141,7 +141,7 @@ export function ArchitectureDetailView({ canvasId, viewerId, mode }: Architectur
       <Suspense
         fallback={
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#FFF8F0]">
-            <PremiumLoaderFullScreen showText />
+            <PremiumLoaderFullScreen />
           </div>
         }
       >

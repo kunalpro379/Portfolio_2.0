@@ -13,10 +13,19 @@ cd server
 node scripts/initPassword.js
 ```
 
+For architecture/diagram edit password seed:
+
+```bash
+cd server
+npm run seed:architecture-password
+```
+
 This will:
 - Hash the password `` using bcrypt
 - Store it in MongoDB under the key `TODO_PASSWORD`
 - The plain password is NEVER stored in the database
+
+For architecture seed, it stores password under key `ARCHITECTURE_PASSWORD` (bcrypt hash only).
 
 ### 2. Password Usage
 The password is used for:

@@ -992,92 +992,80 @@ function Contact() {
             </div>
           </div>
 
-          {/* White circle — offset from right; strong contrast vs cream page */}
-          <div className="relative z-10 flex justify-center lg:mr-6 lg:justify-end xl:mr-14">
+          {/* Oversized white circle in the background; content sits on top */}
+          <div className="relative z-10 flex justify-center lg:justify-end">
+            {/* Big decorative circle – only a part is visible */}
             <div
-              className="relative flex aspect-square w-[min(100%,19.5rem)] shrink-0 flex-col items-center justify-center rounded-full border-[1.5px] border-black/12 bg-[#ffffff] text-center text-[#1a1a1a] sm:w-[22rem] md:w-[24rem] lg:w-[27rem] xl:w-[30rem]"
-              style={{
-                boxShadow:
-                  "0 28px 90px -16px rgba(0,0,0,0.38), 0 12px 32px -8px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,1)",
-              }}
-            >
-              <span
-                aria-hidden
-                className="pointer-events-none absolute -inset-1 rounded-full border border-black/[0.06]"
-              />
-              <span
-                aria-hidden
-                className="pointer-events-none absolute inset-4 rounded-full border border-dashed border-black/[0.08] sm:inset-5"
-              />
+              aria-hidden
+              className="pointer-events-none absolute -right-[18%] top-1/2 h-[520px] w-[520px] -translate-y-1/2 rounded-full border border-black/10 bg-white/95 shadow-[0_40px_120px_-32px_rgba(0,0,0,0.6)] sm:h-[580px] sm:w-[580px] lg:-right-[10%] lg:h-[640px] lg:w-[640px]"
+            />
 
-              <div className="flex max-h-[86%] w-[78%] flex-col items-center justify-center gap-3.5 sm:w-[76%] sm:gap-4">
+            {/* Contact content – not clipped by the circle */}
+            <div className="relative max-w-md rounded-xl bg-white/90 px-8 py-8 text-[#1a1a1a] shadow-[0_18px_60px_-32px_rgba(0,0,0,0.60)] ring-1 ring-black/[0.04] backdrop-blur-sm sm:px-9 sm:py-9">
+              <h3 className="font-display text-[1.1rem] font-semibold leading-tight sm:text-[1.25rem]">
+                Contact Information
+              </h3>
+              <p className="mt-1.5 text-[11px] leading-snug text-black/60 sm:text-[12px]">
+                If you have any questions, feel free to get in touch.
+              </p>
+
+              <div className="mt-4 h-px w-14 bg-black/12" />
+
+              <div className="mt-4 space-y-3 text-left sm:space-y-3.5">
                 <div>
-                  <h3 className="font-display text-[1.05rem] font-semibold leading-tight sm:text-[1.2rem]">
-                    Contact Information
-                  </h3>
-                  <p className="mt-1.5 text-[10px] leading-snug text-black/55 sm:text-[11px]">
-                    If you have any questions, feel free to get in touch.
-                  </p>
+                  <div className="label-mono mb-0.5 text-[9px] tracking-wider text-[#b85c38] sm:text-[10px]">PHONE</div>
+                  <a href="tel:+919892885090" className="text-[11px] font-medium hover:text-[#b85c38] sm:text-[12px]">
+                    +91 9892885090
+                  </a>
                 </div>
-
-                <div className="h-px w-14 bg-black/12" />
-
-                <div className="w-full space-y-3 text-left sm:space-y-3.5">
-                  <div>
-                    <div className="label-mono mb-0.5 text-[9px] tracking-wider text-[#b85c38] sm:text-[10px]">PHONE</div>
-                    <a href="tel:+919892885090" className="text-[11px] font-medium hover:text-[#b85c38] sm:text-[12px]">
-                      +91 9892885090
-                    </a>
-                  </div>
-                  <div>
-                    <div className="label-mono mb-0.5 text-[9px] tracking-wider text-[#b85c38] sm:text-[10px]">EMAIL</div>
-                    <a
-                      href="mailto:kunaldp379@gmail.com"
-                      className="break-all text-[11px] font-medium hover:text-[#b85c38] sm:text-[12px]"
-                    >
-                      kunaldp379@gmail.com
-                    </a>
-                  </div>
-                  <div>
-                    <div className="label-mono mb-0.5 text-[9px] tracking-wider text-[#b85c38] sm:text-[10px]">LOCATION</div>
-                    <p className="text-[11px] font-medium sm:text-[12px]">Mumbai, Maharashtra, India</p>
-                  </div>
-                  <div>
-                    <div className="label-mono mb-0.5 text-[9px] tracking-wider text-[#b85c38] sm:text-[10px]">AVAILABILITY</div>
-                    <p className="text-[11px] font-medium sm:text-[12px]">Monday – Sunday</p>
-                    <p className="text-[10px] text-black/55 sm:text-[11px]">10:00 AM – 10:00 PM</p>
-                  </div>
-                  <div>
-                    <div className="label-mono mb-0.5 text-[9px] tracking-wider text-[#b85c38] sm:text-[10px]">GITHUB</div>
-                    <a
-                      href="https://github.com/kunalpro379"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-[11px] font-medium hover:text-[#b85c38] sm:text-[12px]"
-                    >
-                      github.com/kunalpro379
-                    </a>
-                  </div>
-                  <div>
-                    <div className="label-mono mb-0.5 text-[9px] tracking-wider text-[#b85c38] sm:text-[10px]">RESUME</div>
-                    <a
-                      href="https://notesportfolio.blob.core.windows.net/notes/Resume.kunal.pdf"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-[11px] font-semibold text-[#b85c38] hover:underline sm:text-[12px]"
-                    >
-                      View Resume →
-                    </a>
-                  </div>
+                <div>
+                  <div className="label-mono mb-0.5 text-[9px] tracking-wider text-[#b85c38] sm:text-[10px]">EMAIL</div>
+                  <a
+                    href="mailto:kunaldp379@gmail.com"
+                    className="break-all text-[11px] font-medium hover:text-[#b85c38] sm:text-[12px]"
+                  >
+                    kunaldp379@gmail.com
+                  </a>
                 </div>
-
-                <p className="border-l-2 border-[#b85c38]/50 pl-3 text-left text-[9px] leading-[1.5] text-black/70 sm:text-[10px]">
-                  <span className="font-semibold text-[#b85c38]">Open for full-time roles</span> in AI/ML, DevOps, and Backend
-                  Development. Also available for{" "}
-                  <span className="font-semibold text-black/85">freelance projects</span> and{" "}
-                  <span className="font-semibold text-black/85">remote work</span>.
-                </p>
+                <div>
+                  <div className="label-mono mb-0.5 text-[9px] tracking-wider text-[#b85c38] sm:text-[10px]">LOCATION</div>
+                  <p className="text-[11px] font-medium sm:text-[12px]">Mumbai, Maharashtra, India</p>
+                </div>
+                <div>
+                  <div className="label-mono mb-0.5 text-[9px] tracking-wider text-[#b85c38] sm:text-[10px]">AVAILABILITY</div>
+                  <p className="text-[11px] font-medium sm:text-[12px]">Monday – Sunday</p>
+                  <p className="text-[10px] text-black/55 sm:text-[11px]">10:00 AM – 10:00 PM</p>
+                </div>
+                <div>
+                  <div className="label-mono mb-0.5 text-[9px] tracking-wider text-[#b85c38] sm:text-[10px]">GITHUB</div>
+                  <a
+                    href="https://github.com/kunalpro379"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[11px] font-medium hover:text-[#b85c38] sm:text-[12px]"
+                  >
+                    github.com/kunalpro379
+                  </a>
+                </div>
+                <div>
+                  <div className="label-mono mb-0.5 text-[9px] tracking-wider text-[#b85c38] sm:text-[10px]">RESUME</div>
+                  <a
+                    href="https://notesportfolio.blob.core.windows.net/notes/Resume.kunal.pdf"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[11px] font-semibold text-[#b85c38] hover:underline sm:text-[12px]"
+                  >
+                    View Resume →
+                  </a>
+                </div>
               </div>
+
+              <p className="mt-5 border-l-2 border-[#b85c38]/50 pl-3 text-left text-[9px] leading-[1.5] text-black/70 sm:text-[10px]">
+                <span className="font-semibold text-[#b85c38]">Open for full-time roles</span> in AI/ML, DevOps, and Backend
+                Development. Also available for{" "}
+                <span className="font-semibold text-black/85">freelance projects</span> and{" "}
+                <span className="font-semibold text-black/85">remote work</span>.
+              </p>
             </div>
           </div>
         </div>

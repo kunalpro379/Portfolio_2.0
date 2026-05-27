@@ -144,8 +144,48 @@ export function ExcalidrawCanvas({
 
   return (
     <div className="fixed inset-0 z-50 bg-white" onMouseMove={() => setShowControls(true)}>
+      {/* Mobile: minimal top-left control row (X / Lock / Edit) */}
+      <div className="pointer-events-none fixed left-3 top-20 z-[70] md:hidden">
+        <div className="pointer-events-auto flex items-center gap-2 border-2 border-black bg-white/95 p-2 shadow-[4px_4px_0_0_#000] backdrop-blur-sm">
+          <button
+            type="button"
+            onClick={onClose}
+            className="border-2 border-black bg-white px-2 py-1.5 transition-all hover:bg-[#FFF8F0]"
+            title="Close"
+          >
+            <X size={18} strokeWidth={2.5} />
+          </button>
+
+          <div
+            className={`flex items-center justify-center border-2 border-black px-2 py-1.5 ${
+              viewOnly ? "bg-red-50 text-red-700" : isPublic ? "bg-emerald-50 text-emerald-700" : "bg-[#FFF8F0]"
+            }`}
+            title={viewOnly ? "View only" : isPublic ? "Public" : "Private"}
+          >
+            {viewOnly ? (
+              <Lock size={18} strokeWidth={2.5} />
+            ) : isPublic ? (
+              <Unlock size={18} strokeWidth={2.5} />
+            ) : (
+              <Lock size={18} strokeWidth={2.5} />
+            )}
+          </div>
+
+          {editCanvasId && (
+            <Link
+              to="/architecture/$canvasId/edit"
+              params={{ canvasId: editCanvasId }}
+              className="border-2 border-black bg-[#8B4513] px-2 py-1.5 text-white transition-all hover:bg-black"
+              title="Edit"
+            >
+              <Pencil size={18} strokeWidth={2.5} />
+            </Link>
+          )}
+        </div>
+      </div>
+
       <div
-        className={`pointer-events-none fixed z-[60] transition-opacity duration-300 ${showControls ? "opacity-100" : "opacity-0"} top-[100px] left-2 flex flex-col items-start gap-1.5 md:top-4 md:left-4 md:right-4 md:flex-row md:items-center md:justify-between`}
+        className={`pointer-events-none fixed z-[60] transition-opacity duration-300 ${showControls ? "opacity-100" : "opacity-0"} top-[100px] left-2 hidden flex-col items-start gap-1.5 md:top-4 md:left-4 md:right-4 md:flex md:flex-row md:items-center md:justify-between`}
       >
         <div className="pointer-events-auto flex flex-col items-start gap-1.5 md:flex-row md:items-center md:gap-2 md:rounded-none md:border-2 md:border-black md:bg-white/95 md:p-2 md:shadow-[4px_4px_0_0_#000]">
           <button
@@ -238,12 +278,6 @@ export function ExcalidrawCanvas({
           )}
         </div>
       </div>
-
-      {viewOnly && (
-        <div className="pointer-events-none fixed left-1/2 top-20 z-[60] -translate-x-1/2 border-2 border-black bg-[#FFF8F0] px-5 py-2 text-xs font-bold uppercase tracking-[0.2em] text-[#8B4513] shadow-[3px_3px_0_0_#000]">
-          View only
-        </div>
-      )}
 
       <div
         className="absolute inset-0 z-10"

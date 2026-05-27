@@ -88,7 +88,7 @@ async function verifyDiagramPassword(password) {
   if (!password || typeof password !== 'string') {
     return false;
   }
-  return Password.verifyPassword('TODO_PASSWORD', password);
+  return Password.verifyPassword('ARCHITECTURE_PASSWORD', password);
 }
 
 // GET all canvases

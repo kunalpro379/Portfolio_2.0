@@ -31,6 +31,16 @@
     -webkit-overflow-scrolling: touch !important;
     overflow: hidden !important;
   }
+
+  /* Hide Excalidraw bottom bar / footer on mobile */
+  .excalidraw .layer-ui__wrapper__footer,
+  .excalidraw .App-bottom-bar,
+  .excalidraw .footer-center,
+  .excalidraw .HelpDialog__header,
+  .excalidraw .App-toolbar,
+  .excalidraw .App-menu {
+    display: none !important;
+  }
 }
 
 @media (min-width: 769px) and (max-width: 1024px) {
