@@ -992,16 +992,8 @@ function Contact() {
             </div>
           </div>
 
-          {/* Oversized white circle in the background; content sits on top */}
           <div className="relative z-10 flex justify-center lg:justify-end">
-            {/* Big decorative circle – only a part is visible */}
-            <div
-              aria-hidden
-              className="pointer-events-none absolute -right-[18%] top-1/2 h-[520px] w-[520px] -translate-y-1/2 rounded-full border border-black/10 bg-white/95 shadow-[0_40px_120px_-32px_rgba(0,0,0,0.6)] sm:h-[580px] sm:w-[580px] lg:-right-[10%] lg:h-[640px] lg:w-[640px]"
-            />
-
-            {/* Contact content – not clipped by the circle */}
-            <div className="relative max-w-md rounded-xl bg-white/90 px-8 py-8 text-[#1a1a1a] shadow-[0_18px_60px_-32px_rgba(0,0,0,0.60)] ring-1 ring-black/[0.04] backdrop-blur-sm sm:px-9 sm:py-9">
+            <div className="relative max-w-md bg-white/90 px-8 py-10 text-[#1a1a1a] shadow-[0_18px_60px_-32px_rgba(0,0,0,0.60)] ring-1 ring-black/[0.04] backdrop-blur-sm sm:px-9 sm:py-12">
               <h3 className="font-display text-[1.1rem] font-semibold leading-tight sm:text-[1.25rem]">
                 Contact Information
               </h3>
