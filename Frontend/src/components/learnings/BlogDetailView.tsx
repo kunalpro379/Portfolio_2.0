@@ -1,12 +1,13 @@
 import { useQuery } from '@tanstack/react-query';
 import { useState, useMemo } from 'react';
 import { useNavigate } from '@tanstack/react-router';
-import { ArrowLeft, Calendar, ExternalLink, FileText, Link as LinkIcon, Tag, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowLeft, Calendar, ExternalLink, FileText, Link as LinkIcon, Tag, ChevronLeft, ChevronRight, Pencil } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Header } from './Header';
 import { config } from '@/config/config';
 import { PremiumLoader } from './PremiumLoader';
+import { ArchitecturePasswordSidebar } from './ArchitecturePasswordSidebar';
 
 interface Blog {
   blogId: string;
@@ -49,6 +50,7 @@ export function BlogDetailView({ blogId }: BlogDetailViewProps) {
   const [activeTab] = useState("blogs");
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [activeSection, setActiveSection] = useState<string>('');
+  const [showEditSidebar, setShowEditSidebar] = useState(false);
 
   const handleTabChange = (tab: string) => {
     navigate({ to: '/learnings', search: { tab } });
@@ -100,6 +102,21 @@ export function BlogDetailView({ blogId }: BlogDetailViewProps) {
       element.scrollIntoView({ behavior: 'smooth', block: 'start' });
       setActiveSection(headingId);
     }
+  };
+
+  const handleEditSubmit = async (password: string) => {
+    // Verify by attempting a PUT — 401 = wrong password
+    const res = await fetch(`${config.apiUrl}/blogs/${blog?.blogId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ password }),
+    });
+    if (res.status === 401) {
+      const data = await res.json();
+      throw new Error(data.message || "Incorrect password");
+    }
+    setShowEditSidebar(false);
+    navigate({ to: `/learnings/blogs/${blogId}/edit`, search: { password } });
   };
 
   // Custom markdown components
@@ -165,6 +182,7 @@ export function BlogDetailView({ blogId }: BlogDetailViewProps) {
   }
 
   return (
+    <>
     <div className="h-screen flex flex-col bg-white overflow-hidden">
       <Header activeTab={activeTab} onTabChange={handleTabChange} tabs={tabs} />
       
@@ -191,6 +209,14 @@ export function BlogDetailView({ blogId }: BlogDetailViewProps) {
             >
               <ArrowLeft className="h-3.5 w-3.5" />
               Back to Blogs
+            </button>
+
+            <button
+              onClick={() => setShowEditSidebar(true)}
+              className="flex items-center gap-1.5 border border-[#8B4513]/40 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#8B4513] hover:bg-[#8B4513] hover:text-white transition-colors mb-1"
+            >
+              <Pencil className="h-3 w-3" />
+              Edit Blog
             </button>
 
             {/* Subject Badge */}
@@ -332,5 +358,15 @@ export function BlogDetailView({ blogId }: BlogDetailViewProps) {
         </div>
       </div>
     </div>
+
+      <ArchitecturePasswordSidebar
+        open={showEditSidebar}
+        title="Edit Blog"
+        description="Enter password to edit this blog"
+        submitLabel="Continue to editor"
+        onClose={() => setShowEditSidebar(false)}
+        onSubmit={handleEditSubmit}
+      />
+    </>
   );
 }

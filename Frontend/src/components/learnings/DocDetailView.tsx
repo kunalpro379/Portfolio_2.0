@@ -1,12 +1,13 @@
 import { useQuery } from '@tanstack/react-query';
 import { useState, useEffect } from 'react';
 import { useNavigate } from '@tanstack/react-router';
-import { ArrowLeft, Calendar, Clock, FileText, Image as ImageIcon, Paperclip, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowLeft, Calendar, Clock, FileText, Image as ImageIcon, Paperclip, ChevronLeft, ChevronRight, Pencil } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Header } from './Header';
 import { config } from '@/config/config';
 import { PremiumLoader, PremiumLoaderFullScreen } from './PremiumLoader';
+import { ArchitecturePasswordSidebar } from './ArchitecturePasswordSidebar';
 
 interface DocFile {
   fileId: string;
@@ -55,9 +56,25 @@ export function DocDetailView({ docId }: DocDetailViewProps) {
   const [activeTab] = useState("docs");
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [selectedFile, setSelectedFile] = useState<DocFile | null>(null);
+  const [showEditSidebar, setShowEditSidebar] = useState(false);
 
   const handleTabChange = (tab: string) => {
     navigate({ to: '/learnings', search: { tab } });
+  };
+
+  const handleEditSubmit = async (password: string) => {
+    // Verify password against update endpoint
+    const res = await fetch(`${config.apiUrl}/documentation/${doc?.docId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ password }),
+    });
+    if (res.status === 401) {
+      const data = await res.json();
+      throw new Error(data.message || "Incorrect password");
+    }
+    setShowEditSidebar(false);
+    navigate({ to: `/learnings/docs/${docId}/edit`, search: { password } });
   };
 
   // Fetch doc data
@@ -159,6 +176,7 @@ export function DocDetailView({ docId }: DocDetailViewProps) {
   const diagramFiles = doc.files.filter(f => f.type === 'diagram');
 
   return (
+    <>
     <div className="h-screen flex flex-col bg-white overflow-hidden">
       <Header activeTab={activeTab} onTabChange={handleTabChange} tabs={tabs} />
       
@@ -184,6 +202,14 @@ export function DocDetailView({ docId }: DocDetailViewProps) {
             >
               <ArrowLeft className="h-3.5 w-3.5" />
               Back to Docs
+            </button>
+
+            <button
+              onClick={() => setShowEditSidebar(true)}
+              className="flex items-center gap-1.5 border border-[#8B4513]/40 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#8B4513] hover:bg-[#8B4513] hover:text-white transition-colors mb-1"
+            >
+              <Pencil className="h-3 w-3" />
+              Edit Doc
             </button>
 
             {/* Title */}
@@ -330,5 +356,15 @@ export function DocDetailView({ docId }: DocDetailViewProps) {
         </div>
       </div>
     </div>
+
+      <ArchitecturePasswordSidebar
+        open={showEditSidebar}
+        title="Edit Documentation"
+        description="Enter password to edit this doc"
+        submitLabel="Continue to editor"
+        onClose={() => setShowEditSidebar(false)}
+        onSubmit={handleEditSubmit}
+      />
+    </>
   );
 }

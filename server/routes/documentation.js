@@ -2,6 +2,7 @@ import express from 'express';
 import multer from 'multer';
 import { BlobServiceClient } from '@azure/storage-blob';
 import { Documentation } from '../models/Documentation.js';
+import Password from '../models/Password.js';
 
 const router = express.Router();
 
@@ -122,7 +123,16 @@ async function streamToString(readableStream) {
 
 router.post('/create', async (req, res) => {
   try {
-    const { title, subject, description, tags, date, time, content, isPublic, assets } = req.body;
+    const { title, subject, description, tags, date, time, content, isPublic, assets, password } = req.body;
+
+    // Verify password
+    if (!password) {
+      return res.status(401).json({ message: 'Password is required' });
+    }
+    const isValid = await Password.verifyPassword('ARCHITECTURE_PASSWORD', password);
+    if (!isValid) {
+      return res.status(401).json({ message: 'Incorrect password' });
+    }
 
     if (!title || !subject || !content) {
       return res.status(400).json({ message: 'Title, subject, and content are required' });
@@ -341,7 +351,16 @@ router.get('/admin/:docId', async (req, res) => {
 router.put('/:docId', async (req, res) => {
   try {
     const { docId } = req.params;
-    const { title, subject, description, tags, date, time, content, isPublic, assets } = req.body;
+    const { title, subject, description, tags, date, time, content, isPublic, assets, password } = req.body;
+
+    // Verify password
+    if (!password) {
+      return res.status(401).json({ message: 'Password is required' });
+    }
+    const isValid = await Password.verifyPassword('ARCHITECTURE_PASSWORD', password);
+    if (!isValid) {
+      return res.status(401).json({ message: 'Incorrect password' });
+    }
 
     const doc = await Documentation.findOne({ docId });
     if (!doc) {

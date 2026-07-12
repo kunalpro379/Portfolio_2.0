@@ -74,10 +74,19 @@ router.get('/', async (req, res) => {
     }
 });
 
-// Create new blog
+// Create new blog (password protected)
 router.post('/create', async (req, res) => {
     try {
-        const { blogId, title, tagline, subject, shortDescription, tags, datetime, footer, blogLinks } = req.body;
+        const { blogId, title, tagline, subject, shortDescription, tags, datetime, footer, blogLinks, password } = req.body;
+
+        // Verify password
+        if (!password) {
+            return res.status(401).json({ message: 'Password is required' });
+        }
+        const isValid = await Password.verifyPassword('ARCHITECTURE_PASSWORD', password);
+        if (!isValid) {
+            return res.status(401).json({ message: 'Incorrect password' });
+        }
 
         if (!title) {
             return res.status(400).json({ message: 'Title is required' });
@@ -188,10 +197,12 @@ router.put('/:blogId', async (req, res) => {
         const updateData = { ...req.body };
 
         if (updateData.password) {
-            const isValid = await Password.verifyPassword('TODO_PASSWORD', updateData.password);
+            const isValid = await Password.verifyPassword('ARCHITECTURE_PASSWORD', updateData.password);
             if (!isValid) {
                 return res.status(401).json({ message: 'Incorrect password' });
             }
+        } else {
+            return res.status(401).json({ message: 'Password is required' });
         }
 
         delete updateData.password;

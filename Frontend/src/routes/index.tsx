@@ -189,11 +189,13 @@ function Header({ onContactClick }: { onContactClick: () => void }) {
 
 function Hero({ onContactClick }: { onContactClick: () => void }) {
   return (
-    <section id="home" className="relative overflow-hidden border-b border-border">
-      {/* Decorative background overlay */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 bg-cream/30 z-[1]">
-        <div className="absolute -left-32 top-10 h-96 w-96 rounded-full bg-[oklch(0.72_0.13_75/0.12)] blur-3xl" />
-        <div className="absolute -right-24 bottom-0 h-[28rem] w-[28rem] rounded-full bg-[oklch(0.6_0.16_35/0.10)] blur-3xl" />
+    <section id="home" className="relative overflow-hidden border-b border-border/50">
+      {/* Premium gradient background with multiple layers */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 z-[1]">
+        <div className="absolute inset-0 bg-gradient-to-br from-[oklch(0.98_0.008_240)] via-[oklch(0.97_0.010_260)] to-[oklch(0.96_0.012_280)]" />
+        <div className="absolute -left-32 top-10 h-[600px] w-[600px] rounded-full bg-[oklch(0.58_0.24_240/0.15)] blur-[128px]" />
+        <div className="absolute -right-24 -bottom-32 h-[700px] w-[700px] rounded-full bg-[oklch(0.62_0.22_35/0.12)] blur-[120px]" />
+        <div className="absolute right-1/3 top-1/2 h-[400px] w-[400px] rounded-full bg-[oklch(0.52_0.24_280/0.10)] blur-[100px]" />
       </div>
 
       <div className="page-container relative z-[2] grid grid-cols-1 gap-8 py-12 lg:grid-cols-[1.4fr_1fr] lg:gap-12 lg:py-16">
@@ -214,19 +216,17 @@ function Hero({ onContactClick }: { onContactClick: () => void }) {
             </span>
           </p>
 
-          <h1 className="font-display mt-4 text-[clamp(3rem,8vw,7.5rem)] font-medium leading-[1.1] tracking-tight">
-            <span className="block">
-              <span className="text-foreground">Building </span>
-              <span className="text-accent">Ideas</span>
+          <h1 className="font-display mt-4 text-[clamp(3rem,8vw,7.5rem)] font-bold leading-[1] tracking-tight">
+            <span className="block bg-gradient-to-r from-[oklch(0.12_0.015_270)] via-[oklch(0.20_0.018_265)] to-[oklch(0.12_0.015_270)] bg-clip-text text-transparent">
+              Building <span className="bg-gradient-to-r from-[oklch(0.58_0.24_240)] to-[oklch(0.52_0.24_280)] bg-clip-text">Ideas</span>
             </span>
-            <span className="block">
-              <span className="text-foreground">Into </span>
-              <span className="text-accent">Reality</span>
+            <span className="block bg-gradient-to-r from-[oklch(0.12_0.015_270)] via-[oklch(0.20_0.018_265)] to-[oklch(0.12_0.015_270)] bg-clip-text text-transparent">
+              Into <span className="bg-gradient-to-r from-[oklch(0.62_0.22_35)] to-[oklch(0.58_0.24_240)] bg-clip-text">Reality</span>
             </span>
           </h1>
           
           <div className="mt-4">
-            <span className="font-display block text-[clamp(2rem,5vw,4rem)] font-bold tracking-tight text-[#8B4513]">
+            <span className="font-display block text-[clamp(2rem,5vw,4rem)] font-extrabold tracking-tighter bg-gradient-to-r from-[oklch(0.25_0.018_270)] to-[oklch(0.35_0.020_268)] bg-clip-text text-transparent">
               KUNAL PATIL
             </span>
           </div>
@@ -240,43 +240,45 @@ function Hero({ onContactClick }: { onContactClick: () => void }) {
             <span className="text-foreground font-medium">ideas to life.</span>
           </p>
 
-          <div className="mt-6 flex flex-col gap-2.5 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
             <a
               href="#work"
-              className="rounded-md bg-foreground px-4 py-2.5 text-center text-[13px] font-semibold text-background transition-colors hover:bg-[#8B4513] sm:px-6 sm:py-3 sm:text-[15px] lg:px-8 lg:py-4 lg:text-[16px]"
+              className="group relative overflow-hidden rounded-lg bg-gradient-to-r from-[oklch(0.58_0.24_240)] to-[oklch(0.52_0.24_280)] px-6 py-3.5 text-center text-[14px] font-bold text-white shadow-lg transition-all hover:shadow-[var(--shadow-glow)] sm:px-8 sm:py-4 sm:text-[16px] lg:px-10 lg:py-5 lg:text-[17px]"
             >
-              Explore My Projects & Work
+              <span className="relative z-10">Explore My Projects & Work</span>
+              <div className="absolute inset-0 bg-gradient-to-r from-[oklch(0.62_0.26_235)] to-[oklch(0.56_0.26_275)] opacity-0 transition-opacity group-hover:opacity-100" />
             </a>
             <a
               href="#writing"
-              className="rounded-md border-2 border-foreground px-4 py-2.5 text-center text-[13px] font-semibold text-foreground transition-colors hover:bg-foreground hover:text-background sm:px-6 sm:py-3 sm:text-[15px] lg:px-8 lg:py-4 lg:text-[16px]"
+              className="group relative overflow-hidden rounded-lg border-2 border-[oklch(0.20_0.018_270)] bg-transparent px-6 py-3.5 text-center text-[14px] font-bold text-foreground shadow-md transition-all hover:border-[oklch(0.58_0.24_240)] hover:bg-gradient-to-r hover:from-[oklch(0.58_0.24_240)] hover:to-[oklch(0.52_0.24_280)] hover:text-white hover:shadow-lg sm:px-8 sm:py-4 sm:text-[16px] lg:px-10 lg:py-5 lg:text-[17px]"
             >
               Read My Learnings & Blogs
             </a>
             <button
               type="button"
               onClick={onContactClick}
-              className="rounded-md border-2 border-foreground px-4 py-2.5 text-center text-[13px] font-semibold text-foreground transition-colors hover:bg-foreground hover:text-background sm:px-6 sm:py-3 sm:text-[15px] lg:px-8 lg:py-4 lg:text-[16px]"
+              className="group relative overflow-hidden rounded-lg border-2 border-[oklch(0.62_0.22_35)] bg-transparent px-6 py-3.5 text-center text-[14px] font-bold text-foreground shadow-md transition-all hover:border-[oklch(0.62_0.22_35)] hover:bg-[oklch(0.62_0.22_35)] hover:text-white hover:shadow-lg sm:px-8 sm:py-4 sm:text-[16px] lg:px-10 lg:py-5 lg:text-[17px]"
             >
               Get In Touch With Me
             </button>
           </div>
 
-          <div className="mt-4 flex flex-wrap items-center gap-3">
-            <span className="inline-flex items-center border border-border px-3 py-1.5 text-[12px] font-medium text-foreground">
-              <span className="text-foreground">AI/ML Engineer</span>
+          <div className="mt-6 flex flex-wrap items-center gap-3">
+            <span className="relative inline-flex items-center overflow-hidden rounded-full border border-[oklch(0.58_0.24_240/0.30)] bg-gradient-to-r from-[oklch(0.58_0.24_240/0.08)] to-[oklch(0.52_0.24_280/0.08)] px-4 py-2 text-[13px] font-bold text-foreground shadow-sm backdrop-blur-sm">
+              <span className="relative z-10">AI/ML Engineer</span>
             </span>
-            <span className="inline-flex items-center border border-border px-3 py-1.5 text-[12px] font-medium text-foreground">
-              <span className="text-foreground">Open to opportunities</span>
+            <span className="relative inline-flex items-center overflow-hidden rounded-full border border-[oklch(0.62_0.22_35/0.30)] bg-gradient-to-r from-[oklch(0.62_0.22_35/0.08)] to-[oklch(0.75_0.18_85/0.08)] px-4 py-2 text-[13px] font-bold text-foreground shadow-sm backdrop-blur-sm">
+              <span className="absolute left-3 h-2 w-2 animate-pulse rounded-full bg-[oklch(0.62_0.22_35)]" />
+              <span className="relative z-10 ml-3">Open to opportunities</span>
             </span>
-            <span className="inline-flex items-center border border-border px-3 py-1.5 text-[12px] font-medium text-foreground">
-              <span className="text-foreground">Agentic AI</span>
+            <span className="inline-flex items-center rounded-full border border-border/50 bg-white/60 px-4 py-2 text-[13px] font-bold text-foreground shadow-sm backdrop-blur-sm">
+              Agentic AI
             </span>
-            <span className="inline-flex items-center border border-border px-3 py-1.5 text-[12px] font-medium text-foreground">
-              <span className="text-foreground">Cloud & DevOps</span>
+            <span className="inline-flex items-center rounded-full border border-border/50 bg-white/60 px-4 py-2 text-[13px] font-bold text-foreground shadow-sm backdrop-blur-sm">
+              Cloud & DevOps
             </span>
-            <span className="inline-flex items-center border border-border px-3 py-1.5 text-[12px] font-medium text-foreground">
-              <span className="text-foreground">LLM</span>
+            <span className="inline-flex items-center rounded-full border border-border/50 bg-white/60 px-4 py-2 text-[13px] font-bold text-foreground shadow-sm backdrop-blur-sm">
+              LLM
             </span>
           </div>
         </div>
@@ -467,16 +469,25 @@ function Work() {
   };
 
   return (
-    <section id="work" className="border-b border-border">
-      <div className="page-container py-16 sm:py-24">
+    <section id="work" className="relative border-b border-border/50">
+      {/* Premium gradient background */}
+      <div aria-hidden className="pointer-events-none absolute inset-0">
+        <div className="absolute inset-0 bg-gradient-to-b from-[oklch(0.97_0.010_260)] to-[oklch(0.96_0.012_280)]" />
+        <div className="absolute right-0 top-0 h-[500px] w-[500px] rounded-full bg-[oklch(0.58_0.24_240/0.08)] blur-[120px]" />
+      </div>
+      
+      <div className="page-container relative z-10 py-20 sm:py-28">
         {/* Other Projects Section */}
         <SectionLabel index="02" title="Projects" kicker="More work" />
-        <div className="mt-6 flex flex-wrap items-end justify-between gap-8">
-          <h2 className="font-display max-w-3xl text-[clamp(2.25rem,4.5vw,3.75rem)] font-bold leading-[1.05]">
+        <div className="mt-8 flex flex-wrap items-end justify-between gap-8">
+          <h2 className="font-display max-w-3xl text-[clamp(2.5rem,5vw,4.5rem)] font-bold leading-[1] bg-gradient-to-r from-[oklch(0.12_0.015_270)] to-[oklch(0.25_0.018_268)] bg-clip-text text-transparent">
             4 years of building.{" "}
-            <span className="text-muted-foreground">""</span>
+            <span className="bg-gradient-to-r from-[oklch(0.58_0.24_240)] to-[oklch(0.62_0.22_35)] bg-clip-text">Innovation</span>
           </h2>
-          <a href="#" className="link-underline text-sm">View all projects ↗</a>
+          <a href="#" className="group relative text-[15px] font-bold text-[oklch(0.58_0.24_240)] transition-all hover:text-[oklch(0.52_0.24_280)]">
+            View all projects
+            <span className="ml-2 inline-block transition-transform group-hover:translate-x-1">→</span>
+          </a>
         </div>
 
         {showShimmer ? (
@@ -484,7 +495,7 @@ function Work() {
         ) : isSuccess && projects.length === 0 ? (
           <div className="mt-16 text-center text-muted-foreground">No projects found.</div>
         ) : (
-          <div className="mt-16 grid grid-cols-2 gap-0 lg:grid-cols-5">
+          <div className="mt-16 grid grid-cols-2 gap-6 lg:grid-cols-4">
             {projects.map((project, idx) => {
               const links =
                 project.links && !Array.isArray(project.links) ? project.links : null;
@@ -493,62 +504,75 @@ function Work() {
               return (
                 <article
                   key={project._id}
-                  className="group relative border border-black/15 bg-transparent transition-all duration-200 hover:border-black hover:shadow-[0_0_0_1px_rgba(0,0,0,0.12)]"
+                  className="group relative overflow-hidden rounded-xl border border-border/40 bg-white/80 backdrop-blur-sm transition-all duration-300 hover:border-[oklch(0.58_0.24_240/0.5)] hover:shadow-[var(--shadow-premium)]"
                 >
                   <button
                     type="button"
                     onClick={() => openProject(project)}
                     className="block h-full w-full cursor-pointer text-left"
                   >
-                    <div className="overflow-hidden border-b border-black/10">
+                    <div className="relative overflow-hidden">
                       {project.cardasset && project.cardasset.length > 0 ? (
-                        <img
-                          src={project.cardasset[0]}
-                          alt={project.title}
-                          loading="lazy"
-                          className="aspect-[4/3] w-full object-cover grayscale transition-transform duration-700 group-hover:scale-[1.01] group-hover:grayscale-0 sm:aspect-[16/10]"
-                        />
+                        <>
+                          <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                          <img
+                            src={project.cardasset[0]}
+                            alt={project.title}
+                            loading="lazy"
+                            className="aspect-[4/3] w-full object-cover transition-all duration-500 group-hover:scale-105 sm:aspect-[16/10]"
+                          />
+                        </>
                       ) : (
-                        <div className="aspect-[4/3] w-full bg-white sm:aspect-[16/10]" />
+                        <div className="aspect-[4/3] w-full bg-gradient-to-br from-[oklch(0.98_0.008_240)] to-[oklch(0.96_0.012_260)] sm:aspect-[16/10]" />
                       )}
+                      {/* Premium gradient overlay */}
+                      <div className="absolute inset-0 bg-gradient-to-br from-[oklch(0.58_0.24_240/0.05)] to-[oklch(0.62_0.22_35/0.05)] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
                     </div>
-                    <div className="flex h-full flex-col p-2.5 sm:p-4">
-                      <div className="mb-2 flex items-start justify-between gap-2 sm:mb-3 sm:gap-3">
-                        <div className="label-mono text-[8px] uppercase leading-tight tracking-[0.14em] text-black/55 sm:text-[10px] sm:tracking-[0.22em]">
+                    <div className="flex h-full flex-col p-4 sm:p-5">
+                      <div className="mb-3 flex items-start justify-between gap-2 sm:mb-4">
+                        <div className="label-mono text-[9px] uppercase leading-tight tracking-[0.16em] text-[oklch(0.58_0.24_240)] sm:text-[10px]">
                           {String(idx + 1).padStart(2, "0")} ·{" "}
                           {project.projectId?.toUpperCase() || "PROJECT"}
                         </div>
                         {year && (
-                          <div className="label-mono shrink-0 text-[8px] uppercase tracking-[0.12em] text-black/45 sm:text-[10px]">
+                          <div className="label-mono shrink-0 rounded-full bg-[oklch(0.58_0.24_240/0.10)] px-2 py-0.5 text-[8px] uppercase tracking-[0.14em] text-[oklch(0.58_0.24_240)] sm:text-[9px]">
                             {new Date(year).getFullYear()}
                           </div>
                         )}
                       </div>
-                      <h3 className="font-display text-[12px] font-semibold leading-tight text-black transition-colors group-hover:underline group-hover:decoration-black group-hover:underline-offset-2 sm:text-[1.15rem] sm:group-hover:underline-offset-4">
+                      <h3 className="font-display text-[13px] font-bold leading-tight text-foreground transition-colors group-hover:text-[oklch(0.58_0.24_240)] sm:text-[1.25rem]">
                         {project.title}
                       </h3>
                       {project.description && (
-                        <p className="mt-2 text-[10px] leading-[1.55] text-black/68 line-clamp-4 sm:mt-3 sm:text-[12px] sm:leading-[1.6]">
+                        <p className="mt-2 line-clamp-3 text-[11px] leading-[1.55] text-foreground/70 sm:mt-3 sm:text-[13px] sm:leading-[1.6]">
                           {project.description}
                         </p>
                       )}
                       {project.tags && project.tags.length > 0 && (
-                        <div className="mt-2 flex flex-wrap gap-x-1.5 gap-y-1 text-[8px] uppercase tracking-[0.12em] text-black/55 sm:mt-4 sm:gap-x-3 sm:text-[10px] sm:tracking-[0.14em]">
-                          {project.tags.slice(0, 4).map((tag) => (
-                            <span key={tag}>{tag}</span>
+                        <div className="mt-3 flex flex-wrap gap-1.5 sm:mt-4">
+                          {project.tags.slice(0, 3).map((tag) => (
+                            <span key={tag} className="rounded-full border border-[oklch(0.58_0.24_240/0.25)] bg-[oklch(0.58_0.24_240/0.06)] px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.12em] text-[oklch(0.58_0.24_240)] sm:text-[10px]">
+                              {tag}
+                            </span>
                           ))}
                         </div>
                       )}
                       {(links?.github || links?.live) && (
-                        <div className="mt-auto flex items-center gap-2 border-t border-black/10 pt-2 text-[8px] font-semibold uppercase tracking-[0.12em] text-black/60 sm:mt-4 sm:gap-4 sm:pt-3 sm:text-[10px] sm:tracking-[0.18em]">
+                        <div className="mt-auto flex items-center gap-3 border-t border-border/30 pt-3 text-[9px] font-bold uppercase tracking-[0.14em] text-foreground/60 sm:mt-4 sm:gap-4 sm:pt-4 sm:text-[10px]">
                           {links?.github && (
-                            <span className="transition-colors group-hover:text-black group-hover:underline group-hover:underline-offset-2 sm:group-hover:underline-offset-4">
-                              GitHub ↗
+                            <span className="flex items-center gap-1 transition-colors group-hover:text-[oklch(0.58_0.24_240)]">
+                              GitHub
+                              <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                              </svg>
                             </span>
                           )}
                           {links?.live && (
-                            <span className="transition-colors group-hover:text-black group-hover:underline group-hover:underline-offset-2 sm:group-hover:underline-offset-4">
-                              Live Demo →
+                            <span className="flex items-center gap-1 transition-colors group-hover:text-[oklch(0.62_0.22_35)]">
+                              Live
+                              <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                              </svg>
                             </span>
                           )}
                         </div>
@@ -617,54 +641,63 @@ function Lab() {
   ];
   
   return (
-    <section id="lab" className="border-b border-border">
-      <div className="page-container py-16 sm:py-24">
+    <section id="lab" className="relative border-b border-border/50">
+      {/* Premium gradient background */}
+      <div aria-hidden className="pointer-events-none absolute inset-0">
+        <div className="absolute inset-0 bg-gradient-to-b from-[oklch(0.96_0.012_280)] to-[oklch(0.97_0.010_260)]" />
+        <div className="absolute left-0 bottom-0 h-[600px] w-[600px] rounded-full bg-[oklch(0.52_0.24_280/0.08)] blur-[120px]" />
+      </div>
+      
+      <div className="page-container relative z-10 py-20 sm:py-28">
         <SectionLabel index="03" title="Experience" kicker="Work history" />
-        <div className="mt-6">
-          <h2 className="font-display text-[clamp(2.25rem,4.5vw,3.5rem)] font-bold leading-[1.05]">
+        <div className="mt-8">
+          <h2 className="font-display text-[clamp(2.5rem,5vw,4.5rem)] font-bold leading-[1] bg-gradient-to-r from-[oklch(0.12_0.015_270)] to-[oklch(0.25_0.018_268)] bg-clip-text text-transparent">
             Work History
           </h2>
         </div>
 
-        <ul className="mt-8 divide-y divide-border border-y border-border sm:mt-14">
-          {experiences.map((e) => (
+        <ul className="mt-12 space-y-0 sm:mt-16">
+          {experiences.map((e, idx) => (
             <li
               key={e.company}
-              className={`grid grid-cols-[minmax(0,1fr)] gap-2 py-4 sm:grid-cols-[160px_1fr] sm:gap-6 sm:py-10 md:items-start ${e.accent ? "bg-accent/5" : ""}`}
+              className={`group relative grid grid-cols-[minmax(0,1fr)] gap-3 overflow-hidden rounded-2xl border border-border/40 bg-white/60 p-6 backdrop-blur-sm transition-all duration-300 hover:border-[oklch(0.58_0.24_240/0.4)] hover:shadow-[var(--shadow-premium)] sm:grid-cols-[180px_1fr] sm:gap-8 sm:p-8 ${idx !== experiences.length - 1 ? "mb-4" : ""} ${e.accent ? "border-[oklch(0.58_0.24_240/0.35)] bg-gradient-to-br from-[oklch(0.58_0.24_240/0.06)] to-[oklch(0.52_0.24_280/0.04)]" : ""}`}
             >
-              <div className="flex items-center justify-between gap-2 sm:flex-col sm:items-start sm:justify-start sm:gap-2">
+              {/* Accent gradient overlay on hover */}
+              <div className="absolute inset-0 bg-gradient-to-br from-[oklch(0.58_0.24_240/0.03)] to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+              
+              <div className="relative z-10 flex items-center justify-between gap-2 sm:flex-col sm:items-start sm:justify-start sm:gap-3">
                 <div
-                  className={`label-mono flex items-center gap-1.5 text-[10px] font-semibold sm:gap-2 sm:text-[11px] ${e.accent ? "text-accent" : "text-muted-foreground"}`}
+                  className={`label-mono flex items-center gap-2 rounded-full px-3 py-1.5 text-[11px] font-bold sm:text-[12px] ${e.accent ? "bg-gradient-to-r from-[oklch(0.58_0.24_240)] to-[oklch(0.52_0.24_280)] text-white shadow-md" : "bg-[oklch(0.90_0.015_270)] text-foreground/80"}`}
                 >
                   <span
-                    className={`inline-block h-1.5 w-1.5 shrink-0 rounded-full sm:h-2 sm:w-2 ${e.accent ? "animate-pulse bg-accent" : "bg-muted-foreground"}`}
+                    className={`inline-block h-2 w-2 shrink-0 rounded-full ${e.accent ? "animate-pulse bg-white shadow-[0_0_8px_rgba(255,255,255,0.8)]" : "bg-muted-foreground"}`}
                   />
                   {e.tag}
                 </div>
-                <div className="label-mono shrink-0 text-[9px] text-muted-foreground sm:text-[12px]">{e.period}</div>
+                <div className="label-mono shrink-0 text-[10px] text-muted-foreground sm:text-[13px]">{e.period}</div>
               </div>
-              <div className="min-w-0">
-                <div className="mb-2 flex flex-col gap-0.5 sm:mb-4 sm:gap-2">
-                  <h3 className="font-display truncate text-[1rem] font-semibold leading-tight sm:text-[1.75rem]">
+              <div className="relative z-10 min-w-0">
+                <div className="mb-3 flex flex-col gap-1 sm:mb-5 sm:gap-2">
+                  <h3 className="font-display text-[1.1rem] font-bold leading-tight transition-colors group-hover:text-[oklch(0.58_0.24_240)] sm:text-[2rem]">
                     {e.company}
                   </h3>
                   <div
-                    className={`truncate text-[11px] font-semibold leading-tight sm:text-[15px] ${e.accent ? "text-accent" : "text-foreground"}`}
+                    className={`text-[12px] font-bold leading-tight sm:text-[16px] ${e.accent ? "bg-gradient-to-r from-[oklch(0.58_0.24_240)] to-[oklch(0.52_0.24_280)] bg-clip-text text-transparent" : "text-foreground"}`}
                   >
                     {e.cat}
                   </div>
-                  <div className="label-mono truncate text-[10px] text-muted-foreground sm:text-[13px]">{e.title}</div>
+                  <div className="label-mono text-[11px] text-muted-foreground sm:text-[14px]">{e.title}</div>
                 </div>
                 <p
-                  className={`line-clamp-2 max-w-3xl text-[11px] leading-snug sm:line-clamp-none sm:text-[15px] sm:leading-[1.7] ${e.accent ? "text-foreground/80" : "text-foreground/70"}`}
+                  className={`max-w-3xl text-[12px] leading-[1.65] sm:text-[16px] sm:leading-[1.75] ${e.accent ? "text-foreground/85" : "text-foreground/75"}`}
                 >
                   {e.body}
                 </p>
-                <div className="mt-2 flex flex-wrap gap-1 sm:mt-5 sm:gap-2">
+                <div className="mt-4 flex flex-wrap gap-2 sm:mt-6">
                   {e.skills.map((skill) => (
                     <span
                       key={skill}
-                      className={`border px-1.5 py-0.5 text-[8px] font-semibold uppercase tracking-wide sm:px-3 sm:py-1.5 sm:text-[11px] ${e.accent ? "border-accent/30 bg-accent/10 text-accent" : "border-border bg-card text-foreground/70"}`}
+                      className={`rounded-full border px-3 py-1.5 text-[9px] font-bold uppercase tracking-wide transition-all sm:px-4 sm:py-2 sm:text-[11px] ${e.accent ? "border-[oklch(0.58_0.24_240/0.35)] bg-[oklch(0.58_0.24_240/0.10)] text-[oklch(0.58_0.24_240)] hover:bg-[oklch(0.58_0.24_240/0.20)]" : "border-border/50 bg-white/80 text-foreground/75 hover:border-[oklch(0.58_0.24_240/0.3)] hover:text-[oklch(0.58_0.24_240)]"}`}
                     >
                       {skill}
                     </span>

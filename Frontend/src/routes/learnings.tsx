@@ -39,7 +39,11 @@ function LearningsPage() {
   const isOnChildRoute = matches.some(match => 
     match.routeId === '/learnings/files/$folderId' || 
     match.routeId === '/learnings/blogs/$blogId' ||
-    match.routeId === '/learnings/docs/$docId'
+    match.routeId === '/learnings/docs/$docId' ||
+    match.routeId === '/learnings/blogs/create' ||
+    match.routeId === '/learnings/blogs/$blogId/edit' ||
+    match.routeId === '/learnings/docs/create' ||
+    match.routeId === '/learnings/docs/$docId/edit'
   );
   
   console.log('LearningsPage - matches:', matches.map(m => m.routeId));
