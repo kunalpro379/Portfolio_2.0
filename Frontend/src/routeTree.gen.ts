@@ -19,6 +19,10 @@ import { Route as LearningsDocsDocIdRouteImport } from './routes/learnings.docs.
 import { Route as LearningsBlogsBlogIdRouteImport } from './routes/learnings.blogs.$blogId'
 import { Route as ArchitectureViewViewerIdRouteImport } from './routes/architecture.view.$viewerId'
 import { Route as ArchitectureCanvasIdEditRouteImport } from './routes/architecture.$canvasId.edit'
+import { Route as LearningsBlogsCreateRouteImport } from './routes/learnings.blogs.create'
+import { Route as LearningsBlogsBlogIdEditRouteImport } from './routes/learnings.blogs.$blogId.edit'
+import { Route as LearningsDocsCreateRouteImport } from './routes/learnings.docs.create'
+import { Route as LearningsDocsDocIdEditRouteImport } from './routes/learnings.docs.$docId.edit'
 
 const LearningsRoute = LearningsRouteImport.update({
   id: '/learnings',
@@ -74,6 +78,30 @@ const ArchitectureCanvasIdEditRoute =
     getParentRoute: () => ArchitectureCanvasIdRoute,
   } as any)
 
+const LearningsBlogsCreateRoute = LearningsBlogsCreateRouteImport.update({
+  id: '/blogs/create',
+  path: '/blogs/create',
+  getParentRoute: () => LearningsRoute,
+} as any)
+
+const LearningsBlogsBlogIdEditRoute = LearningsBlogsBlogIdEditRouteImport.update({
+  id: '/blogs/$blogId/edit',
+  path: '/blogs/$blogId/edit',
+  getParentRoute: () => LearningsRoute,
+} as any)
+
+const LearningsDocsCreateRoute = LearningsDocsCreateRouteImport.update({
+  id: '/docs/create',
+  path: '/docs/create',
+  getParentRoute: () => LearningsRoute,
+} as any)
+
+const LearningsDocsDocIdEditRoute = LearningsDocsDocIdEditRouteImport.update({
+  id: '/docs/$docId/edit',
+  path: '/docs/$docId/edit',
+  getParentRoute: () => LearningsRoute,
+} as any)
+
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/game': typeof GameRoute
@@ -82,7 +110,11 @@ export interface FileRoutesByFullPath {
   '/architecture/$canvasId/edit': typeof ArchitectureCanvasIdEditRoute
   '/architecture/view/$viewerId': typeof ArchitectureViewViewerIdRoute
   '/learnings/blogs/$blogId': typeof LearningsBlogsBlogIdRoute
+  '/learnings/blogs/create': typeof LearningsBlogsCreateRoute
+  '/learnings/blogs/$blogId/edit': typeof LearningsBlogsBlogIdEditRoute
   '/learnings/docs/$docId': typeof LearningsDocsDocIdRoute
+  '/learnings/docs/create': typeof LearningsDocsCreateRoute
+  '/learnings/docs/$docId/edit': typeof LearningsDocsDocIdEditRoute
   '/learnings/files/$folderId': typeof LearningsFilesFolderIdRoute
   '/architecture/$canvasId/': typeof ArchitectureCanvasIdIndexRoute
 }
@@ -93,7 +125,11 @@ export interface FileRoutesByTo {
   '/architecture/$canvasId/edit': typeof ArchitectureCanvasIdEditRoute
   '/architecture/view/$viewerId': typeof ArchitectureViewViewerIdRoute
   '/learnings/blogs/$blogId': typeof LearningsBlogsBlogIdRoute
+  '/learnings/blogs/create': typeof LearningsBlogsCreateRoute
+  '/learnings/blogs/$blogId/edit': typeof LearningsBlogsBlogIdEditRoute
   '/learnings/docs/$docId': typeof LearningsDocsDocIdRoute
+  '/learnings/docs/create': typeof LearningsDocsCreateRoute
+  '/learnings/docs/$docId/edit': typeof LearningsDocsDocIdEditRoute
   '/learnings/files/$folderId': typeof LearningsFilesFolderIdRoute
   '/architecture/$canvasId': typeof ArchitectureCanvasIdIndexRoute
 }
@@ -106,7 +142,11 @@ export interface FileRoutesById {
   '/architecture/$canvasId/edit': typeof ArchitectureCanvasIdEditRoute
   '/architecture/view/$viewerId': typeof ArchitectureViewViewerIdRoute
   '/learnings/blogs/$blogId': typeof LearningsBlogsBlogIdRoute
+  '/learnings/blogs/create': typeof LearningsBlogsCreateRoute
+  '/learnings/blogs/$blogId/edit': typeof LearningsBlogsBlogIdEditRoute
   '/learnings/docs/$docId': typeof LearningsDocsDocIdRoute
+  '/learnings/docs/create': typeof LearningsDocsCreateRoute
+  '/learnings/docs/$docId/edit': typeof LearningsDocsDocIdEditRoute
   '/learnings/files/$folderId': typeof LearningsFilesFolderIdRoute
   '/architecture/$canvasId/': typeof ArchitectureCanvasIdIndexRoute
 }
@@ -120,7 +160,11 @@ export interface FileRouteTypes {
     | '/architecture/$canvasId/edit'
     | '/architecture/view/$viewerId'
     | '/learnings/blogs/$blogId'
+    | '/learnings/blogs/create'
+    | '/learnings/blogs/$blogId/edit'
     | '/learnings/docs/$docId'
+    | '/learnings/docs/create'
+    | '/learnings/docs/$docId/edit'
     | '/learnings/files/$folderId'
     | '/architecture/$canvasId/'
   fileRoutesByTo: FileRoutesByTo
@@ -131,7 +175,11 @@ export interface FileRouteTypes {
     | '/architecture/$canvasId/edit'
     | '/architecture/view/$viewerId'
     | '/learnings/blogs/$blogId'
+    | '/learnings/blogs/create'
+    | '/learnings/blogs/$blogId/edit'
     | '/learnings/docs/$docId'
+    | '/learnings/docs/create'
+    | '/learnings/docs/$docId/edit'
     | '/learnings/files/$folderId'
     | '/architecture/$canvasId'
   id:
@@ -143,7 +191,11 @@ export interface FileRouteTypes {
     | '/architecture/$canvasId/edit'
     | '/architecture/view/$viewerId'
     | '/learnings/blogs/$blogId'
+    | '/learnings/blogs/create'
+    | '/learnings/blogs/$blogId/edit'
     | '/learnings/docs/$docId'
+    | '/learnings/docs/create'
+    | '/learnings/docs/$docId/edit'
     | '/learnings/files/$folderId'
     | '/architecture/$canvasId/'
   fileRoutesById: FileRoutesById
@@ -214,6 +266,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LearningsBlogsBlogIdRouteImport
       parentRoute: typeof LearningsRoute
     }
+    '/learnings/blogs/create': {
+      id: '/learnings/blogs/create'
+      path: '/blogs/create'
+      fullPath: '/learnings/blogs/create'
+      preLoaderRoute: typeof LearningsBlogsCreateRouteImport
+      parentRoute: typeof LearningsRoute
+    }
+    '/learnings/blogs/$blogId/edit': {
+      id: '/learnings/blogs/$blogId/edit'
+      path: '/blogs/$blogId/edit'
+      fullPath: '/learnings/blogs/$blogId/edit'
+      preLoaderRoute: typeof LearningsBlogsBlogIdEditRouteImport
+      parentRoute: typeof LearningsRoute
+    }
+    '/learnings/docs/create': {
+      id: '/learnings/docs/create'
+      path: '/docs/create'
+      fullPath: '/learnings/docs/create'
+      preLoaderRoute: typeof LearningsDocsCreateRouteImport
+      parentRoute: typeof LearningsRoute
+    }
+    '/learnings/docs/$docId/edit': {
+      id: '/learnings/docs/$docId/edit'
+      path: '/docs/$docId/edit'
+      fullPath: '/learnings/docs/$docId/edit'
+      preLoaderRoute: typeof LearningsDocsDocIdEditRouteImport
+      parentRoute: typeof LearningsRoute
+    }
     '/architecture/view/$viewerId': {
       id: '/architecture/view/$viewerId'
       path: '/architecture/view/$viewerId'
@@ -233,13 +313,21 @@ declare module '@tanstack/react-router' {
 
 interface LearningsRouteChildren {
   LearningsBlogsBlogIdRoute: typeof LearningsBlogsBlogIdRoute
+  LearningsBlogsCreateRoute: typeof LearningsBlogsCreateRoute
+  LearningsBlogsBlogIdEditRoute: typeof LearningsBlogsBlogIdEditRoute
   LearningsDocsDocIdRoute: typeof LearningsDocsDocIdRoute
+  LearningsDocsCreateRoute: typeof LearningsDocsCreateRoute
+  LearningsDocsDocIdEditRoute: typeof LearningsDocsDocIdEditRoute
   LearningsFilesFolderIdRoute: typeof LearningsFilesFolderIdRoute
 }
 
 const LearningsRouteChildren: LearningsRouteChildren = {
   LearningsBlogsBlogIdRoute: LearningsBlogsBlogIdRoute,
+  LearningsBlogsCreateRoute: LearningsBlogsCreateRoute,
+  LearningsBlogsBlogIdEditRoute: LearningsBlogsBlogIdEditRoute,
   LearningsDocsDocIdRoute: LearningsDocsDocIdRoute,
+  LearningsDocsCreateRoute: LearningsDocsCreateRoute,
+  LearningsDocsDocIdEditRoute: LearningsDocsDocIdEditRoute,
   LearningsFilesFolderIdRoute: LearningsFilesFolderIdRoute,
 }
 

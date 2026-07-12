@@ -49,47 +49,42 @@
 
 :root {
   --radius: 0.5rem;
-  /* Premium dark-modern palette with depth */
-  --cream: oklch(0.98 0.008 90);
-  --cream-soft: oklch(0.96 0.010 88);
-  --cream-deep: oklch(0.94 0.012 86);
-  --ink: oklch(0.12 0.015 270);
-  --ink-soft: oklch(0.25 0.018 270);
+  /* Rich creamy palette - Enhanced for more prominence */
+  --cream: oklch(0.975 0.020 84);
+  --cream-soft: oklch(0.960 0.022 82);
+  --cream-deep: oklch(0.920 0.028 80);
+  --ink: oklch(0.165 0.008 60);
+  --ink-soft: oklch(0.32 0.01 60);
 
-  /* Vibrant premium accents */
-  --gold: oklch(0.75 0.18 85);
-  --sage: oklch(0.65 0.12 155);
-  --terracotta: oklch(0.62 0.22 35);
-  --electric-blue: oklch(0.58 0.24 240);
-  --deep-purple: oklch(0.48 0.20 285);
+  /* Premium accents */
+  --gold: oklch(0.72 0.13 75);
+  --sage: oklch(0.62 0.05 145);
+  --terracotta: oklch(0.6 0.16 35);
 
-  --background: oklch(0.96 0.008 90);
+  --background: var(--cream);
   --foreground: var(--ink);
-  --card: oklch(0.99 0.005 90);
+  --card: oklch(0.990 0.018 84);
   --card-foreground: var(--ink);
-  --popover: oklch(0.99 0.005 90);
+  --popover: var(--cream);
   --popover-foreground: var(--ink);
   --primary: var(--ink);
   --primary-foreground: var(--cream);
-  --secondary: oklch(0.92 0.015 88);
+  --secondary: oklch(0.935 0.020 82);
   --secondary-foreground: var(--ink);
-  --muted: oklch(0.90 0.015 88);
-  --muted-foreground: oklch(0.50 0.015 270);
-  --accent: var(--electric-blue);
+  --muted: oklch(0.945 0.020 82);
+  --muted-foreground: oklch(0.42 0.012 70);
+  --accent: var(--terracotta);
   --accent-foreground: var(--cream);
-  --destructive: oklch(0.58 0.25 28);
+  --destructive: oklch(0.55 0.22 27);
   --destructive-foreground: var(--cream);
-  --border: oklch(0.85 0.012 270/0.25);
-  --input: oklch(0.88 0.012 88);
-  --ring: oklch(0.58 0.20 240);
+  --border: oklch(0.86 0.018 80);
+  --input: oklch(0.86 0.018 80);
+  --ring: oklch(0.5 0.012 70);
 
-  --shadow-premium: 0 4px 8px oklch(0.12 0.015 270 / 0.08), 0 12px 32px -8px oklch(0.12 0.015 270 / 0.20), 0 0 0 1px oklch(0.12 0.015 270 / 0.04);
-  --shadow-soft: 0 2px 4px oklch(0.12 0.015 270 / 0.04), 0 4px 16px -4px oklch(0.12 0.015 270 / 0.10);
-  --shadow-glow: 0 0 20px oklch(0.58 0.24 240 / 0.25), 0 0 40px oklch(0.58 0.24 240 / 0.15);
-  --gradient-cream: linear-gradient(180deg, oklch(0.99 0.005 90) 0%, oklch(0.96 0.010 88) 100%);
-  --gradient-gold: linear-gradient(135deg, oklch(0.75 0.18 85) 0%, oklch(0.65 0.20 60) 100%);
-  --gradient-electric: linear-gradient(135deg, oklch(0.62 0.26 220) 0%, oklch(0.58 0.24 260) 100%);
-  --gradient-purple: linear-gradient(135deg, oklch(0.52 0.24 280) 0%, oklch(0.48 0.20 295) 100%);
+  --shadow-premium: 0 1px 2px oklch(0.18 0.005 60 / 0.04), 0 8px 24px -10px oklch(0.18 0.005 60 / 0.12);
+  --shadow-soft: 0 1px 2px oklch(0.18 0.005 60 / 0.03), 0 2px 8px -4px oklch(0.18 0.005 60 / 0.06);
+  --gradient-cream: linear-gradient(180deg, var(--cream) 0%, var(--cream-deep) 100%);
+  --gradient-gold: linear-gradient(135deg, oklch(0.78 0.12 78) 0%, oklch(0.68 0.14 60) 100%);
 }
 
 .dark {
@@ -187,28 +182,15 @@
     font-weight: 500;
   }
   .card-premium {
-    background: linear-gradient(180deg, oklch(0.99 0.005 90) 0%, oklch(0.97 0.008 88) 100%);
-    border: 1px solid oklch(0.85 0.012 270/0.20);
+    background: linear-gradient(180deg, var(--color-card) 0%, var(--color-cream-soft) 100%);
+    border: 1px solid var(--color-border);
     box-shadow: var(--shadow-soft);
-    transition: all .35s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
-    overflow: hidden;
-  }
-  .card-premium::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, oklch(0.58 0.24 240 / 0.03) 0%, oklch(0.62 0.22 35 / 0.02) 100%);
-    opacity: 0;
-    transition: opacity .35s ease;
+    transition: box-shadow .35s ease, transform .35s ease, border-color .35s ease;
   }
   .card-premium:hover {
     box-shadow: var(--shadow-premium);
-    border-color: oklch(0.58 0.24 240 / 0.35);
-    transform: translateY(-4px);
-  }
-  .card-premium:hover::before {
-    opacity: 1;
+    border-color: oklch(0.65 0.04 70);
+    transform: translateY(-2px);
   }
   .bg-paper {
     background:
@@ -251,12 +233,6 @@
 @layer components {
   .page-container {
     @apply mx-auto max-w-[1400px] px-3 sm:px-6 lg:px-10;
-  }
-  .input-base {
-    @apply h-10 w-full border-2 border-black bg-white px-3 text-sm font-medium text-black placeholder:text-black/35 focus:outline-none focus:ring-0;
-  }
-  textarea.input-base {
-    @apply h-auto py-2;
   }
 }
 
