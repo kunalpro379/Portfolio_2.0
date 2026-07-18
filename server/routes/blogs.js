@@ -63,10 +63,12 @@ const uploadToAzure = async (buffer, folder, filename, fileType) => {
   }
 };
 
-// Get all blogs
+// Get all blogs (admin=true returns all, otherwise only visible)
 router.get('/', async (req, res) => {
     try {
-        const blogs = await Blog.find().sort({ datetime: -1 });
+        const isAdmin = req.query.admin === 'true';
+        const filter = isAdmin ? {} : { isVisible: { $ne: false } };
+        const blogs = await Blog.find(filter).sort({ datetime: -1 });
         res.json({ blogs });
     } catch (error) {
         console.error('Get blogs error:', error);
@@ -428,6 +430,29 @@ router.delete('/:blogId/assets/:index', async (req, res) => {
     } catch (error) {
         console.error('Delete asset error:', error);
         res.status(500).json({ message: 'Server error', error: error.message });
+    }
+});
+
+// Toggle blog visibility
+router.patch('/:blogId/visibility', async (req, res) => {
+    try {
+        const { blogId } = req.params;
+        const { isVisible } = req.body;
+
+        const blog = await Blog.findOneAndUpdate(
+            { blogId },
+            { isVisible: Boolean(isVisible), updated_at: new Date() },
+            { new: true }
+        );
+
+        if (!blog) {
+            return res.status(404).json({ message: 'Blog not found' });
+        }
+
+        res.json({ message: 'Visibility updated', blog });
+    } catch (error) {
+        console.error('Toggle visibility error:', error);
+        res.status(500).json({ message: 'Server error' });
     }
 });
 

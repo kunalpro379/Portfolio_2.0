@@ -244,4 +244,31 @@
   .scrollbar-none::-webkit-scrollbar {
     display: none;
   }
+
+  /* Blog editor utilities */
+  .meta-input {
+    width: 100%;
+    padding: 5px 8px;
+    font-size: 12px;
+    background: white;
+    border: 1px solid oklch(0.86 0.018 80);
+    border-radius: 3px;
+    font-family: var(--font-sans);
+    color: var(--color-ink);
+    line-height: 1.4;
+  }
+  .meta-input:focus {
+    outline: none;
+    border-color: oklch(0.5 0.012 70);
+    box-shadow: 0 0 0 2px oklch(0.5 0.012 70 / 0.1);
+  }
+  .label-tiny {
+    display: block;
+    font-size: 9px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: oklch(0.42 0.012 70);
+    margin-bottom: 3px;
+  }
 }

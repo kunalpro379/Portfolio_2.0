@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FileText, Plus, Edit, Trash2, Calendar, Tag } from 'lucide-react';
-import config, { buildUrl } from '../config/config';
+import { FileText, Plus, Edit, Trash2, Calendar, Tag, Check, X } from 'lucide-react';
+import config from '../config/config';
 import PageShimmer from '../components/PageShimmer';
 
 interface Blog {
@@ -16,6 +16,7 @@ interface Blog {
   datetime: string;
   coverImage: string;
   created_at: string;
+  isVisible: boolean;
 }
 
 export default function Blogs() {
@@ -31,13 +32,28 @@ export default function Blogs() {
 
   const fetchBlogs = async () => {
     try {
-      const response = await fetch(config.api.endpoints.blogs);
+      const response = await fetch(`${config.api.endpoints.blogs}?admin=true`);
       const data = await response.json();
       setBlogs(data.blogs);
     } catch (error) {
       console.error('Error fetching blogs:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const toggleVisibility = async (blogId: string, currentVisibility: boolean) => {
+    try {
+      const response = await fetch(config.api.endpoints.blogVisibility(blogId), {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isVisible: !currentVisibility })
+      });
+      if (response.ok) {
+        setBlogs(prev => prev.map(b => b.blogId === blogId ? { ...b, isVisible: !currentVisibility } : b));
+      }
+    } catch (error) {
+      console.error('Error toggling visibility:', error);
     }
   };
 
@@ -115,7 +131,7 @@ export default function Blogs() {
             {blogs.map((blog) => (
               <div
                 key={blog._id}
-                className="bg-white border-4 border-black rounded-2xl overflow-hidden shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[-2px] hover:translate-y-[-2px] transition"
+                className={`bg-white border-4 border-black rounded-2xl overflow-hidden shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[-2px] hover:translate-y-[-2px] transition ${blog.isVisible === false ? 'opacity-50' : ''}`}
               >
                 {/* Cover Image */}
                 {blog.coverImage && (
@@ -186,6 +202,22 @@ export default function Blogs() {
 
                   {/* Actions */}
                   <div className="flex gap-2 pt-4 border-t-3 border-black">
+                    {/* Visibility Toggle */}
+                    <button
+                      onClick={() => toggleVisibility(blog.blogId, blog.isVisible !== false)}
+                      title={blog.isVisible !== false ? 'Visible — click to hide' : 'Hidden — click to show'}
+                      className={`flex items-center justify-center px-3 py-2 border-3 border-black rounded-xl font-bold transition shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] ${
+                        blog.isVisible !== false
+                          ? 'bg-green-200 hover:bg-green-300'
+                          : 'bg-red-200 hover:bg-red-300'
+                      }`}
+                    >
+                      {blog.isVisible !== false ? (
+                        <Check className="w-4 h-4" strokeWidth={3} />
+                      ) : (
+                        <X className="w-4 h-4" strokeWidth={3} />
+                      )}
+                    </button>
                     <button
                       onClick={() => navigate(`/blogs/edit/${blog.blogId}`)}
                       className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-blue-200 border-3 border-black rounded-xl font-bold hover:bg-blue-300 transition shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]"

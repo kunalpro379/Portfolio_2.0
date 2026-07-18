@@ -53,6 +53,10 @@ const blogSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+  isVisible: {
+    type: Boolean,
+    default: true
+  },
   created_at: {
     type: Date,
     default: Date.now
