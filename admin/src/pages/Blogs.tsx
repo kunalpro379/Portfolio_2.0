@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FileText, Plus, Edit, Trash2, Calendar, Tag, Check, X } from 'lucide-react';
-import config from '../config/config';
+import config, { buildUrl } from '../config/config';
 import PageShimmer from '../components/PageShimmer';
 
 interface Blog {
@@ -25,6 +25,7 @@ export default function Blogs() {
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [newBlogId, setNewBlogId] = useState('');
+  const [togglingId, setTogglingId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchBlogs();
@@ -42,21 +43,6 @@ export default function Blogs() {
     }
   };
 
-  const toggleVisibility = async (blogId: string, currentVisibility: boolean) => {
-    try {
-      const response = await fetch(config.api.endpoints.blogVisibility(blogId), {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ isVisible: !currentVisibility })
-      });
-      if (response.ok) {
-        setBlogs(prev => prev.map(b => b.blogId === blogId ? { ...b, isVisible: !currentVisibility } : b));
-      }
-    } catch (error) {
-      console.error('Error toggling visibility:', error);
-    }
-  };
-
   const deleteBlog = async (blogId: string) => {
     if (!confirm('Delete this blog? This will remove all associated files from Azure.')) return;
 
@@ -70,6 +56,26 @@ export default function Blogs() {
       }
     } catch (error) {
       console.error('Error deleting blog:', error);
+    }
+  };
+
+  const toggleVisibility = async (blogId: string, currentVisibility: boolean) => {
+    setTogglingId(blogId);
+    try {
+      const response = await fetch(config.api.endpoints.blogVisibility(blogId), {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isVisible: !currentVisibility })
+      });
+      if (response.ok) {
+        setBlogs(prev =>
+          prev.map(b => b.blogId === blogId ? { ...b, isVisible: !currentVisibility } : b)
+        );
+      }
+    } catch (error) {
+      console.error('Error toggling visibility:', error);
+    } finally {
+      setTogglingId(null);
     }
   };
 
@@ -131,7 +137,7 @@ export default function Blogs() {
             {blogs.map((blog) => (
               <div
                 key={blog._id}
-                className={`bg-white border-4 border-black rounded-2xl overflow-hidden shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[-2px] hover:translate-y-[-2px] transition ${blog.isVisible === false ? 'opacity-50' : ''}`}
+                className={`bg-white border-4 border-black rounded-2xl overflow-hidden shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[-2px] hover:translate-y-[-2px] transition ${blog.isVisible === false ? 'opacity-60' : ''}`}
               >
                 {/* Cover Image */}
                 {blog.coverImage && (
@@ -205,18 +211,18 @@ export default function Blogs() {
                     {/* Visibility Toggle */}
                     <button
                       onClick={() => toggleVisibility(blog.blogId, blog.isVisible !== false)}
-                      title={blog.isVisible !== false ? 'Visible — click to hide' : 'Hidden — click to show'}
-                      className={`flex items-center justify-center px-3 py-2 border-3 border-black rounded-xl font-bold transition shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] ${
+                      disabled={togglingId === blog.blogId}
+                      title={blog.isVisible !== false ? 'Visible on UI — click to hide' : 'Hidden from UI — click to show'}
+                      className={`flex items-center justify-center px-4 py-2 border-3 border-black rounded-xl font-bold transition shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] ${
                         blog.isVisible !== false
                           ? 'bg-green-200 hover:bg-green-300'
                           : 'bg-red-200 hover:bg-red-300'
-                      }`}
+                      } ${togglingId === blog.blogId ? 'opacity-50 cursor-not-allowed' : ''}`}
                     >
-                      {blog.isVisible !== false ? (
-                        <Check className="w-4 h-4" strokeWidth={3} />
-                      ) : (
-                        <X className="w-4 h-4" strokeWidth={3} />
-                      )}
+                      {blog.isVisible !== false
+                        ? <Check className="w-5 h-5" strokeWidth={3} />
+                        : <X className="w-5 h-5" strokeWidth={3} />
+                      }
                     </button>
                     <button
                       onClick={() => navigate(`/blogs/edit/${blog.blogId}`)}

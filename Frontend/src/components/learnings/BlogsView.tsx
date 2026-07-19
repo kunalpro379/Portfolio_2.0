@@ -25,6 +25,7 @@ export function BlogsView({ search }: BlogsViewProps) {
   });
 
   const filteredBlogs = blogs.filter((item: any) => {
+    if (item.isVisible === false) return false;
     if (!search) return true;
     const searchLower = search.toLowerCase();
     const title = (item.title || '').toLowerCase();

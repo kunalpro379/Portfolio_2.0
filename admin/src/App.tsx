@@ -13,7 +13,6 @@ import Documentation from './pages/Documentation';
 import CreateDocumentation from './pages/CreateDocumentation';
 import EditDocumentation from './pages/EditDocumentation';
 import Notes from './pages/Notes';
-import Files from './pages/Files';
 import Code from './pages/Code';
 import CodeEditor from './pages/CodeEditor';
 import TodoEditor from './pages/TodoEditor';
@@ -154,22 +153,6 @@ function App() {
             element={
               <PrivateRoute>
                 <Notes />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/files"
-            element={
-              <PrivateRoute>
-                <Files />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/files/:folderId"
-            element={
-              <PrivateRoute>
-                <Files />
               </PrivateRoute>
             }
           />
