@@ -439,11 +439,22 @@ router.patch('/:blogId/visibility', async (req, res) => {
         const { blogId } = req.params;
         const { isVisible } = req.body;
 
-        const blog = await Blog.findOneAndUpdate(
+        // Try blogId first, fallback to _id
+        let blog = await Blog.findOneAndUpdate(
             { blogId },
             { isVisible: Boolean(isVisible), updated_at: new Date() },
             { new: true }
         );
+
+        if (!blog) {
+            try {
+                blog = await Blog.findByIdAndUpdate(
+                    blogId,
+                    { isVisible: Boolean(isVisible), updated_at: new Date() },
+                    { new: true }
+                );
+            } catch (_) {}
+        }
 
         if (!blog) {
             return res.status(404).json({ message: 'Blog not found' });
