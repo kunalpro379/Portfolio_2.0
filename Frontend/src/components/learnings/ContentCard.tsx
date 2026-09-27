@@ -46,24 +46,29 @@ export function ContentCard({ item, type, onClick, displayNumber }: ContentCardP
 
   return (
     <article 
-      className={`group relative h-full border border-black/15 ${isGrayBackground ? 'bg-gray-100 hover:bg-gray-200' : 'bg-transparent'} transition-all duration-200 hover:border-black hover:shadow-[0_0_0_1px_rgba(0,0,0,0.12)] ${onClick ? 'cursor-pointer' : 'cursor-default'}`}
+      className={`group relative h-full overflow-hidden border border-black/15 ${isGrayBackground ? 'bg-white/60 backdrop-blur-sm hover:bg-white' : 'bg-transparent'} transition-all duration-500 ease-out hover:-translate-y-1 hover:border-black/50 hover:shadow-[0_12px_40px_rgba(0,0,0,0.08)] ${onClick ? 'cursor-pointer' : 'cursor-default'}`}
       onClick={onClick}
     >
+      <div className="absolute inset-0 z-0 bg-gradient-to-br from-black/0 via-black/0 to-black/[0.02] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+      <div className="relative z-10 flex h-full flex-col">
       {isTextOnly ? (
-        <div className="relative flex h-full flex-col p-2.5 sm:p-4">
-          <div className="mb-2 flex items-center gap-2 text-[8px] uppercase tracking-[0.14em] text-black/55 sm:mb-3 sm:gap-3 sm:text-[10px] sm:tracking-[0.18em]">
+        <div className="relative flex h-full flex-col p-4 sm:p-6">
+          <div className="mb-3 flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] text-black/50 sm:mb-4 sm:gap-3 sm:text-[11px]">
             {typeof displayNumber === 'number' && (
-              <span className="inline-flex items-center justify-center font-bold text-black/80">
+              <span className="inline-flex items-center justify-center font-bold text-[#742308]">
                 {String(displayNumber).padStart(2, '0')}
               </span>
             )}
             <span className="font-bold text-black/80">{type === 'guide' ? 'GUIDE' : type.toUpperCase()}</span>
             {dateLabel && (
-              <span className="font-semibold tracking-[0.16em] text-black/45">{dateLabel}</span>
+              <>
+                <span className="h-1 w-1 rounded-full bg-black/20" />
+                <span className="font-semibold tracking-[0.16em] text-black/50">{dateLabel}</span>
+              </>
             )}
           </div>
 
-          <h3 className="mb-1.5 font-display text-[0.58rem] font-semibold leading-tight text-black transition-colors duration-200 group-hover:underline group-hover:decoration-black group-hover:underline-offset-4 sm:mb-2 sm:text-[1.15rem]">
+          <h3 className="mb-2 font-display text-[1.1rem] font-bold leading-[1.2] text-black transition-colors duration-300 group-hover:text-[#742308] sm:mb-3 sm:text-[1.35rem] lg:text-[1.5rem] line-clamp-3">
             {getTitle()}
           </h3>
 
@@ -100,22 +105,23 @@ export function ContentCard({ item, type, onClick, displayNumber }: ContentCardP
               )}
             </div>
 
-            <h3 className="cursor-pointer font-display text-[0.58rem] font-semibold leading-tight text-black transition-colors group-hover:underline group-hover:decoration-black group-hover:underline-offset-4 sm:text-[1.15rem]">
+            <h3 className="cursor-pointer font-display text-[0.95rem] font-semibold leading-snug text-black transition-colors group-hover:underline group-hover:decoration-black group-hover:underline-offset-4 sm:text-[1rem] lg:text-[1.1rem] line-clamp-2">
               {getTitle()}
             </h3>
             
-            <p className="mt-1.5 text-[10px] leading-[1.5] text-black/68 line-clamp-3 sm:mt-3 sm:text-[12px] sm:leading-[1.6]">
+            <p className="mt-2 text-[11px] leading-[1.6] text-black/70 line-clamp-3 sm:mt-3 sm:text-[13px]">
               {getDescription()}
             </p>
 
-            <div className="mt-2 flex flex-wrap gap-x-1.5 gap-y-1 text-[8px] uppercase tracking-[0.12em] text-black/55 sm:mt-4 sm:gap-x-3 sm:text-[10px] sm:tracking-[0.14em]">
+            <div className="mt-4 flex flex-wrap gap-x-2 gap-y-1.5 text-[9px] font-bold uppercase tracking-[0.15em] text-black/50 sm:mt-5 sm:gap-x-3 sm:text-[10px]">
               {getTags().slice(0, 4).map((tag: string, idx: number) => (
-                <span key={idx}>{tag}</span>
+                <span key={idx} className="border-b border-black/10 pb-0.5">{tag}</span>
               ))}
             </div>
           </div>
         </div>
       )}
+      </div>
     </article>
   );
 }

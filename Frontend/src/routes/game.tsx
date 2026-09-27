@@ -24,7 +24,7 @@ function NavTabs({ variant = "desktop" }: { variant?: "desktop" | "mobile" }) {
     <nav
       className={`flex bg-black text-white ${
         isMobile
-          ? "min-h-[36px] w-full items-stretch overflow-x-auto scrollbar-none"
+          ? "min-h-[36px] w-full items-stretch overflow-hidden flex-wrap"
           : "items-center"
       }`}
     >

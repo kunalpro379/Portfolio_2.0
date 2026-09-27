@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-
 const userSchema = new mongoose.Schema({
   username: {
     type: String,
@@ -16,5 +15,4 @@ const userSchema = new mongoose.Schema({
     default: Date.now
   }
 });
-
 export default mongoose.model('User', userSchema, 'users');

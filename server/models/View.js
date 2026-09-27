@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-
 const viewSchema = new mongoose.Schema({
   viewId: {
     type: String,
@@ -45,12 +44,8 @@ const viewSchema = new mongoose.Schema({
 }, {
   timestamps: true
 });
-
-// Index for faster queries
 viewSchema.index({ timestamp: -1 });
 viewSchema.index({ ipAddress: 1 });
 viewSchema.index({ path: 1 });
-
 const View = mongoose.model('View', viewSchema);
-
 export default View;

@@ -8,6 +8,8 @@ import { Header } from './Header';
 import { config } from '@/config/config';
 import { PremiumLoader, PremiumLoaderFullScreen } from './PremiumLoader';
 import { ArchitecturePasswordSidebar } from './ArchitecturePasswordSidebar';
+import { Excalidraw } from "@excalidraw/excalidraw";
+import "@excalidraw/excalidraw/index.css";
 
 interface DocFile {
   fileId: string;
@@ -92,7 +94,7 @@ export function DocDetailView({ docId }: DocDetailViewProps) {
       console.log('File content received:', data);
       return data.file?.content || data.content || '';
     },
-    enabled: !!selectedFile && selectedFile.type === 'markdown' && !!doc,
+    enabled: !!selectedFile && (selectedFile.type === 'markdown' || selectedFile.type === 'diagram') && !!doc,
     retry: 2,
   });
 
@@ -288,9 +290,25 @@ export function DocDetailView({ docId }: DocDetailViewProps) {
           {sidebarOpen ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
         </button>
 
-        <div className="min-w-0 flex-1 overflow-y-auto bg-white">
-          <div className="max-w-5xl mx-auto px-3 py-4">
-            {selectedFile?.type === 'markdown' ? (
+        <div className="min-w-0 flex-1 flex flex-col bg-white overflow-hidden">
+          {selectedFile?.type === 'diagram' ? (
+            <div className="flex-1 w-full relative">
+              {isLoadingContent ? (
+                <PremiumLoaderFullScreen />
+              ) : (
+                <div className="absolute inset-0 z-10" style={{ touchAction: "none", userSelect: "none" }}>
+                  <Excalidraw
+                    initialData={typeof fileContent === 'string' ? (() => { try { return JSON.parse(fileContent); } catch { return undefined; } })() : fileContent}
+                    viewModeEnabled={true}
+                    zenModeEnabled={false}
+                    gridModeEnabled={false}
+                    theme="light"
+                  />
+                </div>
+              )}
+            </div>
+          ) : selectedFile?.type === 'markdown' ? (
+            <div className="max-w-5xl mx-auto px-3 py-4 w-full overflow-y-auto">
               <article className="prose prose-slate max-w-none">
                 {contentError ? (
                   <div className="text-center py-12">
@@ -301,7 +319,7 @@ export function DocDetailView({ docId }: DocDetailViewProps) {
                 ) : isLoadingContent ? (
                   <PremiumLoaderFullScreen />
                 ) : fileContent ? (
-                  <ReactMarkdown 
+                  <ReactMarkdown
                     remarkPlugins={[remarkGfm]}
                     components={components}
                   >
@@ -310,25 +328,17 @@ export function DocDetailView({ docId }: DocDetailViewProps) {
                 ) : (
                   <div className="text-center py-12">
                     <FileText className="mx-auto h-12 w-12 mb-3 opacity-20" />
-                    <p className="text-black/60">No content available</p>
+                    <PremiumLoaderFullScreen />
                   </div>
                 )}
               </article>
-            ) : selectedFile?.type === 'diagram' ? (
-              <div className="h-full flex items-center justify-center">
-                <div className="text-center">
-                  <ImageIcon className="mx-auto h-16 w-16 mb-4 opacity-20" />
-                  <p className="text-black/60 mb-2">Diagram viewer coming soon</p>
-                  <p className="text-xs text-black/40">Excalidraw integration will be added</p>
-                </div>
-              </div>
-            ) : (
-              <div className="text-center py-12">
-                <FileText className="mx-auto h-12 w-12 mb-3 opacity-20" />
-                <p className="text-black/60">Select a file to view</p>
-              </div>
-            )}
-          </div>
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <FileText className="mx-auto h-12 w-12 mb-3 opacity-20" />
+              <p className="text-black/60">Select a file to view</p>
+            </div>
+          )}
         </div>
       </div>
     </div>

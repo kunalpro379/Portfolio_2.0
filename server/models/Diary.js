@@ -1,8 +1,7 @@
 import mongoose from 'mongoose';
-
 const diarySchema = new mongoose.Schema({
   date: {
-    type: String, // stored as YYYY-MM-DD for easy lookup
+    type: String, 
     required: true,
     unique: true
   },
@@ -29,9 +28,6 @@ const diarySchema = new mongoose.Schema({
 }, {
   timestamps: true
 });
-
 diarySchema.index({ date: 1 });
-
 const Diary = mongoose.model('Diary', diarySchema);
-
 export default Diary;

@@ -3,23 +3,18 @@ import multer from 'multer';
 import { BlobServiceClient } from '@azure/storage-blob';
 import Blog from '../models/Blog.js';
 import Password from '../models/Password.js';
-
 const router = express.Router();
-
-// Initialize Azure Blob Storage client
 const blobServiceClient = BlobServiceClient.fromConnectionString(
   process.env.AZURE_STORAGE_CONNECTION_STRING
 );
 const containerName = process.env.AZURE_BLOB_CONTAINER_NAME;
-
 const storage = multer.memoryStorage();
 const upload = multer({ 
   storage: storage,
   limits: {
-    fileSize: 200 * 1024 * 1024 // 200MB in bytes
+    fileSize: 200 * 1024 * 1024 
   }
 });
-
 const toSlug = (value = '') =>
     value
         .toLowerCase()
@@ -28,31 +23,24 @@ const toSlug = (value = '') =>
         .replace(/\s+/g, '-')
         .replace(/-+/g, '-')
         .replace(/(^-|-$)/g, '');
-
 const getUniqueBlogId = async (seed) => {
     const base = toSlug(seed) || `blog-${Date.now()}`;
     let candidate = base;
     let suffix = 1;
-
     while (await Blog.exists({ blogId: candidate })) {
         candidate = `${base}-${suffix}`;
         suffix += 1;
     }
-
     return candidate;
 };
-
-// Upload to Azure Blob Storage
 const uploadToAzure = async (buffer, folder, filename, fileType) => {
   try {
     const containerClient = blobServiceClient.getContainerClient(containerName);
     const blobPath = `blogs/${folder}/${filename}`;
     const blockBlobClient = containerClient.getBlockBlobClient(blobPath);
-    
     await blockBlobClient.upload(buffer, buffer.length, {
       blobHTTPHeaders: { blobContentType: fileType }
     });
-    
     return {
       blobPath: blobPath,
       blobUrl: blockBlobClient.url
@@ -62,8 +50,6 @@ const uploadToAzure = async (buffer, folder, filename, fileType) => {
     throw error;
   }
 };
-
-// Get all blogs (admin=true returns all, otherwise only visible)
 router.get('/', async (req, res) => {
     try {
         const isAdmin = req.query.admin === 'true';
@@ -75,13 +61,9 @@ router.get('/', async (req, res) => {
         res.status(500).json({ message: 'Server error' });
     }
 });
-
-// Create new blog (password protected)
 router.post('/create', async (req, res) => {
     try {
         const { blogId, title, tagline, subject, shortDescription, tags, datetime, footer, blogLinks, password } = req.body;
-
-        // Verify password
         if (!password) {
             return res.status(401).json({ message: 'Password is required' });
         }
@@ -89,19 +71,14 @@ router.post('/create', async (req, res) => {
         if (!isValid) {
             return res.status(401).json({ message: 'Incorrect password' });
         }
-
         if (!title) {
             return res.status(400).json({ message: 'Title is required' });
         }
-
         const normalizedInputId = blogId ? toSlug(blogId) : '';
         const finalBlogId = normalizedInputId
             ? await getUniqueBlogId(normalizedInputId)
             : await getUniqueBlogId(title);
-
-        // Generate slug from title
         const slug = toSlug(title);
-
         const blog = new Blog({
             blogId: finalBlogId,
             title,
@@ -119,9 +96,7 @@ router.post('/create', async (req, res) => {
             created_at: new Date(),
             updated_at: new Date()
         });
-
         await blog.save();
-
         res.status(201).json({
             message: 'Blog created successfully',
             blog
@@ -134,70 +109,48 @@ router.post('/create', async (req, res) => {
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 });
-
-// Get single blog
 router.get('/:blogId', async (req, res) => {
     try {
         const { blogId } = req.params;
-        
-        // Try to find by blogId first, then by _id as fallback
         let blog = await Blog.findOne({ blogId });
-        
         if (!blog) {
-            // Try finding by MongoDB _id
             blog = await Blog.findById(blogId);
         }
-
         if (!blog) {
             return res.status(404).json({ message: 'Blog not found' });
         }
-
         res.json({ blog });
     } catch (error) {
         console.error('Get blog error:', error);
         res.status(500).json({ message: 'Server error' });
     }
 });
-
-// Get MD file content from Azure
 router.get('/:blogId/md-content', async (req, res) => {
     try {
         const { blogId } = req.params;
-        
-        // Try to find by blogId first, then by _id as fallback
         let blog = await Blog.findOne({ blogId });
-        
         if (!blog) {
-            // Try finding by MongoDB _id
             blog = await Blog.findById(blogId);
         }
-
         if (!blog) {
             return res.status(404).json({ message: 'Blog not found' });
         }
-
         if (!blog.mdFiles || blog.mdFiles.length === 0) {
             return res.json({ content: '', exists: false });
         }
-
-        // Fetch MD file content from Azure URL
         const mdUrl = blog.mdFiles[0];
         const response = await fetch(mdUrl);
         const content = await response.text();
-
         res.json({ content, exists: true, url: mdUrl });
     } catch (error) {
         console.error('Get MD content error:', error);
         res.status(500).json({ message: 'Server error' });
     }
 });
-
-// Update blog
 router.put('/:blogId', async (req, res) => {
     try {
         const { blogId } = req.params;
         const updateData = { ...req.body };
-
         if (updateData.password) {
             const isValid = await Password.verifyPassword('ARCHITECTURE_PASSWORD', updateData.password);
             if (!isValid) {
@@ -206,41 +159,31 @@ router.put('/:blogId', async (req, res) => {
         } else {
             return res.status(401).json({ message: 'Password is required' });
         }
-
         delete updateData.password;
-
         const blog = await Blog.findOneAndUpdate(
             { blogId },
             { ...updateData, updated_at: new Date() },
             { new: true }
         );
-
         if (!blog) {
             return res.status(404).json({ message: 'Blog not found' });
         }
-
         res.json({ message: 'Blog updated successfully', blog });
     } catch (error) {
         console.error('Update blog error:', error);
         res.status(500).json({ message: 'Server error' });
     }
 });
-
-// Upload MD file
 router.post('/:blogId/md-file', upload.single('mdFile'), async (req, res) => {
     try {
         const { blogId } = req.params;
         const blog = await Blog.findOne({ blogId });
-
         if (!blog) {
             return res.status(404).json({ message: 'Blog not found' });
         }
-
         if (!req.file) {
             return res.status(400).json({ message: 'No file uploaded' });
         }
-
-        // Delete old MD file from Azure if exists
         if (blog.mdFiles && blog.mdFiles.length > 0) {
             const oldUrl = blog.mdFiles[0];
             const blobPath = oldUrl.split(`${containerName}/`)[1];
@@ -254,7 +197,6 @@ router.post('/:blogId/md-file', upload.single('mdFile'), async (req, res) => {
                 }
             }
         }
-
         const filename = `${blogId}-content.md`;
         const result = await uploadToAzure(
             req.file.buffer,
@@ -262,36 +204,28 @@ router.post('/:blogId/md-file', upload.single('mdFile'), async (req, res) => {
             filename,
             'text/markdown'
         );
-
         blog.mdFiles = [result.blobUrl];
         blog.updated_at = new Date();
         await blog.save();
-
         res.json({ message: 'MD file uploaded', url: result.blobUrl, blog });
     } catch (error) {
         console.error('Upload MD file error:', error);
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 });
-
-// Upload assets
 router.post('/:blogId/assets', upload.array('assets', 10), async (req, res) => {
     try {
         const { blogId } = req.params;
         const { assetNames } = req.body;
         const blog = await Blog.findOne({ blogId });
-
         if (!blog) {
             return res.status(404).json({ message: 'Blog not found' });
         }
-
         if (!req.files || req.files.length === 0) {
             return res.status(400).json({ message: 'No files uploaded' });
         }
-
         const uploadedAssets = [];
         const names = assetNames ? JSON.parse(assetNames) : [];
-
         for (let i = 0; i < req.files.length; i++) {
             const file = req.files[i];
             const result = await uploadToAzure(
@@ -300,40 +234,31 @@ router.post('/:blogId/assets', upload.array('assets', 10), async (req, res) => {
                 file.originalname,
                 file.mimetype
             );
-            
             uploadedAssets.push({
                 name: names[i] || file.originalname.split('.')[0],
                 url: result.blobUrl,
                 filename: file.originalname
             });
         }
-
         blog.assets = [...(blog.assets || []), ...uploadedAssets];
         blog.updated_at = new Date();
         await blog.save();
-
         res.json({ message: 'Assets uploaded', assets: uploadedAssets, blog });
     } catch (error) {
         console.error('Upload assets error:', error);
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 });
-
-// Upload cover image
 router.post('/:blogId/cover', upload.single('cover'), async (req, res) => {
     try {
         const { blogId } = req.params;
         const blog = await Blog.findOne({ blogId });
-
         if (!blog) {
             return res.status(404).json({ message: 'Blog not found' });
         }
-
         if (!req.file) {
             return res.status(400).json({ message: 'No file uploaded' });
         }
-
-        // Delete old cover image if exists
         if (blog.coverImage) {
             const blobPath = blog.coverImage.split(`${containerName}/`)[1];
             if (blobPath) {
@@ -346,70 +271,54 @@ router.post('/:blogId/cover', upload.single('cover'), async (req, res) => {
                 }
             }
         }
-
         const result = await uploadToAzure(
             req.file.buffer,
             `${blogId}/cover`,
             req.file.originalname,
             req.file.mimetype
         );
-
         blog.coverImage = result.blobUrl;
         blog.updated_at = new Date();
         await blog.save();
-
         res.json({ message: 'Cover image uploaded', url: result.blobUrl, blog });
     } catch (error) {
         console.error('Upload cover error:', error);
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 });
-
-// Update asset name
 router.put('/:blogId/assets/:index/name', async (req, res) => {
     try {
         const { blogId, index } = req.params;
         const { name } = req.body;
         const blog = await Blog.findOne({ blogId });
-
         if (!blog) {
             return res.status(404).json({ message: 'Blog not found' });
         }
-
         if (!blog.assets[parseInt(index)]) {
             return res.status(404).json({ message: 'Asset not found' });
         }
-
         blog.assets[parseInt(index)].name = name;
         blog.updated_at = new Date();
         await blog.save();
-
         res.json({ message: 'Asset name updated', blog });
     } catch (error) {
         console.error('Update asset name error:', error);
         res.status(500).json({ message: 'Server error' });
     }
 });
-
-// Delete asset
 router.delete('/:blogId/assets/:index', async (req, res) => {
     try {
         const { blogId, index } = req.params;
         const blog = await Blog.findOne({ blogId });
-
         if (!blog) {
             return res.status(404).json({ message: 'Blog not found' });
         }
-
         const asset = blog.assets[parseInt(index)];
         if (!asset) {
             return res.status(404).json({ message: 'Asset not found' });
         }
-
-        // Delete from Azure
         try {
             const assetUrl = typeof asset === 'string' ? asset : asset?.url;
-            
             if (assetUrl && typeof assetUrl === 'string') {
                 const blobPath = assetUrl.split(`${containerName}/`)[1];
                 if (blobPath) {
@@ -421,31 +330,24 @@ router.delete('/:blogId/assets/:index', async (req, res) => {
         } catch (err) {
             console.error('Error deleting from Azure:', err);
         }
-
         blog.assets.splice(parseInt(index), 1);
         blog.updated_at = new Date();
         await blog.save();
-
         res.json({ message: 'Asset deleted', blog });
     } catch (error) {
         console.error('Delete asset error:', error);
         res.status(500).json({ message: 'Server error', error: error.message });
     }
 });
-
-// Toggle blog visibility
 router.patch('/:blogId/visibility', async (req, res) => {
     try {
         const { blogId } = req.params;
         const { isVisible } = req.body;
-
-        // Try blogId first, fallback to _id
         let blog = await Blog.findOneAndUpdate(
             { blogId },
             { isVisible: Boolean(isVisible), updated_at: new Date() },
             { new: true }
         );
-
         if (!blog) {
             try {
                 blog = await Blog.findByIdAndUpdate(
@@ -455,38 +357,28 @@ router.patch('/:blogId/visibility', async (req, res) => {
                 );
             } catch (_) {}
         }
-
         if (!blog) {
             return res.status(404).json({ message: 'Blog not found' });
         }
-
         res.json({ message: 'Visibility updated', blog });
     } catch (error) {
         console.error('Toggle visibility error:', error);
         res.status(500).json({ message: 'Server error' });
     }
 });
-
-// Delete blog
 router.delete('/:blogId', async (req, res) => {
     try {
         const { blogId } = req.params;
         const blog = await Blog.findOne({ blogId });
-
         if (!blog) {
             return res.status(404).json({ message: 'Blog not found' });
         }
-
-        // Delete all assets from Azure
         const containerClient = blobServiceClient.getContainerClient(containerName);
-        
-        // Collect all URLs
         const allUrls = [
             ...(blog.mdFiles || []),
             ...(blog.assets || []).map(a => typeof a === 'string' ? a : a.url),
             blog.coverImage
         ].filter(url => url);
-
         for (const url of allUrls) {
             try {
                 const blobPath = url.split(`${containerName}/`)[1];
@@ -498,14 +390,11 @@ router.delete('/:blogId', async (req, res) => {
                 console.error('Error deleting from Azure:', err);
             }
         }
-
         await Blog.deleteOne({ blogId });
-
         res.json({ message: 'Blog deleted successfully' });
     } catch (error) {
         console.error('Delete blog error:', error);
         res.status(500).json({ message: 'Server error' });
     }
 });
-
 export default router;

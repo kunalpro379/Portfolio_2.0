@@ -2,9 +2,7 @@ import { NavLink } from 'react-router-dom';
 import { LayoutDashboard, FolderOpen, FileText, BookOpen, StickyNote, Code2, Eye, LogOut, X, Database } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
-interface SidebarProps {
-  onClose?: () => void;
-}
+interface SidebarProps { onClose?: () => void; }
 
 export default function Sidebar({ onClose }: SidebarProps) {
   const { logout } = useAuth();
@@ -20,74 +18,55 @@ export default function Sidebar({ onClose }: SidebarProps) {
     { to: '/views', icon: Eye, label: 'Views' },
   ];
 
-  const handleNavClick = () => {
-    if (onClose) onClose();
-  };
-
   return (
-    <aside className="w-64 bg-white border-r-4 border-black h-screen flex flex-col relative flex-shrink-0">
-      {/* Decorative elements */}
-      <div className="absolute top-20 right-0 w-8 h-8 border-2 border-black opacity-10 transform rotate-45"></div>
-      <div className="absolute bottom-40 left-4 w-6 h-6 border-2 border-black rounded-full opacity-10"></div>
-
-      {/* Logo Section */}
-      <div className="p-6 border-b-4 border-black">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 border-3 border-black rounded-xl flex items-center justify-center bg-yellow-200 transform -rotate-3 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
-              <span className="text-2xl font-black">K</span>
-            </div>
-            <div>
-              <h2 className="text-xl font-black text-black" style={{ fontFamily: 'Comic Sans MS, cursive' }}>
-                Kunal
-              </h2>
-              <p className="text-xs text-gray-600 font-bold">Admin Panel</p>
-            </div>
+    <aside
+      className="w-60 bg-black/40 backdrop-blur-md border-r border-white/[0.06] h-screen flex flex-col flex-shrink-0"
+    >
+      {/* Brand */}
+      <div className="px-5 py-5 border-b border-white/6 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 bg-white flex items-center justify-center">
+            <span className="text-black font-bold text-sm">K</span>
           </div>
-          
-          {/* Close button for mobile */}
-          {onClose && (
-            <button
-              onClick={onClose}
-              className="lg:hidden p-2 hover:bg-gray-100 rounded-lg transition"
-            >
-              <X className="w-5 h-5 text-black" strokeWidth={2.5} />
-            </button>
-          )}
+          <div>
+            <p className="text-white text-[13px] font-semibold leading-none">Kunal Patil</p>
+            <p className="label-mono text-[9px] text-white/30 uppercase tracking-[0.2em] mt-0.5">Admin</p>
+          </div>
         </div>
+        {onClose && (
+          <button onClick={onClose} className="lg:hidden p-1 text-white/40 hover:text-white transition">
+            <X className="w-4 h-4" />
+          </button>
+        )}
       </div>
 
-      {/* Navigation */}
-      <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
+      {/* Nav */}
+      <nav className="flex-1 py-3 overflow-y-auto">
         {navItems.map((item) => (
           <NavLink
             key={item.to}
             to={item.to}
-            onClick={handleNavClick}
+            onClick={onClose}
             className={({ isActive }) =>
-              `flex items-center gap-3 px-4 py-3 rounded-xl border-3 border-black font-bold transition-all ${
-                isActive
-                  ? 'bg-black text-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] translate-x-[-2px] translate-y-[-2px]'
-                  : 'bg-white text-black hover:bg-gray-50 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-[5px_5px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[-2px] hover:translate-y-[-2px]'
-              }`
+              'flex items-center gap-3 px-5 py-2.5 text-[12.5px] font-medium transition-all border-l-2 ' +
+              (isActive
+                ? 'bg-white/[0.08] text-white border-white'
+                : 'text-white/40 hover:text-white hover:bg-white/[0.04] border-transparent')
             }
           >
-            <item.icon className="w-5 h-5" strokeWidth={2.5} />
+            <item.icon className="w-3.5 h-3.5 flex-shrink-0" />
             <span>{item.label}</span>
           </NavLink>
         ))}
       </nav>
 
-      {/* Logout Button */}
-      <div className="p-4 border-t-4 border-black">
+      {/* Logout */}
+      <div className="p-4 border-t border-white/6">
         <button
-          onClick={() => {
-            logout();
-            if (onClose) onClose();
-          }}
-          className="w-full flex items-center gap-3 px-4 py-3 rounded-xl border-3 border-black font-bold bg-red-100 hover:bg-red-200 text-black transition-all shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-[5px_5px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[-2px] hover:translate-y-[-2px]"
+          onClick={() => { logout(); if (onClose) onClose(); }}
+          className="w-full flex items-center gap-3 px-4 py-2.5 text-[12px] font-medium text-red-400/70 hover:text-red-400 hover:bg-red-400/5 border border-red-400/10 hover:border-red-400/20 transition-all"
         >
-          <LogOut className="w-5 h-5" strokeWidth={2.5} />
+          <LogOut className="w-3.5 h-3.5" />
           <span>Logout</span>
         </button>
       </div>

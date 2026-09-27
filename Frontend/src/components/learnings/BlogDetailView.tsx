@@ -6,7 +6,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Header } from './Header';
 import { config } from '@/config/config';
-import { PremiumLoader } from './PremiumLoader';
+import { PremiumLoader, PremiumLoaderFullScreen } from './PremiumLoader';
 import { ArchitecturePasswordSidebar } from './ArchitecturePasswordSidebar';
 
 interface Blog {
@@ -319,7 +319,7 @@ export function BlogDetailView({ blogId }: BlogDetailViewProps) {
               ) : (
                 <div className="text-center py-12">
                   <FileText className="mx-auto h-12 w-12 mb-3 opacity-20" />
-                  <p className="text-black/60">No content available</p>
+                  <PremiumLoaderFullScreen />
                 </div>
               )}
 

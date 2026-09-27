@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-
 const diagramSchema = new mongoose.Schema({
   canvasId: {
     type: String,
@@ -40,13 +39,9 @@ const diagramSchema = new mongoose.Schema({
     default: Date.now
   }
 });
-
-// Update the updatedAt timestamp before saving
 diagramSchema.pre('save', function(next) {
   this.updatedAt = new Date();
   next();
 });
-
 const Diagram = mongoose.model('Diagram', diagramSchema);
-
 export default Diagram;

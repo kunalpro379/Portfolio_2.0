@@ -93,20 +93,22 @@ router.get('/folders', async (req, res) => {
   try {
     const { parentPath } = req.query;
     const query = parentPath ? { parentPath } : { parentPath: '' };
-
     const folders = await Folder.find(query).sort({ createdAt: -1 });
-    
-    // Add file count for each folder
     const foldersWithCounts = await Promise.all(
       folders.map(async (folder) => {
-        const fileCount = await File.countDocuments({ folderPath: folder.path });
+        const files = await File.find({ folderPath: folder.path }).lean();
+        const fileCount = files.length;
+        const totalSize = files.reduce((acc, file) => acc + (file.size || 0), 0);
+        const fileNames = files.slice(0, 5).map(f => f.filename);
+        
         return {
           ...folder.toObject(),
-          fileCount
+          fileCount,
+          totalSize,
+          files: fileNames
         };
       })
     );
-    
     res.json({ folders: foldersWithCounts });
   } catch (error) {
     console.error('Get folders error:', error);

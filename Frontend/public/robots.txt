@@ -1,4 +1,4 @@
-# robots.txt for kunalpatil.me
+# robots.txt for kunalpatil.in
 User-agent: *
 Allow: /
 Allow: /projects
@@ -26,4 +26,4 @@ Allow: /*.svg$
 Crawl-delay: 0
 
 # Sitemap location
-Sitemap: https://kunalpatil.me/sitemap.xml
+Sitemap: https://kunalpatil.in/sitemap.xml

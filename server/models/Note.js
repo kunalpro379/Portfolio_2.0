@@ -1,6 +1,4 @@
 import mongoose from 'mongoose';
-
-// Folder Schema
 const folderSchema = new mongoose.Schema({
   folderId: {
     type: String,
@@ -24,8 +22,6 @@ const folderSchema = new mongoose.Schema({
     default: Date.now
   }
 });
-
-// File Schema
 const fileSchema = new mongoose.Schema({
   fileId: {
     type: String,
@@ -55,12 +51,9 @@ const fileSchema = new mongoose.Schema({
     default: Date.now
   }
 });
-
-// Create indexes
 folderSchema.index({ path: 1 });
 folderSchema.index({ parentPath: 1 });
 fileSchema.index({ folderPath: 1 });
 fileSchema.index({ createdAt: -1 });
-
 export const Folder = mongoose.model('Folder', folderSchema, 'folders');
 export const File = mongoose.model('File', fileSchema, 'files');

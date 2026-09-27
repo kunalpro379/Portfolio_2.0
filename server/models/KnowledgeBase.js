@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-
 const knowledgeBaseSchema = new mongoose.Schema({
   fileId: {
     type: String,
@@ -54,10 +53,7 @@ const knowledgeBaseSchema = new mongoose.Schema({
     default: Date.now
   }
 });
-
-// Index for better query performance
 knowledgeBaseSchema.index({ createdAt: -1 });
 knowledgeBaseSchema.index({ status: 1 });
 knowledgeBaseSchema.index({ fileType: 1 });
-
 export const KnowledgeBase = mongoose.model('KnowledgeBase', knowledgeBaseSchema, 'knowledgebase');

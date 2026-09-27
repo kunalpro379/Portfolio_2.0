@@ -1,33 +1,18 @@
 import express from 'express';
 import cors from 'cors';
 import CONFIG from '../config.shared.js';
-
-/**
- * Server Configuration Singleton
- * Ensures consistent server setup and configuration across the application
- */
 class ServerConfig {
   constructor() {
     this.app = null;
     this.server = null;
     this.isConfigured = false;
   }
-
-  /**
-   * Get the singleton instance of ServerConfig
-   * @returns {ServerConfig} The singleton instance
-   */
   static getInstance() {
     if (!ServerConfig.instance) {
       ServerConfig.instance = new ServerConfig();
     }
     return ServerConfig.instance;
   }
-
-  /**
-   * Configure and return the Express application
-   * @returns {express.Application} Configured Express app
-   */
   getApp() {
     if (!this.app || !this.isConfigured) {
       this.app = this.createApp();
@@ -37,56 +22,24 @@ class ServerConfig {
     }
     return this.app;
   }
-
-  /**
-   * Create Express application instance
-   * @private
-   * @returns {express.Application} Express app instance
-   */
   createApp() {
     const app = express();
-    
-    // Trust proxy for proper IP handling in production
     app.set('trust proxy', 1);
-    
     return app;
   }
-
-  /**
-   * Configure middleware for the Express application
-   * @private
-   */
   configureMiddleware() {
     if (!this.app) return;
-
-    // CORS Configuration
     this.configureCORS();
-    
-    // Cache control middleware
     this.configureCacheControl();
-    
-    // Request logging middleware
     this.configureRequestLogging();
-    
-    // Body parsing middleware
     this.configureBodyParsing();
-    
-    // Error handling middleware
     this.configureErrorHandling();
   }
-
-  /**
-   * Configure CORS middleware
-   * @private
-   */
   configureCORS() {
     console.log('Server: Configuring CORS with origins:', CONFIG.CORS.ORIGINS);
-
-    // Handle preflight requests explicitly FIRST
     this.app.options('*', (req, res) => {
       const origin = req.headers.origin;
       const allowedOrigin = CONFIG.CORS.ORIGINS.includes(origin) ? origin : null;
-      
       if (allowedOrigin) {
         res.header('Access-Control-Allow-Origin', allowedOrigin);
         res.header('Access-Control-Allow-Credentials', 'true');
@@ -98,13 +51,9 @@ class ServerConfig {
         res.status(403).end();
       }
     });
-
     const corsOptions = {
       origin: (origin, callback) => {
-        // Allow requests with no origin (mobile apps, curl, etc.)
         if (!origin) return callback(null, true);
-        
-        // Check if origin is in allowed list
         if (CONFIG.CORS.ORIGINS.includes(origin)) {
           console.log('CORS: Allowing origin:', origin);
           callback(null, true);
@@ -125,14 +74,8 @@ class ServerConfig {
       preflightContinue: false,
       optionsSuccessStatus: 204
     };
-
     this.app.use(cors(corsOptions));
   }
-
-  /**
-   * Configure cache control middleware
-   * @private
-   */
   configureCacheControl() {
     this.app.use((req, res, next) => {
       res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
@@ -141,11 +84,6 @@ class ServerConfig {
       next();
     });
   }
-
-  /**
-   * Configure request logging middleware
-   * @private
-   */
   configureRequestLogging() {
     this.app.use((req, res, next) => {
       const timestamp = new Date().toISOString();
@@ -157,42 +95,25 @@ class ServerConfig {
         contentLength: req.headers['content-length'],
         userAgent: req.headers['user-agent']?.substring(0, 50)
       };
-      
       console.log(`[${timestamp}] ${req.method} ${req.path}`, logData);
       next();
     });
   }
-
-  /**
-   * Configure body parsing middleware
-   * @private
-   */
   configureBodyParsing() {
     this.app.use(express.json({ limit: '50mb' }));
     this.app.use(express.urlencoded({ limit: '50mb', extended: true }));
   }
-
-  /**
-   * Configure error handling middleware
-   * @private
-   */
   configureErrorHandling() {
-    // Global error handler - must be last middleware
     this.app.use((err, req, res, next) => {
       console.error('Server Error:', err);
-      
-      // Ensure CORS headers are set even on errors
       const origin = req.headers.origin;
       const allowedOrigin = CONFIG.CORS.ORIGINS.includes(origin) ? origin : null;
-      
       if (allowedOrigin) {
         res.header('Access-Control-Allow-Origin', allowedOrigin);
         res.header('Access-Control-Allow-Credentials', 'true');
       }
-      
       const statusCode = err.status || err.statusCode || 500;
       const message = err.message || 'Internal server error';
-      
       res.status(statusCode).json({
         success: false,
         message,
@@ -200,50 +121,34 @@ class ServerConfig {
       });
     });
   }
-
-  /**
-   * Start the server on specified port
-   * @param {number} port - Port number to listen on
-   * @returns {Promise<Server>} HTTP server instance
-   */
   async startServer(port = CONFIG.SERVER.PORT) {
     return new Promise((resolve, reject) => {
       try {
-        // Don't start server in serverless environment
         if (process.env.VERCEL === '1') {
           console.log('Server: Running in serverless mode, skipping port binding');
           resolve(null);
           return;
         }
-
         if (this.server) {
           console.log('Server: Already running');
           resolve(this.server);
           return;
         }
-
         this.server = this.app.listen(port, () => {
           console.log(`Server: Running on port ${port}`);
           console.log(`Server: Environment - ${process.env.NODE_ENV || 'development'}`);
           resolve(this.server);
         });
-
         this.server.on('error', (error) => {
           console.error('Server: Failed to start:', error);
           reject(error);
         });
-
       } catch (error) {
         console.error('Server: Startup error:', error);
         reject(error);
       }
     });
   }
-
-  /**
-   * Stop the server gracefully
-   * @returns {Promise<void>}
-   */
   async stopServer() {
     return new Promise((resolve) => {
       if (this.server) {
@@ -257,11 +162,6 @@ class ServerConfig {
       }
     });
   }
-
-  /**
-   * Get server status
-   * @returns {object} Server status information
-   */
   getStatus() {
     return {
       configured: this.isConfigured,
@@ -271,7 +171,5 @@ class ServerConfig {
     };
   }
 }
-
-// Export singleton instance
 const serverConfig = ServerConfig.getInstance();
 export default serverConfig;

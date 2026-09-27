@@ -1,21 +1,15 @@
 import express from 'express';
 import aiChatService from '../services/aiChatService.js';
-
 const router = express.Router();
-
-// Chat endpoint
 router.post('/chat', async (req, res) => {
   try {
-    const { message } = req.body;
-    
+    const { message, context } = req.body;
     if (!message || typeof message !== 'string' || message.trim().length === 0) {
       return res.status(400).json({
         success: false,
         error: 'Message is required and must be a non-empty string'
       });
     }
-
-    // Rate limiting check (simple implementation)
     const userMessage = message.trim();
     if (userMessage.length > 1000) {
       return res.status(400).json({
@@ -23,13 +17,9 @@ router.post('/chat', async (req, res) => {
         error: 'Message too long. Please keep it under 1000 characters.'
       });
     }
-
     console.log(`AI Chat Request: "${userMessage}"`);
-    
-    const result = await aiChatService.chat(userMessage);
-    
+    const result = await aiChatService.chat(userMessage, context);
     console.log(`AI Chat Response: ${result.success ? 'Success' : 'Failed'}`);
-    
     res.json(result);
   } catch (error) {
     console.error('AI Chat API Error:', error);
@@ -40,8 +30,6 @@ router.post('/chat', async (req, res) => {
     });
   }
 });
-
-// Health check endpoint
 router.get('/health', async (req, res) => {
   try {
     const health = await aiChatService.healthCheck();
@@ -60,8 +48,6 @@ router.get('/health', async (req, res) => {
     });
   }
 });
-
-// Get chat capabilities
 router.get('/capabilities', (req, res) => {
   res.json({
     success: true,
@@ -89,5 +75,4 @@ router.get('/capabilities', (req, res) => {
     }
   });
 });
-
 export default router;

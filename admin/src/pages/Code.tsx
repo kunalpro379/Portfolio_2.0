@@ -287,202 +287,201 @@ export default function Code() {
   };
 
   return (
-    <div className="p-3 sm:p-4 md:p-6 lg:p-8">
-      <div className="max-w-7xl mx-auto">
+    <div className="p-4 sm:p-6 lg:p-8 space-y-6">
+      <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between mb-3 sm:mb-4 md:mb-6 lg:mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black text-black mb-1 lg:mb-2" style={{ fontFamily: 'Comic Sans MS, cursive' }}>
+            <span className="text-[10px] font-mono uppercase tracking-widest text-accent font-semibold">Development Workspace</span>
+            <h1 className="text-2xl sm:text-3xl font-display text-white mt-0.5">
               Code Editor
             </h1>
-            <p className="text-xs sm:text-sm lg:text-base text-gray-600 font-medium">Create and edit code files with syntax highlighting</p>
+            <p className="text-sm text-white/40 mt-1">Manage local file structures, code components, and GitHub repositories.</p>
           </div>
-        </div>
 
-        {/* Tab Navigation */}
-        <div className="flex gap-2 mb-4">
-          <button
-            onClick={() => setActiveTab('local')}
-            className={`px-4 py-2 border-2 border-black rounded-lg font-bold text-sm transition ${
-              activeTab === 'local'
-                ? 'bg-blue-200 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
-                : 'bg-white hover:bg-gray-50'
-            }`}
-          >
-            <Code2 className="w-4 h-4 inline mr-2" strokeWidth={2.5} />
-            Local Files
-          </button>
-          <button
-            onClick={() => setActiveTab('github')}
-            className={`px-4 py-2 border-2 border-black rounded-lg font-bold text-sm transition ${
-              activeTab === 'github'
-                ? 'bg-blue-200 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
-                : 'bg-white hover:bg-gray-50'
-            }`}
-          >
-            <Github className="w-4 h-4 inline mr-2" strokeWidth={2.5} />
-            GitHub Repos
-          </button>
+          {/* Tab Switcher */}
+          <div className="inline-flex p-1 bg-[#0d0d0d] border border-white/[0.06] rounded-none shadow-sm self-start sm:self-auto">
+            <button
+              onClick={() => setActiveTab('local')}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition ${
+                activeTab === 'local'
+                  ? 'bg-accent text-accent-contrast shadow-sm'
+                  : 'text-white/40 hover:text-white hover:bg-[#0a0a0a]'
+              }`}
+            >
+              <Code2 className="w-4 h-4" />
+              Local Files
+            </button>
+            <button
+              onClick={() => setActiveTab('github')}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition ${
+                activeTab === 'github'
+                  ? 'bg-accent text-accent-contrast shadow-sm'
+                  : 'text-white/40 hover:text-white hover:bg-[#0a0a0a]'
+              }`}
+            >
+              <Github className="w-4 h-4" />
+              GitHub Repos
+            </button>
+          </div>
         </div>
 
         {/* Content based on active tab */}
         {activeTab === 'local' ? (
           <>
-            {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-2 sm:gap-2 md:gap-3 mb-3 sm:mb-4 md:mb-5 lg:mb-6">
-              <button
-                onClick={() => setShowCreateFolderModal(true)}
-                className="flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 md:px-5 lg:px-6 py-2 sm:py-2.5 lg:py-3 bg-blue-200 border-2 lg:border-3 border-black rounded-lg lg:rounded-xl font-bold text-xs sm:text-sm lg:text-base hover:bg-blue-300 transition shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] lg:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] lg:hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] active:translate-x-[1px] active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] sm:hover:translate-x-[-1px] sm:hover:translate-y-[-1px] lg:hover:translate-x-[-2px] lg:hover:translate-y-[-2px]"
-              >
-                <FolderPlus className="w-4 h-4 lg:w-5 lg:h-5" strokeWidth={2.5} />
-                <span className="whitespace-nowrap">New Folder</span>
-              </button>
-              {currentPath && (
+            {/* Action Toolbar & Path Navigation */}
+            <div className="flex flex-wrap items-center justify-between gap-3 bg-[#0d0d0d] border border-white/[0.06] rounded-none p-4 shadow-sm">
+              <div className="flex items-center gap-2">
                 <button
-                  onClick={() => setShowCreateFileModal(true)}
-                  className="flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 md:px-5 lg:px-6 py-2 sm:py-2.5 lg:py-3 bg-green-200 border-2 lg:border-3 border-black rounded-lg lg:rounded-xl font-bold text-xs sm:text-sm lg:text-base hover:bg-green-300 transition shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] lg:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] lg:hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] active:translate-x-[1px] active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] sm:hover:translate-x-[-1px] sm:hover:translate-y-[-1px] lg:hover:translate-x-[-2px] lg:hover:translate-y-[-2px]"
+                  onClick={() => setShowCreateFolderModal(true)}
+                  className="flex items-center gap-2 px-3.5 py-2 bg-white text-black rounded-none text-xs font-semibold hover:bg-white/90 border border-white/20 transition shadow-sm"
                 >
-                  <FilePlus className="w-4 h-4 lg:w-5 lg:h-5" strokeWidth={2.5} />
-                  <span className="whitespace-nowrap">New File</span>
+                  <FolderPlus className="w-4 h-4" />
+                  New Folder
                 </button>
-              )}
-              {currentPath && files.length > 0 && githubRepos.length > 0 && (
-                <button
-                  onClick={() => setShowPushModal(true)}
-                  className="flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 md:px-5 lg:px-6 py-2 sm:py-2.5 lg:py-3 bg-purple-200 border-2 lg:border-3 border-black rounded-lg lg:rounded-xl font-bold text-xs sm:text-sm lg:text-base hover:bg-purple-300 transition shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] lg:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] lg:hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] active:translate-x-[1px] active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] sm:hover:translate-x-[-1px] sm:hover:translate-y-[-1px] lg:hover:translate-x-[-2px] lg:hover:translate-y-[-2px]"
-                >
-                  <Upload className="w-4 h-4 lg:w-5 lg:h-5" strokeWidth={2.5} />
-                  <span className="whitespace-nowrap">Push to GitHub</span>
-                </button>
-              )}
-            </div>
+                {currentPath && (
+                  <button
+                    onClick={() => setShowCreateFileModal(true)}
+                    className="flex items-center gap-2 px-3.5 py-2 bg-[#0a0a0a] text-white border border-white/[0.2] rounded-none text-xs font-semibold hover:bg-white/[0.05] transition shadow-sm"
+                  >
+                    <FilePlus className="w-4 h-4 text-accent" />
+                    New File
+                  </button>
+                )}
+                {currentPath && files.length > 0 && githubRepos.length > 0 && (
+                  <button
+                    onClick={() => setShowPushModal(true)}
+                    className="flex items-center gap-2 px-3.5 py-2 bg-[#0a0a0a] text-white border border-white/[0.2] rounded-none text-xs font-semibold hover:bg-white/[0.05] transition shadow-sm"
+                  >
+                    <Upload className="w-4 h-4 text-accent" />
+                    Push to GitHub
+                  </button>
+                )}
+              </div>
 
-            {/* Breadcrumbs */}
-            {currentPath && (
-              <div className="bg-white border-2 sm:border-3 lg:border-3 border-black rounded-lg lg:rounded-xl p-2.5 sm:p-3 lg:p-4 mb-3 sm:mb-4 md:mb-5 lg:mb-6 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] lg:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-                <div className="flex items-center gap-1 sm:gap-1.5 lg:gap-2 flex-wrap">
+              {/* Breadcrumb Path */}
+              {currentPath ? (
+                <div className="flex items-center gap-1.5 flex-wrap text-xs">
                   <button
                     onClick={() => setCurrentPath('')}
-                    className="px-2 sm:px-2.5 lg:px-3 py-0.5 sm:py-1 bg-gray-100 border-2 border-black rounded-md lg:rounded-lg font-bold text-[10px] sm:text-xs lg:text-sm hover:bg-gray-200 transition"
+                    className="px-2.5 py-1 bg-[#0a0a0a] border border-white/[0.06] rounded-lg text-white/40 hover:text-white font-mono font-medium transition"
                   >
-                    Root
+                    root
                   </button>
                   {getBreadcrumbs().map((part, index) => (
-                    <div key={index} className="flex items-center gap-1 sm:gap-1.5 lg:gap-2">
-                      <ChevronRight className="w-2.5 h-2.5 sm:w-3 sm:h-3 lg:w-4 lg:h-4" />
+                    <div key={index} className="flex items-center gap-1.5">
+                      <ChevronRight className="w-3.5 h-3.5 text-white/40" />
                       <button
                         onClick={() => {
                           const path = getBreadcrumbs().slice(0, index + 1).join('/');
                           setCurrentPath(path);
                         }}
-                        className="px-2 sm:px-2.5 lg:px-3 py-0.5 sm:py-1 bg-gray-100 border-2 border-black rounded-md lg:rounded-lg font-bold text-[10px] sm:text-xs lg:text-sm hover:bg-gray-200 transition break-all max-w-[120px] sm:max-w-none truncate"
+                        className="px-2.5 py-1 bg-[#0a0a0a] border border-white/[0.06] rounded-lg text-white hover:text-accent font-mono font-medium transition truncate max-w-[140px]"
                       >
                         {part}
                       </button>
                     </div>
                   ))}
                 </div>
-              </div>
-            )}
+              ) : (
+                <span className="text-xs font-mono text-white/40">Path: /root</span>
+              )}
+            </div>
 
-            {/* Main Content */}
-            <div className="grid grid-cols-12 gap-3 sm:gap-4 md:gap-5 lg:gap-6">
+            {/* Folders & Files Layout */}
+            <div className="space-y-6">
               {/* Folders Section */}
-              <div className="col-span-12">
-                <div className="bg-white border-2 sm:border-3 lg:border-4 border-black rounded-lg sm:rounded-xl lg:rounded-2xl p-3 sm:p-4 lg:p-6 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] sm:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] lg:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
-                  <h2 className="text-lg sm:text-xl lg:text-2xl font-black text-black mb-3 sm:mb-4 lg:mb-6" style={{ fontFamily: 'Comic Sans MS, cursive' }}>
-                    Folders
-                  </h2>
+              <div className="bg-[#0d0d0d] border border-white/[0.06] rounded-none p-5 shadow-sm space-y-4">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-lg font-display text-white">Folders</h2>
+                  <span className="text-xs font-mono text-white/40">{folders.length} items</span>
+                </div>
 
-                  {folders.length === 0 ? (
-                    <div className="text-center py-6 sm:py-8 lg:py-12 border-2 lg:border-3 border-dashed border-black rounded-lg lg:rounded-xl">
-                      <Folder className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 text-gray-400 mx-auto mb-2 lg:mb-3" strokeWidth={2} />
-                      <p className="text-xs sm:text-sm lg:text-base text-gray-600 font-medium">No folders here</p>
-                      <p className="text-[10px] sm:text-xs lg:text-sm text-gray-500 mt-1">Create a new folder to get started</p>
+                {folders.length === 0 ? (
+                  <div className="text-center py-10 border border-dashed border-white/[0.06] rounded-xl bg-[#0a0a0a]/50">
+                    <Folder className="w-10 h-10 text-white/40 opacity-40 mx-auto mb-2" />
+                    <p className="text-xs font-semibold text-white">No folders here</p>
+                    <p className="text-[11px] text-white/40 mt-0.5">Create a new folder to structure your files</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                    {folders.map((folder) => (
+                      <div
+                        key={folder._id}
+                        onClick={() => navigateToFolder(folder.path)}
+                        className="group flex items-center justify-between p-3.5 bg-[#0a0a0a] border border-white/[0.06] rounded-xl hover:border-accent/40 hover:bg-white/[0.05] transition cursor-pointer shadow-xs"
+                      >
+                        <div className="flex items-center gap-3 min-w-0">
+                          <Folder className="w-5 h-5 text-accent flex-shrink-0" />
+                          <div className="min-w-0">
+                            <h3 className="font-semibold text-white text-xs truncate group-hover:text-accent transition">{folder.name}</h3>
+                          </div>
+                        </div>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            deleteFolder(folder.folderId);
+                          }}
+                          className="p-1.5 text-white/40 hover:text-red-600 hover:bg-red-50 rounded-lg transition opacity-0 group-hover:opacity-100"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Files Section */}
+              {currentPath && (
+                <div className="bg-[#0d0d0d] border border-white/[0.06] rounded-none p-5 shadow-sm space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h2 className="text-lg font-display text-white">Code Files</h2>
+                    <span className="text-xs font-mono text-white/40">{files.length} files</span>
+                  </div>
+
+                  {files.length === 0 ? (
+                    <div className="text-center py-10 border border-dashed border-white/[0.06] rounded-xl bg-[#0a0a0a]/50">
+                      <Code2 className="w-10 h-10 text-white/40 opacity-40 mx-auto mb-2" />
+                      <p className="text-xs font-semibold text-white">No code files in this folder</p>
+                      <p className="text-[11px] text-white/40 mt-0.5">Create a new file to start coding</p>
                     </div>
                   ) : (
-                    <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3 lg:gap-4">
-                      {folders.map((folder) => (
+                    <div className="divide-y divide-border border border-white/[0.06] rounded-xl overflow-hidden bg-[#0a0a0a]">
+                      {files.map((file) => (
                         <div
-                          key={folder._id}
-                          className="bg-yellow-50 border-2 lg:border-3 border-black rounded-lg lg:rounded-xl p-2.5 sm:p-3 lg:p-4 hover:bg-yellow-100 transition cursor-pointer shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] lg:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:translate-x-[1px] active:translate-y-[1px] sm:hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] lg:hover:shadow-[5px_5px_0px_0px_rgba(0,0,0,1)] sm:hover:translate-x-[-1px] sm:hover:translate-y-[-1px] lg:hover:translate-x-[-2px] lg:hover:translate-y-[-2px]"
+                          key={file._id}
+                          className="flex items-center justify-between p-3.5 hover:bg-white/[0.05] transition gap-4"
                         >
-                          <div className="flex items-start justify-between gap-1.5 sm:gap-2">
-                            <div
-                              onClick={() => navigateToFolder(folder.path)}
-                              className="flex-1 min-w-0"
-                            >
-                              <Folder className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 text-black mb-1 sm:mb-1.5 lg:mb-2" strokeWidth={2.5} />
-                              <h3 className="font-black text-black text-xs sm:text-sm lg:text-base break-words line-clamp-2">{folder.name}</h3>
+                          <div className="flex items-center gap-3 min-w-0">
+                            <File className="w-4 h-4 text-white/40 flex-shrink-0" />
+                            <div className="min-w-0">
+                              <p className="font-semibold text-white text-xs font-mono truncate">{file.filename}</p>
+                              <p className="text-[10px] text-white/40 font-mono mt-0.5 uppercase tracking-wider">
+                                {file.language} • {formatFileSize(file.size)}
+                              </p>
                             </div>
+                          </div>
+                          <div className="flex items-center gap-2">
                             <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                deleteFolder(folder.folderId);
-                              }}
-                              className="p-1 sm:p-1.5 lg:p-2 bg-red-100 border-2 border-black rounded-md lg:rounded-lg hover:bg-red-200 transition flex-shrink-0"
+                              onClick={() => editFile(file)}
+                              className="p-1.5 text-white/40 hover:text-accent hover:bg-card border border-white/[0.06] rounded-lg transition"
+                              title="Edit file"
                             >
-                              <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 lg:w-5 lg:h-5 text-black" strokeWidth={2.5} />
+                              <Edit3 className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => deleteFile(file.fileId)}
+                              className="p-1.5 text-white/40 hover:text-red-600 hover:bg-red-50 border border-white/[0.06] rounded-lg transition"
+                              title="Delete file"
+                            >
+                              <Trash2 className="w-4 h-4" />
                             </button>
                           </div>
                         </div>
                       ))}
                     </div>
                   )}
-                </div>
-              </div>
-
-              {/* Files Section */}
-              {currentPath && (
-                <div className="col-span-12">
-                  <div className="bg-white border-2 sm:border-3 lg:border-4 border-black rounded-lg sm:rounded-xl lg:rounded-2xl p-3 sm:p-4 lg:p-6 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] sm:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] lg:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
-                    <h2 className="text-lg sm:text-xl lg:text-2xl font-black text-black mb-3 sm:mb-4 lg:mb-6" style={{ fontFamily: 'Comic Sans MS, cursive' }}>
-                      Code Files ({files.length})
-                    </h2>
-
-                    {files.length === 0 ? (
-                      <div className="text-center py-6 sm:py-8 lg:py-12 border-2 lg:border-3 border-dashed border-black rounded-lg lg:rounded-xl">
-                        <Code2 className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 text-gray-400 mx-auto mb-2 lg:mb-3" strokeWidth={2} />
-                        <p className="text-xs sm:text-sm lg:text-base text-gray-600 font-medium">No code files in this folder</p>
-                        <p className="text-[10px] sm:text-xs lg:text-sm text-gray-500 mt-1">Create a new file to get started</p>
-                      </div>
-                    ) : (
-                      <div className="space-y-2 sm:space-y-2.5 lg:space-y-3">
-                        {files.map((file) => (
-                          <div
-                            key={file._id}
-                            className="flex items-center justify-between p-3 sm:p-3 lg:p-4 bg-white border-2 lg:border-3 border-black rounded-lg lg:rounded-xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] lg:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:translate-x-[1px] active:translate-y-[1px] sm:hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] lg:hover:shadow-[5px_5px_0px_0px_rgba(0,0,0,1)] sm:hover:translate-x-[-1px] sm:hover:translate-y-[-1px] lg:hover:translate-x-[-2px] lg:hover:translate-y-[-2px] transition gap-2 sm:gap-3"
-                          >
-                            <div className="flex items-center gap-2 sm:gap-2.5 lg:gap-3 flex-1 min-w-0 overflow-hidden">
-                              <File className="w-5 h-5 sm:w-5 sm:h-5 lg:w-5 lg:h-5 text-black flex-shrink-0" strokeWidth={2.5} />
-                              <div className="flex-1 min-w-0 overflow-hidden">
-                                <p className="font-bold text-black text-sm sm:text-sm lg:text-base truncate w-full">{file.filename}</p>
-                                <p className="text-xs sm:text-xs lg:text-sm text-gray-600 font-medium mt-0.5">
-                                  {file.language} • {formatFileSize(file.size)}
-                                </p>
-                              </div>
-                            </div>
-                            <div className="flex items-center gap-1.5 sm:gap-2 justify-end flex-shrink-0">
-                              <button
-                                onClick={() => editFile(file)}
-                                className="p-2 sm:p-2 bg-blue-100 border-2 border-black rounded-md lg:rounded-lg hover:bg-blue-200 transition active:translate-x-[1px] active:translate-y-[1px]"
-                                title="Edit file"
-                              >
-                                <Edit3 className="w-4 h-4 sm:w-4 sm:h-4 text-black" strokeWidth={2.5} />
-                              </button>
-                              <button
-                                onClick={() => deleteFile(file.fileId)}
-                                className="p-2 sm:p-2 bg-red-100 border-2 border-black rounded-md lg:rounded-lg hover:bg-red-200 transition active:translate-x-[1px] active:translate-y-[1px]"
-                                title="Delete file"
-                              >
-                                <Trash2 className="w-4 h-4 sm:w-4 sm:h-4 lg:w-5 lg:h-5 text-black" strokeWidth={2.5} />
-                              </button>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
                 </div>
               )}
             </div>
@@ -500,48 +499,48 @@ export default function Code() {
 
         {/* Create Folder Modal */}
         {showCreateFolderModal && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-3 sm:p-4">
-            <div className="bg-white border-2 sm:border-3 lg:border-4 border-black rounded-lg sm:rounded-xl lg:rounded-2xl p-4 sm:p-5 lg:p-8 max-w-md w-full mx-3 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] sm:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] lg:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)]">
-              <h2 className="text-xl sm:text-2xl lg:text-3xl font-black text-black mb-3 sm:mb-4 lg:mb-6" style={{ fontFamily: 'Comic Sans MS, cursive' }}>
-                Create New Folder
-              </h2>
+          <div className="fixed inset-0 bg-ink/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="bg-[#0d0d0d] border border-white/[0.06] rounded-none p-6 max-w-md w-full shadow-xl space-y-5 animate-in fade-in zoom-in duration-200">
+              <div>
+                <h3 className="text-xl font-display text-white">Create New Folder</h3>
+                <p className="text-xs text-white/40 mt-1">Organize your code files into subdirectories.</p>
+              </div>
 
-              <div className="space-y-2.5 sm:space-y-3 lg:space-y-4 mb-4 sm:mb-5 lg:mb-6">
+              <div className="space-y-4">
                 <div>
-                  <label className="block text-[10px] sm:text-xs lg:text-sm font-black text-black mb-1.5 sm:mb-2 uppercase">
+                  <label className="block text-xs font-mono uppercase tracking-wider text-white/40 mb-1.5">
                     Folder Name *
                   </label>
                   <input
                     type="text"
                     value={newFolderName}
                     onChange={(e) => setNewFolderName(e.target.value)}
-                    className="w-full px-3 sm:px-3 lg:px-4 py-2 sm:py-2.5 lg:py-3 bg-white border-2 lg:border-3 border-black rounded-lg lg:rounded-xl text-xs sm:text-sm lg:text-base font-medium focus:outline-none focus:ring-4 focus:ring-black/20 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] lg:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]"
-                    placeholder="e.g., components"
+                    className="w-full px-3.5 py-2.5 bg-[#0a0a0a] border border-white/[0.06] rounded-xl text-xs font-mono text-white focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent"
+                    placeholder="e.g. components"
                   />
                 </div>
 
                 {currentPath && (
-                  <div className="p-2 sm:p-2.5 lg:p-3 bg-blue-50 border-2 border-black rounded-md lg:rounded-lg">
-                    <p className="text-[10px] sm:text-xs lg:text-sm font-medium text-gray-700">
-                      Creating in: <span className="font-black text-black break-all">{currentPath}</span>
-                    </p>
+                  <div className="p-3 bg-[#0a0a0a] border border-white/[0.06] rounded-xl text-xs">
+                    <span className="text-white/40">Target Path: </span>
+                    <span className="font-mono text-white">{currentPath}</span>
                   </div>
                 )}
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-2 lg:gap-3">
+              <div className="flex gap-3 pt-2">
                 <button
                   onClick={() => setShowCreateFolderModal(false)}
-                  className="flex-1 px-4 py-2 sm:py-2.5 lg:py-3 bg-white border-2 lg:border-3 border-black rounded-lg lg:rounded-xl font-bold text-xs sm:text-sm lg:text-base hover:bg-gray-50 transition shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] lg:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]"
+                  className="flex-1 py-2.5 border border-white/[0.06] rounded-xl text-xs font-semibold text-white/40 hover:text-white hover:bg-[#0a0a0a] transition"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={createFolder}
                   disabled={loading || !newFolderName}
-                  className="flex-1 px-4 py-2 sm:py-2.5 lg:py-3 bg-black text-white border-2 lg:border-3 border-black rounded-lg lg:rounded-xl font-bold text-xs sm:text-sm lg:text-base hover:bg-gray-800 transition shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] lg:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 py-2.5 bg-white text-black rounded-none text-xs font-semibold hover:bg-white/90 border border-white/20 transition shadow-sm disabled:opacity-50"
                 >
-                  {loading ? 'Creating...' : 'Create'}
+                  {loading ? 'Creating...' : 'Create Folder'}
                 </button>
               </div>
             </div>
@@ -550,51 +549,54 @@ export default function Code() {
 
         {/* Create File Modal */}
         {showCreateFileModal && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-3 sm:p-4">
-            <div className="bg-white border-2 sm:border-3 lg:border-4 border-black rounded-lg sm:rounded-xl lg:rounded-2xl p-4 sm:p-5 lg:p-8 max-w-md w-full mx-3 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] sm:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] lg:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)]">
-              <h2 className="text-xl sm:text-2xl lg:text-3xl font-black text-black mb-3 sm:mb-4 lg:mb-6" style={{ fontFamily: 'Comic Sans MS, cursive' }}>
-                Create New File
-              </h2>
+          <div className="fixed inset-0 bg-ink/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="bg-[#0d0d0d] border border-white/[0.06] rounded-none p-6 max-w-md w-full shadow-xl space-y-5 animate-in fade-in zoom-in duration-200">
+              <div>
+                <h3 className="text-xl font-display text-white">Create New File</h3>
+                <p className="text-xs text-white/40 mt-1">Add a new code file to the current folder.</p>
+              </div>
 
-              <div className="space-y-2.5 sm:space-y-3 lg:space-y-4 mb-4 sm:mb-5 lg:mb-6">
+              <div className="space-y-4">
                 <div>
-                  <label className="block text-[10px] sm:text-xs lg:text-sm font-black text-black mb-1.5 sm:mb-2 uppercase">
+                  <label className="block text-xs font-mono uppercase tracking-wider text-white/40 mb-1.5">
                     File Name *
                   </label>
                   <input
                     type="text"
                     value={newFileName}
                     onChange={(e) => setNewFileName(e.target.value)}
-                    className="w-full px-3 sm:px-3 lg:px-4 py-2 sm:py-2.5 lg:py-3 bg-white border-2 lg:border-3 border-black rounded-lg lg:rounded-xl text-xs sm:text-sm lg:text-base font-medium focus:outline-none focus:ring-4 focus:ring-black/20 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] lg:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]"
-                    placeholder="e.g., index.js, style.css, main.py"
+                    className="w-full px-3.5 py-2.5 bg-[#0a0a0a] border border-white/[0.06] rounded-xl text-xs font-mono text-white focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent"
+                    placeholder="e.g. index.ts, style.css"
                   />
                 </div>
 
-                <div className="p-2 sm:p-2.5 lg:p-3 bg-blue-50 border-2 border-black rounded-md lg:rounded-lg">
-                  <p className="text-[10px] sm:text-xs lg:text-sm font-medium text-gray-700">
-                    Creating in: <span className="font-black text-black break-all">{currentPath}</span>
-                  </p>
+                <div className="p-3 bg-[#0a0a0a] border border-white/[0.06] rounded-xl text-xs space-y-1">
+                  <div>
+                    <span className="text-white/40">Folder Path: </span>
+                    <span className="font-mono text-white">{currentPath}</span>
+                  </div>
                   {newFileName && (
-                    <p className="text-[10px] sm:text-xs lg:text-sm font-medium text-gray-700 mt-1">
-                      Language: <span className="font-black text-black">{getLanguageFromExtension(newFileName)}</span>
-                    </p>
+                    <div>
+                      <span className="text-white/40">Detected Language: </span>
+                      <span className="font-mono text-accent font-semibold">{getLanguageFromExtension(newFileName)}</span>
+                    </div>
                   )}
                 </div>
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-2 lg:gap-3">
+              <div className="flex gap-3 pt-2">
                 <button
                   onClick={() => setShowCreateFileModal(false)}
-                  className="flex-1 px-4 py-2 sm:py-2.5 lg:py-3 bg-white border-2 lg:border-3 border-black rounded-lg lg:rounded-xl font-bold text-xs sm:text-sm lg:text-base hover:bg-gray-50 transition shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] lg:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]"
+                  className="flex-1 py-2.5 border border-white/[0.06] rounded-xl text-xs font-semibold text-white/40 hover:text-white hover:bg-[#0a0a0a] transition"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={createFile}
                   disabled={loading || !newFileName}
-                  className="flex-1 px-4 py-2 sm:py-2.5 lg:py-3 bg-black text-white border-2 lg:border-3 border-black rounded-lg lg:rounded-xl font-bold text-xs sm:text-sm lg:text-base hover:bg-gray-800 transition shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] lg:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 py-2.5 bg-white text-black rounded-none text-xs font-semibold hover:bg-white/90 border border-white/20 transition shadow-sm disabled:opacity-50"
                 >
-                  {loading ? 'Creating...' : 'Create'}
+                  {loading ? 'Creating...' : 'Create File'}
                 </button>
               </div>
             </div>
@@ -603,15 +605,16 @@ export default function Code() {
 
         {/* Push to GitHub Modal */}
         {showPushModal && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-3 sm:p-4">
-            <div className="bg-white border-2 sm:border-3 lg:border-4 border-black rounded-lg sm:rounded-xl lg:rounded-2xl p-4 sm:p-5 lg:p-8 max-w-md w-full mx-3 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] sm:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] lg:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)]">
-              <h2 className="text-xl sm:text-2xl lg:text-3xl font-black text-black mb-3 sm:mb-4 lg:mb-6" style={{ fontFamily: 'Comic Sans MS, cursive' }}>
-                Push Code to GitHub
-              </h2>
+          <div className="fixed inset-0 bg-ink/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="bg-[#0d0d0d] border border-white/[0.06] rounded-none p-6 max-w-md w-full shadow-xl space-y-5 animate-in fade-in zoom-in duration-200">
+              <div>
+                <h3 className="text-xl font-display text-white">Push Code to GitHub</h3>
+                <p className="text-xs text-white/40 mt-1">Commit local files directly to your connected repository.</p>
+              </div>
 
-              <div className="space-y-2.5 sm:space-y-3 lg:space-y-4 mb-4 sm:mb-5 lg:mb-6">
+              <div className="space-y-4">
                 <div>
-                  <label className="block text-[10px] sm:text-xs lg:text-sm font-black text-black mb-1.5 sm:mb-2 uppercase">
+                  <label className="block text-xs font-mono uppercase tracking-wider text-white/40 mb-1.5">
                     Select Repository *
                   </label>
                   <select
@@ -620,7 +623,7 @@ export default function Code() {
                       const repo = githubRepos.find(r => r._id === e.target.value);
                       setSelectedRepoForPush(repo || null);
                     }}
-                    className="w-full px-3 sm:px-3 lg:px-4 py-2 sm:py-2.5 lg:py-3 bg-white border-2 lg:border-3 border-black rounded-lg lg:rounded-xl text-xs sm:text-sm lg:text-base font-medium focus:outline-none focus:ring-4 focus:ring-black/20 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] lg:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]"
+                    className="w-full px-3.5 py-2.5 bg-[#0a0a0a] border border-white/[0.06] rounded-xl text-xs text-white focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent"
                   >
                     <option value="">Choose a repository...</option>
                     {githubRepos.map((repo) => (
@@ -632,39 +635,41 @@ export default function Code() {
                 </div>
 
                 <div>
-                  <label className="block text-[10px] sm:text-xs lg:text-sm font-black text-black mb-1.5 sm:mb-2 uppercase">
+                  <label className="block text-xs font-mono uppercase tracking-wider text-white/40 mb-1.5">
                     Commit Message *
                   </label>
                   <input
                     type="text"
                     value={commitMessage}
                     onChange={(e) => setCommitMessage(e.target.value)}
-                    className="w-full px-3 sm:px-3 lg:px-4 py-2 sm:py-2.5 lg:py-3 bg-white border-2 lg:border-3 border-black rounded-lg lg:rounded-xl text-xs sm:text-sm lg:text-base font-medium focus:outline-none focus:ring-4 focus:ring-black/20 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] lg:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]"
+                    className="w-full px-3.5 py-2.5 bg-[#0a0a0a] border border-white/[0.06] rounded-xl text-xs text-white focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent"
                     placeholder="Update code from admin panel"
                   />
                 </div>
 
-                <div className="p-2 sm:p-2.5 lg:p-3 bg-purple-50 border-2 border-black rounded-md lg:rounded-lg">
-                  <p className="text-[10px] sm:text-xs lg:text-sm font-medium text-gray-700">
-                    Pushing from: <span className="font-black text-black break-all">{currentPath}</span>
-                  </p>
-                  <p className="text-[10px] sm:text-xs lg:text-sm font-medium text-gray-700 mt-1">
-                    Files to push: <span className="font-black text-black">{files.length}</span>
-                  </p>
+                <div className="p-3 bg-[#0a0a0a] border border-white/[0.06] rounded-xl text-xs space-y-1">
+                  <div>
+                    <span className="text-white/40">Source Path: </span>
+                    <span className="font-mono text-white">{currentPath}</span>
+                  </div>
+                  <div>
+                    <span className="text-white/40">Files to push: </span>
+                    <span className="font-mono text-accent font-semibold">{files.length}</span>
+                  </div>
                 </div>
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-2 lg:gap-3">
+              <div className="flex gap-3 pt-2">
                 <button
                   onClick={() => setShowPushModal(false)}
-                  className="flex-1 px-4 py-2 sm:py-2.5 lg:py-3 bg-white border-2 lg:border-3 border-black rounded-lg lg:rounded-xl font-bold text-xs sm:text-sm lg:text-base hover:bg-gray-50 transition shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] lg:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]"
+                  className="flex-1 py-2.5 border border-white/[0.06] rounded-xl text-xs font-semibold text-white/40 hover:text-white hover:bg-[#0a0a0a] transition"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={pushCodeToGithub}
                   disabled={loading || !selectedRepoForPush || !commitMessage}
-                  className="flex-1 px-4 py-2 sm:py-2.5 lg:py-3 bg-purple-600 text-white border-2 lg:border-3 border-black rounded-lg lg:rounded-xl font-bold text-xs sm:text-sm lg:text-base hover:bg-purple-700 transition shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] lg:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 py-2.5 bg-white text-black rounded-none text-xs font-semibold hover:bg-white/90 border border-white/20 transition shadow-sm disabled:opacity-50"
                 >
                   {loading ? 'Pushing...' : 'Push to GitHub'}
                 </button>

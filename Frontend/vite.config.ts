@@ -10,6 +10,9 @@ export default defineConfig({
     dedupe: ["react", "react-dom", "react/jsx-runtime"],
   },
   optimizeDeps: {
-    include: ["@excalidraw/excalidraw"],
+    include: ["@excalidraw/excalidraw", "es6-promise-pool"],
+  },
+  define: {
+    "process.env.IS_PREACT": JSON.stringify("false"),
   },
 });

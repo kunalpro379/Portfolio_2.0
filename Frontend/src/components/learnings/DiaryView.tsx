@@ -1,15 +1,14 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { flushSync } from "react-dom";
-import { AlignCenter, AlignLeft, AlignRight, Bold, Calendar, ChevronLeft, ChevronRight, Download, Italic, Trash2, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, Download, X } from "lucide-react";
 import { config } from "@/config/config";
+import { NotepadEditor } from "./NotepadEditor";
+import { AICompletion } from "./AICompletion";
 
 type DiaryEntry = {
   date: string;
-  leftContent: string;
-  rightContent: string;
+  content: string;
 };
-
-type EditorSide = "left" | "right";
 
 type DiaryExportEntry = DiaryEntry;
 
@@ -41,31 +40,24 @@ function sanitizeHtml(html: string) {
 
 export function DiaryView() {
   const [date, setDate] = useState(formatDate(new Date()));
-  const [leftFontSize, setLeftFontSize] = useState(16);
-  const [rightFontSize, setRightFontSize] = useState(16);
-  const [saving, setSaving] = useState(false);
+  const [content, setContent] = useState("");
   const [loadingDate, setLoadingDate] = useState(false);
-  const [activeSide, setActiveSide] = useState<EditorSide>("right");
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [exportStartDate, setExportStartDate] = useState(date);
   const [exportEndDate, setExportEndDate] = useState(date);
   const [exportError, setExportError] = useState("");
   const [exportingPdf, setExportingPdf] = useState(false);
   const [exportEntries, setExportEntries] = useState<DiaryExportEntry[]>([]);
+  const [isEditorReady, setIsEditorReady] = useState(false);
+  const [aiSuggestion, setAiSuggestion] = useState("");
+  const [editorText, setEditorText] = useState("");
 
-  const leftSaveTimeout = useRef<number | null>(null);
-  const rightSaveTimeout = useRef<number | null>(null);
-  const leftEditorRef = useRef<HTMLDivElement | null>(null);
-  const rightEditorRef = useRef<HTMLDivElement | null>(null);
+  const saveTimeout = useRef<number | null>(null);
   const exportSheetRef = useRef<HTMLDivElement | null>(null);
-  const leftSelectionRef = useRef<Range | null>(null);
-  const rightSelectionRef = useRef<Range | null>(null);
-  const leftContentRef = useRef("");
-  const rightContentRef = useRef("");
   const dateInputRef = useRef<HTMLInputElement | null>(null);
+  const editorInstanceRef = useRef<any>(null);
 
   const pageTitle = useMemo(() => date, [date]);
-  const activeFontSize = activeSide === "left" ? leftFontSize : rightFontSize;
 
   function openExportModal() {
     setExportStartDate(date);
@@ -105,17 +97,12 @@ export function DiaryView() {
       const response = await fetch(`${API_BASE_URL}/${dateText}`);
 
       if (!response.ok) {
-        leftContentRef.current = "";
-        rightContentRef.current = "";
+        setContent("");
       } else {
         const data = await response.json();
         const entry: DiaryEntry | null = data.entry ?? null;
-        leftContentRef.current = entry?.leftContent ?? "";
-        rightContentRef.current = entry?.rightContent ?? "";
+        setContent(entry?.content ?? "");
       }
-
-      if (leftEditorRef.current) leftEditorRef.current.innerHTML = leftContentRef.current;
-      if (rightEditorRef.current) rightEditorRef.current.innerHTML = rightContentRef.current;
     } catch (error) {
       console.error("Failed to load diary entry", error);
     } finally {
@@ -123,13 +110,9 @@ export function DiaryView() {
     }
   }
 
-  async function saveEntry(side: EditorSide, html: string) {
+  async function saveEntry(html: string) {
     try {
-      setSaving(true);
-
-      const payload: Partial<DiaryEntry> = { date };
-      if (side === "left") payload.leftContent = html;
-      else payload.rightContent = html;
+      const payload: DiaryEntry = { date, content: html };
 
       await fetch(`${API_BASE_URL}/${date}`, {
         method: "PUT",
@@ -138,23 +121,13 @@ export function DiaryView() {
       });
     } catch (error) {
       console.error("Failed to save diary entry", error);
-    } finally {
-      setSaving(false);
     }
   }
 
-  function scheduleSave(side: EditorSide, html: string) {
-    if (side === "left") {
-      if (leftSaveTimeout.current) window.clearTimeout(leftSaveTimeout.current);
-      leftSaveTimeout.current = window.setTimeout(() => {
-        saveEntry("left", html);
-      }, 800);
-      return;
-    }
-
-    if (rightSaveTimeout.current) window.clearTimeout(rightSaveTimeout.current);
-    rightSaveTimeout.current = window.setTimeout(() => {
-      saveEntry("right", html);
+  function scheduleSave(html: string) {
+    if (saveTimeout.current) window.clearTimeout(saveTimeout.current);
+    saveTimeout.current = window.setTimeout(() => {
+      saveEntry(html);
     }, 800);
   }
 
@@ -169,104 +142,8 @@ export function DiaryView() {
 
     return {
       date: dateText,
-      leftContent: entry?.leftContent ?? "",
-      rightContent: entry?.rightContent ?? "",
+      content: entry?.content ?? "",
     };
-  }
-
-  function getActiveEditor() {
-    return activeSide === "left" ? leftEditorRef.current : rightEditorRef.current;
-  }
-
-  function getSelectionStore() {
-    return activeSide === "left" ? leftSelectionRef : rightSelectionRef;
-  }
-
-  function updateContentFromEditor(side: EditorSide) {
-    const editor = side === "left" ? leftEditorRef.current : rightEditorRef.current;
-    if (!editor) return;
-
-    const html = sanitizeHtml(editor.innerHTML);
-    if (side === "left") {
-      leftContentRef.current = html;
-      scheduleSave("left", html);
-    } else {
-      rightContentRef.current = html;
-      scheduleSave("right", html);
-    }
-  }
-
-  function captureSelection(side: EditorSide) {
-    const selection = window.getSelection();
-    if (!selection || selection.rangeCount === 0) return;
-
-    const range = selection.getRangeAt(0);
-    const editor = side === "left" ? leftEditorRef.current : rightEditorRef.current;
-    if (!editor || !editor.contains(range.commonAncestorContainer)) return;
-
-    getSelectionStore().current = range;
-  }
-
-  function preserveSelection(side: EditorSide) {
-    setActiveSide(side);
-    captureSelection(side);
-  }
-
-  function restoreSelection(side: EditorSide) {
-    const storedRange = side === "left" ? leftSelectionRef.current : rightSelectionRef.current;
-    if (!storedRange) return;
-
-    const selection = window.getSelection();
-    if (!selection) return;
-
-    selection.removeAllRanges();
-    selection.addRange(storedRange);
-  }
-
-  function execCommand(command: string, value?: string) {
-    const editor = getActiveEditor();
-    if (!editor) return;
-
-    editor.focus();
-    restoreSelection(activeSide);
-    document.execCommand(command, false, value);
-    updateContentFromEditor(activeSide);
-  }
-
-  function setTextAlign(align: "left" | "center" | "right") {
-    const editor = getActiveEditor();
-    if (!editor) return;
-
-    editor.focus();
-    restoreSelection(activeSide);
-    document.execCommand(`justify${align.charAt(0).toUpperCase()}${align.slice(1)}`, false);
-    updateContentFromEditor(activeSide);
-  }
-
-  function insertBullet() {
-    execCommand("insertHTML", "<div>•&nbsp;</div>");
-  }
-
-  function insertLine() {
-    execCommand("insertHTML", "<hr />");
-  }
-
-  function clearCurrentPage() {
-    const editor = getActiveEditor();
-    if (!editor) return;
-
-    editor.innerHTML = "";
-    if (activeSide === "left") {
-      leftContentRef.current = "";
-      scheduleSave("left", "");
-    } else {
-      rightContentRef.current = "";
-      scheduleSave("right", "");
-    }
-  }
-
-  function handleEditorInput(side: EditorSide) {
-    updateContentFromEditor(side);
   }
 
   function goToDate(direction: "prev" | "next") {
@@ -307,8 +184,6 @@ export function DiaryView() {
       const pageWidth = 1240;
       const pageHeight = 660;
       const margin = 20;
-      const colGap = 16;
-      const colWidth = (pageWidth - margin * 2 - colGap) / 2;
 
       function htmlToText(html: string) {
         return html
@@ -321,55 +196,31 @@ export function DiaryView() {
       }
 
       for (const entry of entries) {
-        const leftText = htmlToText(sanitizeHtml(entry.leftContent || "")) || "";
-        const rightText = htmlToText(sanitizeHtml(entry.rightContent || "")) || "";
+        const text = htmlToText(sanitizeHtml(entry.content || "")) || "";
         const fontSize = 14;
         const lineHeight = Math.round(fontSize * 1.25);
         doc.setFontSize(fontSize);
 
-        const leftLinesAll = doc.splitTextToSize(leftText, colWidth - 8) as string[];
-        const rightLinesAll = doc.splitTextToSize(rightText, colWidth - 8) as string[];
+        const linesAll = doc.splitTextToSize(text, pageWidth - margin * 2) as string[];
         const linesPerPage = Math.floor((pageHeight - 60) / lineHeight);
 
         let idx = 0;
-        const maxLines = Math.max(leftLinesAll.length, rightLinesAll.length);
-
-        while (idx < maxLines) {
+        while (idx < linesAll.length) {
           doc.setFontSize(16);
           doc.setFont("Courier", "normal");
           doc.text("Diary Export", margin + 4, 28);
           doc.text(entry.date, pageWidth - margin - 80, 28);
           doc.setFontSize(fontSize);
 
-          const leftSlice = leftLinesAll.slice(idx, idx + linesPerPage);
-          const rightSlice = rightLinesAll.slice(idx, idx + linesPerPage);
-
-          const leftX = margin;
+          const slice = linesAll.slice(idx, idx + linesPerPage);
           let y = 48;
-          doc.setFont("Courier", "bold");
-          doc.text("Left Page", leftX + 4, y);
-          doc.setFont("Courier", "normal");
-          y += 8;
-
-          for (const line of leftSlice) {
+          for (const line of slice) {
             y += lineHeight;
-            doc.text(String(line), leftX + 4, y, { maxWidth: colWidth - 8 });
-          }
-
-          const rightX = margin + colWidth + colGap;
-          y = 48;
-          doc.setFont("Courier", "bold");
-          doc.text("Right Page", rightX + 4, y);
-          doc.setFont("Courier", "normal");
-          y += 8;
-
-          for (const line of rightSlice) {
-            y += lineHeight;
-            doc.text(String(line), rightX + 4, y, { maxWidth: colWidth - 8 });
+            doc.text(String(line), margin + 4, y);
           }
 
           idx += linesPerPage;
-          if (idx < maxLines) doc.addPage();
+          if (idx < linesAll.length) doc.addPage();
         }
 
         doc.addPage();
@@ -423,86 +274,18 @@ export function DiaryView() {
   }, []);
 
   return (
-    <div className="flex h-full min-h-0 w-full flex-1 flex-col items-stretch overflow-hidden px-0 pt-0 pb-0 md:px-3 lg:px-4" style={{ zIndex: 30 }}>
+    <div className="flex h-full min-h-0 w-full flex-1 flex-col items-stretch overflow-hidden px-0 pt-0 pb-0 md:px-3 lg:px-4 relative" style={{ zIndex: 30 }}>
       <style>{`\
         @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap');\
 \
         .diary-mono {\
           font-family: 'JetBrains Mono', 'Cascadia Code', 'SFMono-Regular', monospace;\
         }\
-\
-        .toolbar-btn {\
-          transition: transform 150ms ease, box-shadow 150ms ease, background-color 150ms ease;\
-        }\
-\
-        .toolbar-btn:hover {\
-          transform: translateY(-1px);\
-        }\
-\
-        .editor-card {\
-          background: rgba(255,255,255,0.08);
-          border-radius: 0;\
-          border: 1px solid rgba(255,255,255,0.08);
-          box-shadow: 0 10px 30px rgba(16,24,40,0.06);
-          backdrop-filter: blur(8px);\
-          overflow: hidden;\
-        }\
-\
-        .editor-card-left {\
-          background-color: rgba(249, 246, 231, 0.18);
-          background-image: repeating-linear-gradient(to bottom, rgba(0,0,0,0.05) 0px, rgba(0,0,0,0.05) 1px, transparent 1px, transparent 28px);
-        }\
-\
-        .editor-card-right {\
-          background-color: rgba(235, 246, 255, 0.16);
-          background-image: repeating-linear-gradient(to bottom, rgba(0,0,0,0.05) 0px, rgba(0,0,0,0.05) 1px, transparent 1px, transparent 28px);
-        }\
-\
-        .diary-container {\
-          height: auto;\
-          flex: 1;\
-          min-height: 0;\
-        }\
-\
-        .editor-area:focus {\
-          outline: none;\
-        }\
-\
-        .editor-area {\
-          white-space: pre-wrap;\
-          word-break: break-word;\
-          overflow-y: auto;\
-          overflow-x: hidden;\
-          scrollbar-width: thin;\
-          scrollbar-color: rgba(59, 130, 246, 0.45) rgba(0, 0, 0, 0.03);
-        }\
-\
-        .editor-area::-webkit-scrollbar {\
-          width: 6px;\
-        }\
-\
-        .editor-area::-webkit-scrollbar-track {\
-          background: rgba(0, 0, 0, 0.03);
-        }\
-\
-        .editor-area::-webkit-scrollbar-thumb {\
-          background: rgba(59, 130, 246, 0.45);
-          border-radius: 3px;\
-        }\
-\
-        .editor-area::-webkit-scrollbar-thumb:hover {\
-          background: rgba(37, 99, 235, 0.6);
-        }\
-\
-        .editor-area hr {\
-          border: 0;\
-          border-top: 1px solid rgba(0, 0, 0, 0.12);
-          margin: 10px 0;\
-        }\
       `}</style>
 
-      <div className="md:hidden w-full shrink-0 border-b-2 border-black bg-white">
-        <div className="grid w-full grid-cols-[44px_minmax(0,1fr)_44px_44px_44px_44px] items-stretch border-b border-black/15">
+      {/* Header */}
+      <div className="w-full shrink-0 border-b-2 border-black bg-white">
+        <div className="grid w-full grid-cols-[44px_minmax(0,1fr)_44px_44px] items-stretch border-b border-black/15">
           <button
             type="button"
             onClick={() => goToDate("prev")}
@@ -525,27 +308,6 @@ export function DiaryView() {
 
           <button
             type="button"
-            onClick={() => setActiveSide("left")}
-            className={`flex h-11 items-center justify-center border-r border-black/15 diary-mono text-sm font-bold ${
-              activeSide === "left" ? "bg-black text-white" : "bg-white text-gray-800"
-            }`}
-            aria-label="Left page"
-          >
-            L
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveSide("right")}
-            className={`flex h-11 items-center justify-center border-r border-black/15 diary-mono text-sm font-bold ${
-              activeSide === "right" ? "bg-black text-white" : "bg-white text-gray-800"
-            }`}
-            aria-label="Right page"
-          >
-            R
-          </button>
-
-          <button
-            type="button"
             onClick={() => goToDate("next")}
             className="flex h-11 items-center justify-center border-r border-black/15 bg-white text-gray-800"
             aria-label="Next date"
@@ -563,200 +325,91 @@ export function DiaryView() {
             <Download className="h-4 w-4" strokeWidth={2} />
           </button>
         </div>
+      </div>
 
-        <div className="grid w-full grid-cols-10 divide-x divide-black/15">
-          <button
-            type="button"
-            onMouseDown={(e) => { e.preventDefault(); preserveSelection(activeSide); }}
-            onClick={() => execCommand("bold")}
-            className="flex h-10 items-center justify-center bg-white diary-mono text-sm font-bold text-gray-800"
-          >
-            B
-          </button>
-          <button
-            type="button"
-            onMouseDown={(e) => { e.preventDefault(); preserveSelection(activeSide); }}
-            onClick={() => execCommand("italic")}
-            className="flex h-10 items-center justify-center bg-white diary-mono text-sm font-bold text-gray-800"
-          >
-            I
-          </button>
-          <button
-            type="button"
-            onMouseDown={(e) => { e.preventDefault(); preserveSelection(activeSide); }}
-            onClick={insertBullet}
-            className="flex h-10 items-center justify-center bg-white diary-mono text-lg font-bold text-gray-800"
-          >
-            •
-          </button>
-          <button
-            type="button"
-            onMouseDown={(e) => { e.preventDefault(); preserveSelection(activeSide); }}
-            onClick={insertLine}
-            className="flex h-10 items-center justify-center bg-white diary-mono text-lg font-bold text-gray-800"
-          >
-            —
-          </button>
-          <select
-            value={activeSide === "left" ? leftFontSize : rightFontSize}
-            onChange={(e) => {
-              const value = Number(e.target.value);
-              if (activeSide === "left") setLeftFontSize(value);
-              else setRightFontSize(value);
+      {/* AI Completion Header */}
+      <AICompletion
+        content={content}
+        onContentChange={setContent}
+        editor={isEditorReady ? editorInstanceRef.current : null}
+        date={date}
+        onSuggestionChange={(suggestion) => setAiSuggestion(suggestion)}
+        editorText={editorText}
+      />
+
+      {/* Editor */}
+      <div className="flex-1 min-h-0 py-4">
+        {loadingDate ? (
+          <div className="flex items-center justify-center h-full">
+            <div className="text-gray-500">Loading...</div>
+          </div>
+        ) : (
+          <NotepadEditor
+            content={content}
+            onSave={scheduleSave}
+            placeholder="Start writing your diary entry..."
+            suggestion={aiSuggestion}
+            onAcceptSuggestion={() => setAiSuggestion("")}
+            onEditorReady={(editor) => {
+              editorInstanceRef.current = editor;
+              setIsEditorReady(true);
             }}
-            className="h-10 w-full border-0 bg-white text-center diary-mono text-xs font-bold text-gray-800 focus:outline-none"
-            aria-label="Font size"
-          >
-            <option value={12}>12</option>
-            <option value={14}>14</option>
-            <option value={16}>16</option>
-            <option value={18}>18</option>
-            <option value={20}>20</option>
-            <option value={22}>22</option>
-          </select>
-          <button type="button" onClick={() => setTextAlign("left")} className="flex h-10 items-center justify-center bg-white text-gray-800" title="Align left">
-            <AlignLeft className="h-4 w-4" strokeWidth={2} />
-          </button>
-          <button type="button" onClick={() => setTextAlign("center")} className="flex h-10 items-center justify-center bg-white text-gray-800" title="Align center">
-            <AlignCenter className="h-4 w-4" strokeWidth={2} />
-          </button>
-          <button type="button" onClick={() => setTextAlign("right")} className="flex h-10 items-center justify-center bg-white text-gray-800" title="Align right">
-            <AlignRight className="h-4 w-4" strokeWidth={2} />
-          </button>
-          <button type="button" onClick={clearCurrentPage} className="flex h-10 items-center justify-center bg-white text-red-600" title="Delete">
-            <Trash2 className="h-4 w-4" strokeWidth={2} />
-          </button>
-          <div className="flex h-10 items-center justify-center bg-[#f3f3f3] px-1 text-center diary-mono text-[10px] font-bold uppercase tracking-wide text-gray-600">
-            {loadingDate ? "Load" : saving ? "Save" : "Saved"}
-          </div>
-        </div>
+            onTextChange={(text) => {
+              setEditorText(text);
+            }}
+          />
+        )}
       </div>
 
-      <div className="hidden md:block w-full bg-white text-gray-800 rounded-none px-3 sm:px-4 md:px-6 py-1 -mt-px border-t border-gray-200 shrink-0">
-        <div className="flex w-full flex-wrap items-center gap-2">
-          <button onClick={() => goToDate("prev")} className="toolbar-btn h-8 w-8 flex items-center justify-center bg-white border border-gray-200 rounded-none text-gray-700 shrink-0"><ChevronLeft className="w-4 h-4" strokeWidth={2} /></button>
-          <button onClick={() => goToDate("next")} className="toolbar-btn h-8 w-8 flex items-center justify-center bg-white border border-gray-200 rounded-none text-gray-700 shrink-0"><ChevronRight className="w-4 h-4" strokeWidth={2} /></button>
-
-          <button onClick={() => setActiveSide("left")} className={`px-3 py-1 rounded-none font-bold diary-mono transition shrink-0 border border-gray-200 ${activeSide === "left" ? "bg-black text-white" : "bg-white text-gray-700"}`}>L</button>
-          <button onClick={() => setActiveSide("right")} className={`px-3 py-1 rounded-none font-bold diary-mono transition shrink-0 border border-gray-200 ${activeSide === "right" ? "bg-black text-white" : "bg-white text-gray-700"}`}>R</button>
-
-          <div className="flex items-center gap-2 ml-auto flex-wrap justify-end">
-            <button onClick={() => setTextAlign("left")} className="toolbar-btn h-8 w-8 flex items-center justify-center bg-white border border-gray-200 text-gray-800 rounded-none shrink-0" title="Align left"><AlignLeft className="w-4 h-4" strokeWidth={2} /></button>
-            <button onClick={() => setTextAlign("center")} className="toolbar-btn h-8 w-8 flex items-center justify-center bg-white border border-gray-200 text-gray-800 rounded-none shrink-0" title="Align center"><AlignCenter className="w-4 h-4" strokeWidth={2} /></button>
-            <button onClick={() => setTextAlign("right")} className="toolbar-btn h-8 w-8 flex items-center justify-center bg-white border border-gray-200 text-gray-800 rounded-none shrink-0" title="Align right"><AlignRight className="w-4 h-4" strokeWidth={2} /></button>
-
-            <span className="text-sm sm:text-base font-black text-gray-800 diary-mono whitespace-nowrap px-1">{pageTitle}</span>
-            <input type="date" value={date} onChange={(e) => syncDateInput(e.target.value)} className="h-8 px-2 py-1 rounded-none border border-gray-200 text-xs diary-mono text-gray-800 bg-white min-w-[132px]" />
-
-            <button onMouseDown={(e) => { e.preventDefault(); preserveSelection(activeSide); }} onClick={() => execCommand("bold")} className="toolbar-btn px-2 py-1 rounded-none border border-gray-200 bg-white text-xs font-medium diary-mono text-gray-800 active:scale-95 shrink-0"><Bold className="w-3.5 h-3.5 inline-block mr-1" strokeWidth={2} />B</button>
-            <button onMouseDown={(e) => { e.preventDefault(); preserveSelection(activeSide); }} onClick={() => execCommand("italic")} className="toolbar-btn px-2 py-1 rounded-none border border-gray-200 bg-white text-xs font-medium diary-mono text-gray-800 active:scale-95 shrink-0"><Italic className="w-3.5 h-3.5 inline-block mr-1" strokeWidth={2} />I</button>
-            <button onMouseDown={(e) => { e.preventDefault(); preserveSelection(activeSide); }} onClick={insertBullet} className="toolbar-btn px-2 py-1 rounded-none border border-gray-200 bg-white text-xs font-medium diary-mono text-gray-800 active:scale-95 shrink-0">•</button>
-            <button onMouseDown={(e) => { e.preventDefault(); preserveSelection(activeSide); }} onClick={insertLine} className="toolbar-btn px-2 py-1 rounded-none border border-gray-200 bg-white text-xs font-medium diary-mono text-gray-800 active:scale-95 shrink-0">—</button>
-            <select value={activeSide === "left" ? leftFontSize : rightFontSize} onChange={(e) => {
-              const value = Number(e.target.value);
-              if (activeSide === "left") setLeftFontSize(value);
-              else setRightFontSize(value);
-            }} className="h-8 px-2 py-1 rounded-none border border-gray-200 text-xs diary-mono text-gray-800 bg-white shrink-0 max-w-[92px]">
-              <option value={12}>12</option>
-              <option value={14}>14</option>
-              <option value={16}>16</option>
-              <option value={18}>18</option>
-              <option value={20}>20</option>
-              <option value={22}>22</option>
-            </select>
-            <button onClick={openExportModal} className="toolbar-btn h-8 w-8 flex items-center justify-center bg-white border border-gray-200 text-gray-800 rounded-none text-xs active:scale-95 shrink-0" title="Download PDF"><Download className="w-4 h-4" strokeWidth={2} /></button>
-            <button onClick={clearCurrentPage} className="toolbar-btn h-8 w-8 flex items-center justify-center bg-white border border-gray-200 text-red-600 rounded-none text-xs active:scale-95 shrink-0" title="Delete"><Trash2 className="w-4 h-4" strokeWidth={2} /></button>
-            <div className="text-xs sm:text-sm diary-mono text-gray-500 whitespace-nowrap">{loadingDate ? "Loading..." : saving ? "Saving..." : "Saved"}</div>
-          </div>
-        </div>
-      </div>
-
+      {/* Export Modal */}
       {isExportModalOpen && (
-        <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
-          <div className="w-full max-w-md rounded-2xl border-2 border-black bg-[#fffaf1] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden diary-mono">
-            <div className="flex items-center justify-between border-b-2 border-black bg-[#f6ead6] px-4 py-3">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold">Export Diary</h3>
+              <button
+                type="button"
+                onClick={closeExportModal}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="space-y-4">
               <div>
-                <div className="text-base font-black text-gray-900">Download Diary PDF</div>
-                <div className="text-xs font-bold text-gray-600">Pick a start and end date for the export</div>
-              </div>
-              <button type="button" onClick={closeExportModal} className="h-9 w-9 flex items-center justify-center rounded-lg border border-black bg-white text-gray-900" disabled={exportingPdf}><X className="h-4 w-4" strokeWidth={2.5} /></button>
-            </div>
-
-            <div className="space-y-4 px-4 py-4">
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                <label className="space-y-1 text-xs font-bold text-gray-700">
-                  <span className="flex items-center gap-2"><Calendar className="h-4 w-4" strokeWidth={2.5} />Start Date</span>
-                  <input type="date" value={exportStartDate} onChange={(e) => setExportStartDate(e.target.value)} className="w-full rounded-lg border-2 border-black bg-white px-3 py-2 text-sm font-bold text-gray-900" disabled={exportingPdf} />
-                </label>
-
-                <label className="space-y-1 text-xs font-bold text-gray-700">
-                  <span className="flex items-center gap-2"><Calendar className="h-4 w-4" strokeWidth={2.5} />End Date</span>
-                  <input type="date" value={exportEndDate} onChange={(e) => setExportEndDate(e.target.value)} className="w-full rounded-lg border-2 border-black bg-white px-3 py-2 text-sm font-bold text-gray-900" disabled={exportingPdf} />
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+                <input
+                  type="date"
+                  value={exportStartDate}
+                  onChange={(e) => setExportStartDate(e.target.value)}
+                  className="w-full border border-gray-300 rounded-md px-3 py-2"
+                />
               </div>
 
-              <div className="rounded-xl border border-dashed border-black/30 bg-white/80 px-3 py-2 text-xs font-bold text-gray-600">The PDF will keep the notebook look, JetBrains Mono font, and include the date on every spread.</div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+                <input
+                  type="date"
+                  value={exportEndDate}
+                  onChange={(e) => setExportEndDate(e.target.value)}
+                  className="w-full border border-gray-300 rounded-md px-3 py-2"
+                />
+              </div>
 
-              {exportError && <div className="rounded-xl border border-red-400 bg-red-50 px-3 py-2 text-xs font-bold text-red-700">{exportError}</div>}
+              {exportError && (
+                <div className="text-red-600 text-sm">{exportError}</div>
+              )}
+
+              <button
+                type="button"
+                onClick={downloadPdfForRange}
+                disabled={exportingPdf}
+                className="w-full bg-[#8fb0ff] text-white py-2 px-4 rounded-md hover:bg-[#7a9fe8] disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {exportingPdf ? "Exporting..." : "Download PDF"}
+              </button>
             </div>
-
-            <div className="flex gap-3 border-t-2 border-black bg-[#f6ead6] px-4 py-3">
-              <button type="button" onClick={closeExportModal} className="flex-1 rounded-lg border-2 border-black bg-white px-4 py-2.5 text-sm font-black text-gray-900 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]" disabled={exportingPdf}>Cancel</button>
-              <button type="button" onClick={downloadPdfForRange} className="flex-1 rounded-lg border-2 border-emerald-700 bg-emerald-500 px-4 py-2.5 text-sm font-black text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] disabled:cursor-not-allowed disabled:opacity-60" disabled={exportingPdf}>{exportingPdf ? "Preparing PDF..." : "Download"}</button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      <div className="diary-container mx-auto flex min-h-0 w-full max-w-[1400px] flex-1 overflow-hidden md:max-w-[1400px]">
-        <div className="flex h-full min-h-0 w-full flex-col gap-0">
-          <div className={`editor-card flex min-h-0 flex-1 flex-col p-3 md:p-4 ${activeSide === "left" ? "editor-card-left" : "editor-card-right"}`} style={{ borderRadius: 0 }}>
-            <div className="flex-1 min-h-0 overflow-hidden">
-              <div
-                ref={activeSide === "left" ? leftEditorRef : rightEditorRef}
-                contentEditable
-                suppressContentEditableWarning
-                className="editor-area w-full h-full bg-transparent text-black diary-mono leading-7 pr-1 max-w-none"
-                style={{ fontSize: `${activeFontSize}px`, caretColor: "#111827" }}
-                onFocus={() => setActiveSide(activeSide)}
-                onMouseUp={() => captureSelection(activeSide)}
-                onKeyUp={() => captureSelection(activeSide)}
-                onInput={() => handleEditorInput(activeSide)}
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {exportEntries.length > 0 && (
-        <div ref={exportSheetRef} className="fixed left-[-20000px] top-0 pointer-events-none" aria-hidden="true">
-          <div className="flex flex-col bg-[#f6ead6]" style={{ width: "1240px" }}>
-            {exportEntries.map((entry) => (
-              <section key={entry.date} className="w-[1240px] px-2 py-2" style={{ breakAfter: "page", minHeight: "660px" }}>
-                <div className="mb-2 flex items-center justify-between px-2 diary-mono">
-                  <div className="text-base font-black text-gray-900">Diary Export</div>
-                  <div className="text-sm font-bold text-gray-700">{entry.date}</div>
-                </div>
-
-                <div className="flex h-[560px] w-full gap-0 overflow-hidden rounded-lg">
-                  <div className="flex-1 h-full border-[3px] border-[#8a5a44]/30 rounded-l-xl px-3 py-3 md:px-4 md:py-4 bg-[#f6ead6]/35" style={{ boxShadow: "-10px 8px 22px rgba(0,0,0,0.08)" }}>
-                    <div className="mb-3 flex items-center justify-between">
-                      <div className="diary-mono font-bold text-[#7a4b2b]/70">Left Page</div>
-                      <div className="diary-mono text-xs text-[#7a4b2b]/70">{entry.date}</div>
-                    </div>
-                    <div className="editor-area w-full h-[474px] bg-transparent text-black/80 diary-mono leading-7 pr-1" style={{ fontSize: `${leftFontSize}px`, caretColor: "#111827" }} dangerouslySetInnerHTML={{ __html: sanitizeHtml(entry.leftContent) }} />
-                  </div>
-
-                  <div className="flex-1 h-full border-[3px] border-[#4f6b88]/30 rounded-r-xl px-3 py-3 md:px-4 md:py-4 bg-[#eef5fb]/35" style={{ boxShadow: "10px 8px 22px rgba(0,0,0,0.08)" }}>
-                    <div className="mb-3 flex items-center justify-between">
-                      <div className="diary-mono font-bold text-[#2e4964]/70">Right Page</div>
-                      <div className="diary-mono text-xs text-[#2e4964]/70">{entry.date}</div>
-                    </div>
-                    <div className="editor-area w-full h-[474px] bg-transparent text-black/80 diary-mono leading-7 pr-1" style={{ fontSize: `${rightFontSize}px`, caretColor: "#111827" }} dangerouslySetInnerHTML={{ __html: sanitizeHtml(entry.rightContent) }} />
-                  </div>
-                </div>
-              </section>
-            ))}
           </div>
         </div>
       )}

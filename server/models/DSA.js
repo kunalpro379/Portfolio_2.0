@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-
 const dsaSchema = new mongoose.Schema({
   dsaId: {
     type: String,
@@ -17,8 +16,8 @@ const dsaSchema = new mongoose.Schema({
   files: [{
     fileId: String,
     name: String,
-    path: String, // Full path like "folder1/file.cpp"
-    language: String, // cpp, java, python, javascript
+    path: String, 
+    language: String, 
     azurePath: String,
     azureUrl: String,
     canvasAzurePath: String,
@@ -28,7 +27,7 @@ const dsaSchema = new mongoose.Schema({
   folders: [{
     folderId: String,
     name: String,
-    path: String, // Full path like "folder1/subfolder"
+    path: String, 
     createdAt: { type: Date, default: Date.now }
   }],
   createdAt: {
@@ -40,7 +39,5 @@ const dsaSchema = new mongoose.Schema({
     default: Date.now
   }
 });
-
 dsaSchema.index({ createdAt: -1 });
-
 export const DSA = mongoose.model('DSA', dsaSchema, 'dsa');

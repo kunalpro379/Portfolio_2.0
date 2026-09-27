@@ -6,7 +6,8 @@
     "start": "node index.js",
     "dev": "nodemon index.js",
     "build": "echo 'No build step required for Node.js server'",
-    "seed:architecture-password": "node scripts/seedArchitecturePassword.js"
+    "seed:architecture-password": "node scripts/seedArchitecturePassword.js",
+    "test:ec2": "node scripts/test-ec2-connection.js"
   },
   "dependencies": {
     "@azure/storage-blob": "^12.29.1",
@@ -21,6 +22,9 @@
     "mongoose": "^8.0.0",
     "multer": "^2.0.2",
     "node-fetch": "^3.3.2",
+    "ssh2": "^1.17.0",
+    "uuid": "^14.0.2",
+    "ws": "^8.21.3",
     "youtube-captions-scraper": "^2.0.3"
   },
   "devDependencies": {

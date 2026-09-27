@@ -1,7 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
-import kunalSketch from "/kunalpatilsketch.png";
+import { useState, useEffect } from "react";
+import kunalSketch from "/Kunal80.png";
 import heroImage from "/hero.png";
 import workDebt from "@/assets/work-debt.jpg";
 import workMars from "@/assets/work-mars.jpg";
@@ -15,6 +15,8 @@ import { SocialLinks } from "@/components/SocialLinks";
 import { SiteFooter } from "@/components/SiteFooter";
 import { ProjectDetailSlider } from "@/components/learnings/ProjectDetailSlider";
 import { ProjectCardsShimmer, ReadingsCardsShimmer } from "@/components/ui/Shimmer";
+import { Logo3D } from "@/components/Logo3D";
+import { ChatInterface } from "@/components/ChatInterface";
 
 export const Route = createFileRoute("/")({ component: Index });
 
@@ -60,11 +62,10 @@ function NavTabs({ variant = "desktop" }: { variant?: "desktop" | "mobile" }) {
 
   return (
     <nav
-      className={`flex bg-black text-white ${
-        isMobile
-          ? "min-h-[36px] w-full items-stretch overflow-x-auto scrollbar-none"
-          : "items-center"
-      }`}
+      className={`flex bg-black text-white ${isMobile
+        ? "min-h-[36px] w-full items-stretch overflow-hidden flex-wrap"
+        : "items-center"
+        }`}
     >
       {nav.map((n, i) => (
         <a
@@ -72,11 +73,10 @@ function NavTabs({ variant = "desktop" }: { variant?: "desktop" | "mobile" }) {
           href={n.href}
           target={n.label === "RESUME" ? "_blank" : undefined}
           rel={n.label === "RESUME" ? "noopener noreferrer" : undefined}
-          className={`flex items-center justify-center whitespace-nowrap font-semibold tracking-wide transition-colors hover:bg-gray-800 ${
-            isMobile
-              ? "min-w-0 flex-1 border-r border-white/15 px-1 py-2 text-[8px] last:border-r-0 sm:px-2 sm:text-[10px]"
-              : "px-6 py-2 text-[12px]"
-          } ${!isMobile && i === 0 ? "outline outline-2 outline-white outline-offset-[-2px]" : ""}`}
+          className={`flex items-center justify-center whitespace-nowrap font-semibold tracking-wide transition-colors hover:bg-gray-800 ${isMobile
+            ? "min-w-0 flex-1 border-r border-white/15 px-1 py-2 text-[8px] last:border-r-0 sm:px-2 sm:text-[10px]"
+            : "px-6 py-2 text-[12px]"
+            } ${!isMobile && i === 0 ? "outline outline-2 outline-white outline-offset-[-2px]" : ""}`}
         >
           {n.label}
         </a>
@@ -86,23 +86,12 @@ function NavTabs({ variant = "desktop" }: { variant?: "desktop" | "mobile" }) {
 }
 
 function Header({ onContactClick }: { onContactClick: () => void }) {
-  const [isAvatarOpen, setIsAvatarOpen] = useState(false);
-
   return (
     <>
       <header className="sticky top-0 z-50 border-b border-border bg-white backdrop-blur-md">
         {/* Main navbar */}
         <div className="page-container flex h-14 items-center justify-between">
           <a href="#home" className="flex items-center gap-3">
-            <button 
-              onClick={(e) => {
-                e.preventDefault();
-                setIsAvatarOpen(true);
-              }}
-              className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-secondary cursor-pointer hover:ring-2 hover:ring-accent transition-all"
-            >
-              <img src="/kunalgta.png" alt="" className="h-full w-full object-cover" />
-            </button>
             <span className="flex items-baseline gap-3">
               <span className="font-display text-[14px] font-semibold tracking-tight text-foreground">Kunal Patil</span>
               <span className="label-mono hidden sm:inline text-[11px] text-foreground">AI/ML Engineer</span>
@@ -116,10 +105,9 @@ function Header({ onContactClick }: { onContactClick: () => void }) {
           <div className="hidden items-center gap-3 md:flex">
             <a href="https://github.com/kunalpro379" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center text-foreground hover:text-accent transition-colors">
               <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
               </svg>
             </a>
-            <span className="label-mono text-[11px] text-foreground">Mumbai · {new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Kolkata' })} IST</span>
             <button
               type="button"
               onClick={onContactClick}
@@ -156,49 +144,44 @@ function Header({ onContactClick }: { onContactClick: () => void }) {
           <NavTabs variant="mobile" />
         </div>
       </header>
-
-      {/* Avatar Modal */}
-      {isAvatarOpen && (
-        <>
-          <div 
-            className="fixed inset-0 bg-black/80 z-[100] flex items-center justify-center p-4"
-            onClick={() => setIsAvatarOpen(false)}
-          >
-            <div className="relative max-w-2xl w-full">
-              <button 
-                onClick={() => setIsAvatarOpen(false)}
-                className="absolute -top-12 right-0 text-white hover:text-accent transition-colors"
-              >
-                <svg className="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-              <img 
-                src="/kunalgta.png" 
-                alt="Kunal Patil" 
-                className="w-full h-auto rounded-lg shadow-2xl"
-                onClick={(e) => e.stopPropagation()}
-              />
-            </div>
-          </div>
-        </>
-      )}
     </>
   );
 }
 
 function Hero({ onContactClick }: { onContactClick: () => void }) {
   return (
-    <section id="home" className="relative overflow-hidden border-b border-border">
-      {/* Decorative background overlay */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 bg-cream/30 z-[1]">
-        <div className="absolute -left-32 top-10 h-96 w-96 rounded-full bg-[oklch(0.72_0.13_75/0.12)] blur-3xl" />
-        <div className="absolute -right-24 bottom-0 h-[28rem] w-[28rem] rounded-full bg-[oklch(0.6_0.16_35/0.10)] blur-3xl" />
+    <section id="home" className="relative overflow-visible border-b border-border">
+      {/* Split background: Left cream with subtle ambient glow, Right smoothly diminishing white */}
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-0 flex justify-end">
+        <div className="relative h-full flex-1 bg-cream/30 overflow-hidden">
+          <div className="absolute -left-32 top-10 h-96 w-96 rounded-full bg-[oklch(0.72_0.13_75/0.12)] blur-3xl" />
+        </div>
+        <div
+          className="relative hidden lg:block"
+          style={{
+            width: "clamp(300px, 23vw, 490px)",
+            height: "min(785px, 88vh)",
+            background: "linear-gradient(to right, transparent 0%, rgba(255, 255, 255, 0.15) 8%, rgba(255, 255, 255, 0.55) 22%, rgba(255, 255, 255, 0.92) 42%, #ffffff 58%, #ffffff 100%)",
+            maskImage: "linear-gradient(to bottom, black 0%, black 88%, transparent 100%)",
+            WebkitMaskImage: "linear-gradient(to bottom, black 0%, black 88%, transparent 100%)",
+          }}
+        />
       </div>
 
-      <div className="page-container relative z-[2] grid grid-cols-1 gap-8 py-12 lg:grid-cols-[1.4fr_1fr] lg:gap-12 lg:py-16">
-        <div>
-          <p className="label-mono max-w-full text-[10px] leading-[1.5] tracking-wide sm:text-[11px]">
+      {/* AI Chatbot directly on top of the right background (PC Only) */}
+      <div
+        className="hidden lg:flex flex-col pointer-events-auto absolute right-1 lg:right-2 xl:right-3 top-6 z-20"
+        style={{
+          width: "clamp(300px, 22vw, 430px)",
+          height: "min(765px, 86vh)",
+        }}
+      >
+        <ChatInterface />
+      </div>
+
+      <div className="page-container relative z-[2] grid grid-cols-1 gap-8 py-12 lg:grid-cols-[1.4fr_1fr] lg:gap-12 lg:py-16 overflow-visible">
+        <div className="overflow-visible">
+          <p className="font-serif max-w-full text-[11px] leading-[1.5] tracking-[0.2em] uppercase sm:text-[12px] italic text-foreground/80">
             <span className="inline-flex items-start gap-2">
               <span className="relative mt-1.5 flex h-2 w-2 shrink-0">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-60" />
@@ -214,20 +197,22 @@ function Hero({ onContactClick }: { onContactClick: () => void }) {
             </span>
           </p>
 
-          <h1 className="font-display mt-4 text-[clamp(3rem,8vw,7.5rem)] font-medium leading-[1.1] tracking-tight">
+          <h1 className="mt-4 text-[clamp(3rem,8vw,7.5rem)] font-bold leading-[1.1] tracking-tight text-black font-serif">
             <span className="block">
-              <span className="text-foreground">Building </span>
-              <span className="text-accent">Ideas</span>
+              <span>Building </span>
+              <span className="text-[#742308] italic">Ideas</span>
             </span>
             <span className="block">
-              <span className="text-foreground">Into </span>
-              <span className="text-accent">Reality</span>
+              <span>Into </span>
+              <span className="text-[#742308] italic">Reality</span>
             </span>
           </h1>
-          
+
           <div className="mt-4">
-            <span className="font-display block text-[clamp(2rem,5vw,4rem)] font-bold tracking-tight text-[#8B4513]">
-              KUNAL PATIL
+            <span 
+              className="block font-display text-[clamp(2.5rem,6vw,4.5rem)] font-bold tracking-tight text-foreground"
+            >
+              Kunal Patil
             </span>
           </div>
 
@@ -243,55 +228,79 @@ function Hero({ onContactClick }: { onContactClick: () => void }) {
           <div className="mt-6 flex flex-col gap-2.5 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">
             <a
               href="#work"
-              className="rounded-md bg-foreground px-4 py-2.5 text-center text-[13px] font-semibold text-background transition-colors hover:bg-[#8B4513] sm:px-6 sm:py-3 sm:text-[15px] lg:px-8 lg:py-4 lg:text-[16px]"
+              className="rounded-md bg-foreground px-3 py-2 text-center text-[12px] font-semibold text-background transition-colors hover:bg-[#8B4513] sm:px-4 sm:py-2 sm:text-[13px] lg:px-5 lg:py-2.5 lg:text-[14px]"
             >
               Explore My Projects & Work
             </a>
             <a
               href="#writing"
-              className="rounded-md border-2 border-foreground px-4 py-2.5 text-center text-[13px] font-semibold text-foreground transition-colors hover:bg-foreground hover:text-background sm:px-6 sm:py-3 sm:text-[15px] lg:px-8 lg:py-4 lg:text-[16px]"
+              className="rounded-md border-2 border-foreground px-3 py-2 text-center text-[12px] font-semibold text-foreground transition-colors hover:bg-foreground hover:text-background sm:px-4 sm:py-2 sm:text-[13px] lg:px-5 lg:py-2.5 lg:text-[14px]"
             >
               Read My Learnings & Blogs
             </a>
             <button
               type="button"
               onClick={onContactClick}
-              className="rounded-md border-2 border-foreground px-4 py-2.5 text-center text-[13px] font-semibold text-foreground transition-colors hover:bg-foreground hover:text-background sm:px-6 sm:py-3 sm:text-[15px] lg:px-8 lg:py-4 lg:text-[16px]"
+              className="rounded-md border-2 border-foreground px-3 py-2 text-center text-[12px] font-semibold text-foreground transition-colors hover:bg-foreground hover:text-background sm:px-4 sm:py-2 sm:text-[13px] lg:px-5 lg:py-2.5 lg:text-[14px]"
             >
               Get In Touch With Me
             </button>
           </div>
 
-          <div className="mt-4 flex flex-wrap items-center gap-3">
-            <span className="inline-flex items-center border border-border px-3 py-1.5 text-[12px] font-medium text-foreground">
-              <span className="text-foreground">AI/ML Engineer</span>
-            </span>
-            <span className="inline-flex items-center border border-border px-3 py-1.5 text-[12px] font-medium text-foreground">
-              <span className="text-foreground">Open to opportunities</span>
-            </span>
-            <span className="inline-flex items-center border border-border px-3 py-1.5 text-[12px] font-medium text-foreground">
-              <span className="text-foreground">Agentic AI</span>
-            </span>
-            <span className="inline-flex items-center border border-border px-3 py-1.5 text-[12px] font-medium text-foreground">
-              <span className="text-foreground">Cloud & DevOps</span>
-            </span>
-            <span className="inline-flex items-center border border-border px-3 py-1.5 text-[12px] font-medium text-foreground">
-              <span className="text-foreground">LLM</span>
-            </span>
+          {/* 3D Animation */}
+          <div className="flex justify-center w-full overflow-visible mb-0">
+            <div className="relative z-10" style={{ width: 450, height: 350, outline: 'none', border: 'none' }}>
+              <Logo3D variant={1} size={450} zoom={250} bgHex="#ffffff" lineHex="#000000" />
+            </div>
           </div>
         </div>
 
         <div className="flex flex-col items-center justify-between gap-4 sm:gap-6">
-          <div className="relative w-full max-w-[240px] sm:max-w-[380px]">
-            <div className="absolute -inset-3 rounded-full bg-[oklch(0.72_0.13_75/0.18)] blur-2xl sm:-inset-4" />
-            <img src={kunalSketch} alt="Portrait of Kunal Patil" width={600} height={600} className="relative w-full" />
+          <div className="relative w-full max-w-[320px] sm:max-w-[430px] lg:max-w-[440px] flex items-center justify-center -my-2 lg:-my-6 lg:-translate-x-44">
+            {/* Soft Ambient Warm Backdrop Glow */}
+            <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-[oklch(0.72_0.13_75/0.3)] via-amber-500/20 to-transparent blur-3xl" />
+
+            {/* Left Prominent Mirrored Reflection — B&W ghost */}
+            <div
+              className="absolute -left-24 sm:-left-36 lg:-left-96 top-1/2 -translate-y-1/2 w-[90%] sm:w-[95%] pointer-events-none opacity-[0.45] scale-95"
+              style={{
+                transform: "scaleX(-1) rotate(-3deg)",
+                filter: "grayscale(1) blur(2px) brightness(0.85)",
+                maskImage: "linear-gradient(to right, transparent 0%, rgba(0,0,0,0.5) 15%, rgba(0,0,0,1) 40%, rgba(0,0,0,0.8) 65%, transparent 100%)",
+                WebkitMaskImage: "linear-gradient(to right, transparent 0%, rgba(0,0,0,0.5) 15%, rgba(0,0,0,1) 40%, rgba(0,0,0,0.8) 65%, transparent 100%)",
+              }}
+            >
+              <img
+                src={kunalSketch}
+                alt=""
+                aria-hidden="true"
+                className="w-full h-auto object-contain"
+              />
+            </div>
+
+            {/* Feathered Masked Wrapper - Main Portrait */}
+            <div
+              className="relative z-10 w-full overflow-hidden p-4"
+              style={{
+                maskImage: "radial-gradient(circle at 50% 50%, rgba(0,0,0,1) 25%, rgba(0,0,0,0.85) 45%, rgba(0,0,0,0.4) 65%, rgba(0,0,0,0.1) 80%, transparent 92%)",
+                WebkitMaskImage: "radial-gradient(circle at 50% 50%, rgba(0,0,0,1) 25%, rgba(0,0,0,0.85) 45%, rgba(0,0,0,0.4) 65%, rgba(0,0,0,0.1) 80%, transparent 92%)",
+              }}
+            >
+              <img
+                src={kunalSketch}
+                alt="Portrait of Kunal Patil"
+                width={600}
+                height={600}
+                className="relative w-full h-auto object-contain"
+              />
+            </div>
           </div>
 
-          <div className="relative mt-2 w-full max-w-[200px] sm:mt-4 sm:max-w-[320px]">
+          <div className="relative mt-2 w-full max-w-[200px] sm:mt-4 sm:max-w-[320px] lg:-translate-x-36">
             <img src={heroImage} alt="Hero illustration" width={800} height={400} className="w-full" />
           </div>
 
-          <div className="grid w-full max-w-[280px] grid-cols-3 gap-2 border-t border-border pt-4 sm:max-w-none sm:gap-6 sm:pt-6">
+          <div className="grid w-full max-w-[280px] grid-cols-3 gap-2 border-t border-border pt-4 sm:max-w-none sm:gap-6 sm:pt-6 lg:-translate-x-36">
             {[
               { n: "04", l: "Years building" },
               { n: "50+", l: "Projects shipped" },
@@ -574,48 +583,48 @@ function Work() {
 
 function Lab() {
   const experiences = [
-    { 
-      tag: "Current", 
-      cat: "Agentic AI Specialist", 
+    {
+      tag: "Current",
+      cat: "Agentic AI Specialist",
       company: "Idolize Business Solutions",
       period: "Present",
-      title: "Building intelligent AI agent systems", 
+      title: "Building intelligent AI agent systems",
       body: "Developing agentic AI systems and multi-agent workflows for production environments. Focus on autonomous decision-making, tool integration, and scalable AI architectures.",
       accent: true,
       skills: ["Agentic AI", "Multi-Agent Systems", "LLMs", "Production AI"]
     },
-    { 
-      tag: "2025", 
-      cat: "Data & Full-Stack Intern", 
+    {
+      tag: "2025",
+      cat: "Data & Full-Stack Intern",
       company: "ProSmart Concepts & Hydralite",
       period: "Dec 2024 - Jan 2025",
-      title: "Full-stack development and data engineering", 
+      title: "Full-stack development and data engineering",
       body: "Built n8n workflows to automate data extraction, cleaning, and validation. Designed admin dashboard for product handling and client-facing website with seamless data consistency.",
       accent: false,
       skills: ["JavaScript", "SQL", "Node.js", "n8n", "Data Engineering"]
     },
-    { 
-      tag: "2025", 
-      cat: "AQI Prediction & Analytics", 
+    {
+      tag: "2025",
+      cat: "AQI Prediction & Analytics",
       company: "Panache Digilife Pvt. Ltd.",
       period: "Feb 2025 - Apr 2025",
-      title: "Time series forecasting with hybrid ML models", 
+      title: "Time series forecasting with hybrid ML models",
       body: "Implemented ARIMA-LSTM hybrid model for air quality forecasting under Dr. Kanchan Chavan. Deployed real-time prediction system using Firebase listeners for live data updates.",
       accent: false,
       skills: ["Python", "ARIMA", "LSTM", "Time Series", "Firebase"]
     },
-    { 
-      tag: "2024", 
-      cat: "DevOps", 
+    {
+      tag: "2024",
+      cat: "DevOps",
       company: "Plasma X Valnee",
       period: "December 2024",
-      title: "AWS infrastructure and CI/CD deployment", 
+      title: "AWS infrastructure and CI/CD deployment",
       body: "Deployed production platform on AWS using ECS, EC2, and ECR. Configured autoscaling, ALB with GoDaddy DNS, and implemented CI/CD pipelines with GitHub Actions for automated deployments.",
       accent: false,
       skills: ["AWS ECS", "Docker", "CI/CD", "GitHub Actions", "ALB"]
     },
   ];
-  
+
   return (
     <section id="lab" className="border-b border-border">
       <div className="page-container py-16 sm:py-24">
@@ -626,54 +635,58 @@ function Lab() {
           </h2>
         </div>
 
-        <ul className="mt-8 divide-y divide-border border-y border-border sm:mt-14">
+        <div className="mt-6 sm:mt-10 grid grid-cols-1 md:grid-cols-2 gap-x-8 lg:gap-x-12 gap-y-8 sm:gap-y-10 w-full border-t border-black/15 pt-6 sm:pt-8">
           {experiences.map((e) => (
-            <li
-              key={e.company}
-              className={`grid grid-cols-[minmax(0,1fr)] gap-2 py-4 sm:grid-cols-[160px_1fr] sm:gap-6 sm:py-10 md:items-start ${e.accent ? "bg-accent/5" : ""}`}
+            <div 
+              key={e.company} 
+              className="group relative flex flex-col items-start border-l-2 border-black/10 pl-5 transition-all duration-300 hover:border-black/40"
             >
-              <div className="flex items-center justify-between gap-2 sm:flex-col sm:items-start sm:justify-start sm:gap-2">
-                <div
-                  className={`label-mono flex items-center gap-1.5 text-[10px] font-semibold sm:gap-2 sm:text-[11px] ${e.accent ? "text-accent" : "text-muted-foreground"}`}
-                >
-                  <span
-                    className={`inline-block h-1.5 w-1.5 shrink-0 rounded-full sm:h-2 sm:w-2 ${e.accent ? "animate-pulse bg-accent" : "bg-muted-foreground"}`}
-                  />
-                  {e.tag}
+              {/* Top: Period & Indicator */}
+              <div className="flex flex-col justify-start mb-3">
+                <div className="label-mono text-[10px] font-bold uppercase tracking-wider text-black/50">
+                  {e.period}
                 </div>
-                <div className="label-mono shrink-0 text-[9px] text-muted-foreground sm:text-[12px]">{e.period}</div>
-              </div>
-              <div className="min-w-0">
-                <div className="mb-2 flex flex-col gap-0.5 sm:mb-4 sm:gap-2">
-                  <h3 className="font-display truncate text-[1rem] font-semibold leading-tight sm:text-[1.75rem]">
-                    {e.company}
-                  </h3>
-                  <div
-                    className={`truncate text-[11px] font-semibold leading-tight sm:text-[15px] ${e.accent ? "text-accent" : "text-foreground"}`}
-                  >
-                    {e.cat}
+                {e.accent && (
+                  <div className="mt-2 flex items-center gap-2">
+                     <span className="relative flex h-2 w-2">
+                       <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#742308] opacity-75"></span>
+                       <span className="relative inline-flex h-2 w-2 rounded-full bg-[#742308]"></span>
+                     </span>
+                     <span className="label-mono text-[8px] uppercase tracking-widest text-[#742308]">Current Role</span>
                   </div>
-                  <div className="label-mono truncate text-[10px] text-muted-foreground sm:text-[13px]">{e.title}</div>
+                )}
+              </div>
+
+              {/* Experience Details */}
+              <div className="flex flex-col">
+                <h3 className="font-display text-[1.25rem] font-bold leading-tight text-black sm:text-[1.5rem]">
+                  {e.company}
+                </h3>
+                <div className="mt-1.5 font-serif text-[1rem] sm:text-[1.1rem] italic text-black/70">
+                  {e.cat}
                 </div>
-                <p
-                  className={`line-clamp-2 max-w-3xl text-[11px] leading-snug sm:line-clamp-none sm:text-[15px] sm:leading-[1.7] ${e.accent ? "text-foreground/80" : "text-foreground/70"}`}
-                >
+                
+                <div className="mt-4 text-[10px] sm:text-[11px] font-semibold uppercase tracking-[0.1em] text-black/85">
+                  {e.title}
+                </div>
+                <p className="mt-2.5 max-w-lg text-[13px] sm:text-[14px] leading-[1.65] text-black/65">
                   {e.body}
                 </p>
-                <div className="mt-2 flex flex-wrap gap-1 sm:mt-5 sm:gap-2">
+
+                <div className="mt-4 flex flex-wrap gap-x-2 gap-y-1.5">
                   {e.skills.map((skill) => (
                     <span
                       key={skill}
-                      className={`border px-1.5 py-0.5 text-[8px] font-semibold uppercase tracking-wide sm:px-3 sm:py-1.5 sm:text-[11px] ${e.accent ? "border-accent/30 bg-accent/10 text-accent" : "border-border bg-card text-foreground/70"}`}
+                      className="rounded-none border border-black/15 px-2.5 py-1 text-[8px] sm:text-[9px] font-semibold tracking-widest uppercase text-black/55 transition-colors group-hover:border-black/30 group-hover:text-black/85"
                     >
                       {skill}
                     </span>
                   ))}
                 </div>
               </div>
-            </li>
+            </div>
           ))}
-        </ul>
+        </div>
       </div>
     </section>
   );
@@ -725,25 +738,25 @@ function Capabilities() {
 
 function Testimonials() {
   const education = [
-    { 
-      period: "2022 - 2026", 
-      degree: "Bachelor of Technology", 
+    {
+      period: "2022 - 2026",
+      degree: "Bachelor of Technology",
       field: "Artificial Intelligence and Data Science, Mumbai",
       score: "CGPA: 8.1",
       institution: "Vivekanand Education Society Institute of Technology",
       initials: "BT"
     },
-    { 
-      period: "2019 - 2021", 
-      degree: "Higher Secondary Certificate", 
+    {
+      period: "2019 - 2021",
+      degree: "Higher Secondary Certificate",
       field: "Science Stream (PCM)",
       score: "89.67% | CET: 96.19 Percentile",
       institution: "Chandibai Himathmaal Mansukhani Collage, Ulhasnagar",
       initials: "HS"
     },
-    { 
-      period: "2018 - 2019", 
-      degree: "Secondary School Certificate", 
+    {
+      period: "2018 - 2019",
+      degree: "Secondary School Certificate",
       field: "10th grade",
       score: "91%",
       institution: "Bhausaheb Paranjpe Vidyalaya, Ambernath, Thane",
@@ -808,7 +821,7 @@ function Writing() {
   const allBlogs = blogsData?.blogs || [];
   const topBlogs = allBlogs.slice(0, 2);
   const bottomBlogs = allBlogs.slice(2, 6);
-  
+
   return (
     <section id="writing" className="border-b border-white/10 bg-black text-white">
       <div className="page-container py-16 sm:py-24">
@@ -830,137 +843,75 @@ function Writing() {
         ) : (
           <>
             {/* Top 2 Blogs - Large Cards */}
-        <div className="mb-8 sm:mb-12">
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 md:gap-12">
-            {topBlogs.map((blog: any) => (
-              <article key={blog._id} className="border-t border-white/20 pt-5 sm:pt-8">
-                <div className="mb-3 flex items-center justify-between sm:mb-4">
-                  <div className="label-mono text-[10px] uppercase tracking-wider text-white/60 sm:text-[12px]">{blog.subject || "Blog"}</div>
-                  <div className="label-mono text-[10px] text-white/50 sm:text-[12px]">{new Date(blog.datetime || blog.created_at).toLocaleDateString("en-US", { month: "short", year: "numeric" })}</div>
-                </div>
-                <h3 className="font-display mb-3 cursor-pointer text-[1.25rem] font-bold leading-[1.2] text-white transition-colors hover:text-white/80 sm:mb-4 sm:text-[2rem]">{blog.title}</h3>
-                <p className="mb-4 line-clamp-2 text-[13px] leading-[1.6] text-white/70 sm:mb-5 sm:text-[15px] sm:leading-[1.7]">{blog.shortDescription || blog.description || "Read more about this topic..."}</p>
-                <div className="flex flex-wrap items-center gap-2">
-                  {blog.tags?.slice(0, 4).map((tag: string) => (
-                    <span key={tag} className="label-mono rounded-sm border border-white/30 px-2 py-0.5 text-[9px] uppercase tracking-wider text-white/85 sm:text-[11px]">
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              </article>
-            ))}
-          </div>
-        </div>
+            <div className="mb-8 sm:mb-12">
+              <div className="grid grid-cols-1 gap-8 md:grid-cols-2 md:gap-12">
+                {topBlogs.map((blog: any) => (
+                  <Link
+                    key={blog._id}
+                    to="/learnings/blogs/$blogId"
+                    params={{ blogId: blog._id }}
+                    className="group block border-t border-white/20 pt-5 transition-colors hover:border-white/50 sm:pt-8"
+                  >
+                    <article>
+                      <div className="mb-3 flex items-center justify-between sm:mb-4">
+                        <div className="label-mono text-[10px] uppercase tracking-wider text-white/60 sm:text-[12px]">{blog.subject || "Blog"}</div>
+                        <div className="label-mono text-[10px] text-white/50 sm:text-[12px]">{new Date(blog.datetime || blog.created_at).toLocaleDateString("en-US", { month: "short", year: "numeric" })}</div>
+                      </div>
+                      <h3 className="font-display mb-3 text-[1.25rem] font-bold leading-[1.2] text-white transition-colors group-hover:text-amber-300 sm:mb-4 sm:text-[2rem]">{blog.title}</h3>
+                      <p className="mb-4 line-clamp-2 text-[13px] leading-[1.6] text-white/70 sm:mb-5 sm:text-[15px] sm:leading-[1.7]">{blog.shortDescription || blog.description || "Read more about this topic..."}</p>
+                      <div className="flex flex-wrap items-center gap-2">
+                        {blog.tags?.slice(0, 4).map((tag: string) => (
+                          <span key={tag} className="label-mono rounded-sm border border-white/30 px-2 py-0.5 text-[9px] uppercase tracking-wider text-white/85 sm:text-[11px]">
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    </article>
+                  </Link>
+                ))}
+              </div>
+            </div>
 
-        {/* Bottom 4 Blogs - Smaller Cards */}
-        <div>
-          <div className="grid grid-cols-2 gap-3 sm:gap-6 lg:grid-cols-4">
-            {bottomBlogs.map((blog: any) => (
-              <article key={blog._id} className="cursor-pointer rounded-lg bg-white p-3 text-black transition-shadow hover:shadow-xl sm:p-6">
-                <div className="mb-3 sm:mb-4">
-                  <span className="inline-block rounded-sm border border-black/15 bg-black px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-white sm:px-3 sm:py-1 sm:text-[10px]">
-                    {blog.subject || "BLOG"}
-                  </span>
-                </div>
-                <h3 className="font-display mb-2 text-[0.85rem] font-semibold leading-tight transition-colors hover:text-black/70 sm:mb-3 sm:text-[1.25rem]">
-                  {blog.title}
-                </h3>
-                <p className="mb-2 line-clamp-2 text-[10px] leading-snug text-black/70 sm:mb-4 sm:line-clamp-3 sm:text-[13px] sm:leading-[1.6]">
-                  {blog.shortDescription || blog.description || "Explore this blog..."}
-                </p>
-                <div className="mb-3 flex flex-wrap gap-1.5 sm:mb-4 sm:gap-2">
-                  {blog.tags?.slice(0, 3).map((tag: string) => (
-                    <span key={tag} className="rounded-sm border border-black/20 px-1.5 py-0.5 text-[8px] uppercase tracking-wide text-black/70 sm:px-2 sm:text-[10px]">
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-                <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-wide text-black/80">
-                  <span>VIEW DETAILS</span>
-                  <span>→</span>
-                </div>
-              </article>
-            ))}
-          </div>
-        </div>
+            {/* Bottom 4 Blogs - Smaller Cards */}
+            <div>
+              <div className="grid grid-cols-2 gap-3 sm:gap-6 lg:grid-cols-4">
+                {bottomBlogs.map((blog: any) => (
+                  <Link
+                    key={blog._id}
+                    to="/learnings/blogs/$blogId"
+                    params={{ blogId: blog._id }}
+                    className="group block cursor-pointer rounded-lg bg-white p-3 text-black transition-all duration-300 hover:-translate-y-1 hover:shadow-xl sm:p-6"
+                  >
+                    <article>
+                      <div className="mb-3 sm:mb-4">
+                        <span className="inline-block rounded-sm border border-black/15 bg-black px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-white sm:px-3 sm:py-1 sm:text-[10px]">
+                          {blog.subject || "BLOG"}
+                        </span>
+                      </div>
+                      <h3 className="font-display mb-2 text-[0.85rem] font-semibold leading-tight transition-colors group-hover:text-accent sm:mb-3 sm:text-[1.25rem]">
+                        {blog.title}
+                      </h3>
+                      <p className="mb-2 line-clamp-2 text-[10px] leading-snug text-black/70 sm:mb-4 sm:line-clamp-3 sm:text-[13px] sm:leading-[1.6]">
+                        {blog.shortDescription || blog.description || "Explore this blog..."}
+                      </p>
+                      <div className="mb-3 flex flex-wrap gap-1.5 sm:mb-4 sm:gap-2">
+                        {blog.tags?.slice(0, 3).map((tag: string) => (
+                          <span key={tag} className="rounded-sm border border-black/20 px-1.5 py-0.5 text-[8px] uppercase tracking-wide text-black/70 sm:px-2 sm:text-[10px]">
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                      <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-wide text-black/80 group-hover:text-accent">
+                        <span>VIEW DETAILS</span>
+                        <span>→</span>
+                      </div>
+                    </article>
+                  </Link>
+                ))}
+              </div>
+            </div>
           </>
         )}
-      </div>
-    </section>
-  );
-}
-
-function Life() {
-  const featuredProjects = [
-    {
-      id: "curve-catch",
-      title: "Curve Catch Game",
-      description:
-        "Star Catch is a fun physics-based puzzle game where balls travel across mathematical curves and dynamic paths. Your goal is to guide the ball, collect every glowing star, and complete each level using logic, timing, and precision. Every curve changes the movement, making each level a unique challenge blending math, strategy, and arcade gameplay.",
-      image: "/game.png",
-      link: "/game",
-      ctaLabel: "Play Game",
-    },
-    {
-      id: "ai-battleground",
-      title: "AI Battleground",
-      description:
-        "An advanced AI agent competition platform where multiple AI models compete in real-time strategic battles. Features include multi-agent coordination, reinforcement learning, and live performance analytics. Built with cutting-edge ML frameworks and scalable cloud infrastructure.",
-      image: "/debate.png",
-      link: "/ai-battleground",
-      ctaLabel: "Explore Project",
-    },
-  ];
-
-  return (
-    <section id="life" className="border-b border-border">
-      <div className="page-container py-8 sm:py-12">
-        <div className="space-y-12 sm:space-y-16">
-          {featuredProjects.map((featured, idx) => (
-            <article
-              key={featured.id}
-              className={`grid grid-cols-1 items-center gap-8 ${
-                idx % 2 === 0
-                  ? "lg:grid-cols-[1fr_300px] lg:gap-12"
-                  : "lg:grid-cols-[300px_1fr] lg:gap-12"
-              }`}
-            >
-              <div className={`flex flex-col justify-center ${idx % 2 === 0 ? "" : "lg:order-2"}`}>
-                <div className="label-mono text-xs uppercase tracking-wider text-accent">Featured Project</div>
-                <h3 className="font-display mt-3 text-[clamp(1.5rem,3vw,2rem)] font-bold leading-[1.1] tracking-tight text-foreground">
-                  {featured.title}
-                </h3>
-                <p className="mt-4 text-[17px] leading-[1.65] text-foreground/75">{featured.description}</p>
-                <div className="mt-6">
-                  <a
-                    href={featured.link}
-                    className="inline-flex items-center gap-2 bg-foreground px-5 py-2 text-xs font-bold uppercase tracking-wider text-background transition-all hover:bg-foreground/90"
-                  >
-                    <span>{featured.id === "curve-catch" ? "Play Game" : featured.ctaLabel}</span>
-                    <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </a>
-                </div>
-              </div>
-
-              <div className={`flex items-center justify-center ${idx % 2 === 0 ? "" : "lg:order-1"}`}>
-                <a href={featured.link} className="group block">
-                  <img
-                    src={featured.image}
-                    alt={featured.title}
-                    loading="eager"
-                    className="h-auto w-full max-h-[250px] object-contain grayscale transition-all duration-700 group-hover:scale-105 group-hover:grayscale-0"
-                    onError={(e) => {
-                      console.error(`Failed to load image: ${featured.image}`);
-                      e.currentTarget.src = "/placeholder.png";
-                    }}
-                  />
-                </a>
-              </div>
-            </article>
-          ))}
-        </div>
       </div>
     </section>
   );
@@ -1078,7 +1029,7 @@ function Index() {
       <Work />
       {/* <Capabilities /> */}
       <Lab />
-      <Life />
+      {/* <Life /> */}
       <Writing />
       <Testimonials />
       <Contact />

@@ -4,7 +4,7 @@
   
   <!-- Homepage -->
   <url>
-    <loc>https://kunalpatil.me/</loc>
+    <loc>https://kunalpatil.in/</loc>
     <lastmod>2026-03-08</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
@@ -12,49 +12,49 @@
   
   <!-- Main Pages -->
   <url>
-    <loc>https://kunalpatil.me/projects</loc>
+    <loc>https://kunalpatil.in/projects</loc>
     <lastmod>2026-03-08</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   
   <url>
-    <loc>https://kunalpatil.me/learnings</loc>
+    <loc>https://kunalpatil.in/learnings</loc>
     <lastmod>2026-03-08</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   
   <url>
-    <loc>https://kunalpatil.me/learnings?tab=blogs</loc>
+    <loc>https://kunalpatil.in/learnings?tab=blogs</loc>
     <lastmod>2026-03-08</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   
   <url>
-    <loc>https://kunalpatil.me/learnings?tab=documentation</loc>
+    <loc>https://kunalpatil.in/learnings?tab=documentation</loc>
     <lastmod>2026-03-08</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   
   <url>
-    <loc>https://kunalpatil.me/learnings?tab=guide</loc>
+    <loc>https://kunalpatil.in/learnings?tab=guide</loc>
     <lastmod>2026-03-08</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   
   <url>
-    <loc>https://kunalpatil.me/about</loc>
+    <loc>https://kunalpatil.in/about</loc>
     <lastmod>2026-03-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   
   <url>
-    <loc>https://kunalpatil.me/contact</loc>
+    <loc>https://kunalpatil.in/contact</loc>
     <lastmod>2026-03-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -63,7 +63,7 @@
   <!-- Add your blog posts, projects, and documentation pages here -->
   <!-- Example:
   <url>
-    <loc>https://kunalpatil.me/blogs/your-blog-slug</loc>
+    <loc>https://kunalpatil.in/blogs/your-blog-slug</loc>
     <lastmod>2026-03-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>

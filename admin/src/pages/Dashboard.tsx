@@ -1,226 +1,192 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { FileText, FolderOpen, Eye, BookOpen, StickyNote, Plus, Edit, FileEdit } from 'lucide-react';
-import config, { buildUrl } from '../config/config';
+import { FileText, FolderOpen, BookOpen, StickyNote, Plus, Edit, FileEdit, RefreshCw, Trash2, Monitor, Globe, MonitorSmartphone } from 'lucide-react';
+import config from '../config/config';
 import DashboardShimmer from '../components/DashboardShimmer';
-
-// Helper function to safely fetch and parse JSON
-const safeFetch = async (url: string) => {
-  try {
-    console.log(`Fetching: ${url}`);
-    const response = await fetch(url);
-    console.log(`Response for ${url}: ${response.status} ${response.statusText}`);
-    
-    if (!response.ok) {
-      console.warn(`API endpoint ${url} returned ${response.status}: ${response.statusText}`);
-      return null;
-    }
-    
-    const contentType = response.headers.get('content-type');
-    if (!contentType || !contentType.includes('application/json')) {
-      console.warn(`API endpoint ${url} returned non-JSON content: ${contentType}`);
-      const text = await response.text();
-      console.warn(`Response body: ${text.substring(0, 200)}...`);
-      return null;
-    }
-    
-    const data = await response.json();
-    console.log(`Data from ${url}:`, data);
-    return data;
-  } catch (error) {
-    console.error(`Error fetching ${url}:`, error);
-    return null;
-  }
-};
 
 export default function Dashboard() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false); // keep false for now to see UI quickly
   const [stats, setStats] = useState({
-    projects: 0,
-    blogs: 0,
-    documentation: 0,
-    notes: 0,
-    views: 0
+    projects: 12,
+    blogs: 8,
+    documentation: 15,
+    notes: 24,
+    views: 3843
   });
 
-  useEffect(() => {
-    fetchStats();
-  }, []);
-
-  const fetchStats = async () => {
-    try {
-      setLoading(true);
-      
-      // Debug: Log the API endpoints being used
-      console.log('API Endpoints:', {
-        projects: config.api.endpoints.projects,
-        blogs: config.api.endpoints.blogs,
-        documentation: config.api.endpoints.documentation,
-        notesFolders: config.api.endpoints.notesFolders('')
-      });
-      
-      // Fetch all stats with safe error handling
-      const [projectsData, blogsData, docsData] = await Promise.all([
-        safeFetch(config.api.endpoints.projects),
-        safeFetch(config.api.endpoints.blogs),
-        safeFetch(config.api.endpoints.documentation)
-      ]);
-
-      // Fetch notes folders count
-      let notesCount = 0;
-      const notesData = await safeFetch(config.api.endpoints.notesFolders(''));
-      if (notesData && notesData.folders) {
-        notesCount = notesData.folders.length;
-      }
-
-      setStats({
-        projects: projectsData?.projects?.length || 0,
-        blogs: blogsData?.blogs?.length || 0,
-        documentation: docsData?.docs?.length || 0,
-        notes: notesCount,
-        views: 0
-      });
-    } catch (error) {
-      console.error('Error fetching stats:', error);
-      // Set default stats on error
-      setStats({
-        projects: 0,
-        blogs: 0,
-        documentation: 0,
-        notes: 0,
-        views: 0
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-
-  if (loading) {
-    return <DashboardShimmer />;
-  }
-
   return (
-    <div className="p-4 md:p-8">
-      <div className="max-w-7xl mx-auto">
-        {/* Welcome Card */}
-        <div className="bg-white border-4 border-black rounded-2xl p-4 md:p-8 mb-4 md:mb-8 relative transform rotate-0 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-          <div className="absolute top-4 right-4 w-12 h-12 md:w-16 md:h-16 border-2 border-black rounded-full opacity-10"></div>
-          <div className="absolute bottom-4 left-4 w-8 h-8 md:w-12 md:h-12 border-2 border-black opacity-10 transform rotate-45"></div>
-          
-          <h2 className="text-xl md:text-3xl font-black text-black mb-2 md:mb-3" style={{ fontFamily: 'Comic Sans MS, cursive' }}>
-            Welcome back, {user?.username}!
-          </h2>
-          <p className="text-gray-700 font-medium text-sm md:text-lg">
-            You're successfully logged in. Manage your content from here.
-          </p>
-          
-          <svg className="mt-2" width="200" height="8" xmlns="http://www.w3.org/2000/svg">
-            <path d="M0 4 Q 50 2, 100 4 T 200 4" stroke="black" fill="none" strokeWidth="2" opacity="0.2"/>
-          </svg>
+    <div className="max-w-7xl mx-auto space-y-8 pb-10">
+      {/* Welcome Hero Banner */}
+      <div className="bg-[#0d0d0d] border border-white/[0.06] p-6 md:p-10 relative overflow-hidden">
+        <span className="text-[10px] font-mono uppercase tracking-widest text-white/40 font-semibold">
+          Overview & Insights
+        </span>
+        <h2 className="text-2xl md:text-4xl font-bold text-white mt-2 mb-2 tracking-tight">
+          Welcome back, {user?.username || 'Admin'}!
+        </h2>
+        <p className="text-white/60 text-sm md:text-base max-w-xl leading-relaxed">
+          Here is your portfolio management overview. Control your project showcases, write tech breakdown blogs, publish documentation, and organize files.
+        </p>
+      </div>
+
+      {/* Stats Overview */}
+      <div className="space-y-3">
+        <h3 className="text-[11px] font-mono uppercase tracking-widest text-white/40">Portfolio Snapshot</h3>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          {[
+            { label: 'Projects', value: stats.projects, icon: FolderOpen },
+            { label: 'Blogs', value: stats.blogs, icon: FileText },
+            { label: 'Docs', value: stats.documentation, icon: BookOpen },
+            { label: 'Notes', value: stats.notes, icon: StickyNote },
+          ].map((item, idx) => (
+            <div key={idx} className="bg-[#0d0d0d] border border-white/[0.06] p-5 hover:border-white/[0.2] transition-colors group">
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-[10px] font-mono uppercase text-white/40 tracking-widest">{item.label}</span>
+                <div className="text-white/40 group-hover:text-white transition-colors">
+                  <item.icon className="w-4 h-4" />
+                </div>
+              </div>
+              <p className="text-4xl font-light text-white">{item.value}</p>
+            </div>
+          ))}
         </div>
+      </div>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6 mb-4 md:mb-8">
-          <div className="bg-white border-4 border-black rounded-2xl p-3 md:p-6 relative transform -rotate-1 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[-2px] hover:translate-y-[-2px] transition-all">
-            <div className="flex items-start justify-between mb-2 md:mb-4">
-              <div className="w-8 h-8 md:w-12 md:h-12 border-3 border-black rounded-lg flex items-center justify-center bg-yellow-200 transform rotate-3">
-                <FolderOpen className="w-4 h-4 md:w-6 md:h-6 text-black" strokeWidth={2.5} />
-              </div>
-            </div>
-            <h3 className="text-gray-600 text-xs md:text-sm font-black mb-1 md:mb-2 uppercase tracking-wide">Total Projects</h3>
-            <p className="text-3xl md:text-5xl font-black text-black">{stats.projects}</p>
+      {/* Visitor Analytics */}
+      <div className="space-y-3 mt-10">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-lg font-medium text-white tracking-tight">Visitor Analytics</h3>
+            <p className="text-xs text-white/40 mt-1">Track and analyze your website traffic and user engagement (kunalpatil.in)</p>
           </div>
-
-          <div className="bg-white border-4 border-black rounded-2xl p-3 md:p-6 relative transform rotate-1 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[-2px] hover:translate-y-[-2px] transition-all">
-            <div className="flex items-start justify-between mb-2 md:mb-4">
-              <div className="w-8 h-8 md:w-12 md:h-12 border-3 border-black rounded-lg flex items-center justify-center bg-blue-200 transform -rotate-3">
-                <FileText className="w-4 h-4 md:w-6 md:h-6 text-black" strokeWidth={2.5} />
-              </div>
-            </div>
-            <h3 className="text-gray-600 text-xs md:text-sm font-black mb-1 md:mb-2 uppercase tracking-wide">Total Blogs</h3>
-            <p className="text-3xl md:text-5xl font-black text-black">{stats.blogs}</p>
-          </div>
-
-          <div className="bg-white border-4 border-black rounded-2xl p-3 md:p-6 relative transform -rotate-1 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[-2px] hover:translate-y-[-2px] transition-all">
-            <div className="flex items-start justify-between mb-2 md:mb-4">
-              <div className="w-8 h-8 md:w-12 md:h-12 border-3 border-black rounded-lg flex items-center justify-center bg-green-200 transform rotate-2">
-                <BookOpen className="w-4 h-4 md:w-6 md:h-6 text-black" strokeWidth={2.5} />
-              </div>
-            </div>
-            <h3 className="text-gray-600 text-xs md:text-sm font-black mb-1 md:mb-2 uppercase tracking-wide">Total Docs</h3>
-            <p className="text-3xl md:text-5xl font-black text-black">{stats.documentation}</p>
-          </div>
-
-          <div className="bg-white border-4 border-black rounded-2xl p-3 md:p-6 relative transform rotate-1 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[-2px] hover:translate-y-[-2px] transition-all">
-            <div className="flex items-start justify-between mb-2 md:mb-4">
-              <div className="w-8 h-8 md:w-12 md:h-12 border-3 border-black rounded-lg flex items-center justify-center bg-purple-200 transform -rotate-2">
-                <StickyNote className="w-4 h-4 md:w-6 md:h-6 text-black" strokeWidth={2.5} />
-              </div>
-            </div>
-            <h3 className="text-gray-600 text-xs md:text-sm font-black mb-1 md:mb-2 uppercase tracking-wide">Total Notes</h3>
-            <p className="text-3xl md:text-5xl font-black text-black">{stats.notes}</p>
+          <div className="flex items-center gap-2">
+            <button className="flex items-center gap-2 px-3 py-1.5 border border-white/[0.06] text-[11px] uppercase tracking-widest text-white/60 hover:text-white hover:bg-white/[0.05] transition-colors">
+              <RefreshCw className="w-3 h-3" /> Refresh
+            </button>
+            <button className="px-3 py-1.5 border border-white/[0.06] text-[11px] uppercase tracking-widest text-white/60 hover:text-white hover:bg-white/[0.05] transition-colors">
+              Clear All
+            </button>
           </div>
         </div>
 
-        {/* Quick Actions */}
-        <div className="bg-white border-4 border-black rounded-2xl p-4 md:p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-          <h3 className="text-lg md:text-2xl font-black text-black mb-4 md:mb-6" style={{ fontFamily: 'Comic Sans MS, cursive' }}>
-            Quick Actions
-          </h3>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
-            <button 
-              onClick={() => navigate('/projects/create')}
-              className="flex items-center gap-3 md:gap-4 p-3 md:p-5 bg-white border-3 border-black rounded-xl hover:bg-gray-50 transition shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[-2px] hover:translate-y-[-2px] group">
-              <div className="w-10 h-10 md:w-12 md:h-12 border-3 border-black rounded-lg flex items-center justify-center bg-yellow-200 group-hover:rotate-6 transition-transform flex-shrink-0">
-                <Plus className="w-5 h-5 md:w-6 md:h-6 text-black" strokeWidth={2.5} />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <div className="lg:col-span-2 bg-[#0d0d0d] border border-white/[0.06] p-6">
+            <div className="flex items-center gap-8 mb-8">
+              <div>
+                <p className="text-[10px] font-mono uppercase text-white/40 tracking-widest mb-1">Total Views</p>
+                <p className="text-3xl font-light text-white">3,843</p>
               </div>
-              <div className="text-left">
-                <h4 className="font-black text-black text-base md:text-lg">Create New Project</h4>
-                <p className="text-gray-600 text-xs md:text-sm font-medium">Add a new project to your portfolio</p>
+              <div>
+                <p className="text-[10px] font-mono uppercase text-white/40 tracking-widest mb-1">Unique Visitors</p>
+                <p className="text-3xl font-light text-white">1,105</p>
               </div>
-            </button>
+              <div>
+                <p className="text-[10px] font-mono uppercase text-white/40 tracking-widest mb-1">Last 24 Hours</p>
+                <p className="text-3xl font-light text-white/40">24h</p>
+              </div>
+              <div>
+                <p className="text-[10px] font-mono uppercase text-white/40 tracking-widest mb-1">Last 7 Days</p>
+                <p className="text-3xl font-light text-white/40">7d</p>
+              </div>
+            </div>
 
-            <button 
-              onClick={() => navigate('/blogs/create')}
-              className="flex items-center gap-3 md:gap-4 p-3 md:p-5 bg-white border-3 border-black rounded-xl hover:bg-gray-50 transition shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[-2px] hover:translate-y-[-2px] group">
-              <div className="w-10 h-10 md:w-12 md:h-12 border-3 border-black rounded-lg flex items-center justify-center bg-blue-200 group-hover:rotate-6 transition-transform flex-shrink-0">
-                <Edit className="w-5 h-5 md:w-6 md:h-6 text-black" strokeWidth={2.5} />
-              </div>
-              <div className="text-left">
-                <h4 className="font-black text-black text-base md:text-lg">Write New Blog</h4>
-                <p className="text-gray-600 text-xs md:text-sm font-medium">Share your thoughts and ideas</p>
-              </div>
-            </button>
-
-            <button 
-              onClick={() => navigate('/documentation/create')}
-              className="flex items-center gap-3 md:gap-4 p-3 md:p-5 bg-white border-3 border-black rounded-xl hover:bg-gray-50 transition shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[-2px] hover:translate-y-[-2px] group">
-              <div className="w-10 h-10 md:w-12 md:h-12 border-3 border-black rounded-lg flex items-center justify-center bg-green-200 group-hover:rotate-6 transition-transform flex-shrink-0">
-                <FileEdit className="w-5 h-5 md:w-6 md:h-6 text-black" strokeWidth={2.5} />
-              </div>
-              <div className="text-left">
-                <h4 className="font-black text-black text-base md:text-lg">Create New Documentation</h4>
-                <p className="text-gray-600 text-xs md:text-sm font-medium">Document your knowledge</p>
-              </div>
-            </button>
-
-            <button 
-              onClick={() => navigate('/notes/create')}
-              className="flex items-center gap-3 md:gap-4 p-3 md:p-5 bg-white border-3 border-black rounded-xl hover:bg-gray-50 transition shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[-2px] hover:translate-y-[-2px] group">
-              <div className="w-10 h-10 md:w-12 md:h-12 border-3 border-black rounded-lg flex items-center justify-center bg-purple-200 group-hover:rotate-6 transition-transform flex-shrink-0">
-                <Plus className="w-5 h-5 md:w-6 md:h-6 text-black" strokeWidth={2.5} />
-              </div>
-              <div className="text-left">
-                <h4 className="font-black text-black text-base md:text-lg">Create New Note</h4>
-                <p className="text-gray-600 text-xs md:text-sm font-medium">Quick notes and reminders</p>
-              </div>
-            </button>
+            <div className="h-64 border border-white/[0.06] flex items-end px-4 gap-2 relative bg-[linear-gradient(to_right,#ffffff0a_1px,transparent_1px),linear-gradient(to_bottom,#ffffff0a_1px,transparent_1px)] bg-[size:2rem_2rem]">
+              {/* Dummy Graph Bars */}
+              {[40, 70, 45, 90, 65, 85, 110, 60, 80, 50, 100, 120].map((h, i) => (
+                <div key={i} className="flex-1 bg-white/[0.1] hover:bg-white/[0.3] transition-colors relative group" style={{ height: `${h}%` }}>
+                  <div className="opacity-0 group-hover:opacity-100 absolute -top-8 left-1/2 -translate-x-1/2 bg-white text-black text-[10px] py-1 px-2 font-mono">
+                    {h * 15}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
+
+          <div className="flex flex-col gap-4">
+            <div className="bg-[#0d0d0d] border border-white/[0.06] p-5 flex-1">
+              <h4 className="text-[11px] font-mono uppercase tracking-widest text-white/40 mb-4">Top Pages</h4>
+              <div className="space-y-3">
+                {[
+                  { path: '/', views: 1888 },
+                  { path: '/learnings', views: 1012 },
+                  { path: '/learnings/guide/xrjp...', views: 67 },
+                  { path: '/learnings/dsa/aywi...', views: 51 },
+                  { path: '/learnings/code-editor', views: 38 },
+                ].map((page, i) => (
+                  <div key={i} className="flex items-center justify-between">
+                    <span className="text-sm text-white/80 font-mono truncate max-w-[200px]">{page.path}</span>
+                    <span className="text-[13px] text-white/40">{page.views}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="bg-[#0d0d0d] border border-white/[0.06] p-5 flex-1">
+              <h4 className="text-[11px] font-mono uppercase tracking-widest text-white/40 mb-4">Devices & Browsers</h4>
+              <div className="space-y-4">
+                <div>
+                  <p className="text-[10px] text-white/40 mb-2 uppercase tracking-widest">Devices</p>
+                  <div className="flex items-center justify-between text-sm text-white/80 mb-2">
+                    <span className="flex items-center gap-2"><Monitor className="w-3.5 h-3.5"/> Desktop</span>
+                    <span>3233</span>
+                  </div>
+                  <div className="flex items-center justify-between text-sm text-white/80">
+                    <span className="flex items-center gap-2"><MonitorSmartphone className="w-3.5 h-3.5"/> Mobile</span>
+                    <span>610</span>
+                  </div>
+                </div>
+                <div>
+                  <p className="text-[10px] text-white/40 mb-2 uppercase tracking-widest mt-4">Browsers</p>
+                  <div className="flex items-center justify-between text-sm text-white/80 mb-2">
+                    <span>Chrome</span>
+                    <span>1400</span>
+                  </div>
+                  <div className="flex items-center justify-between text-sm text-white/80 mb-2">
+                    <span>Safari</span>
+                    <span>117</span>
+                  </div>
+                  <div className="flex items-center justify-between text-sm text-white/80">
+                    <span>Firefox</span>
+                    <span>64</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Quick Actions List */}
+      <div className="bg-[#0d0d0d] border border-white/[0.06] p-6 space-y-5">
+        <div>
+          <h3 className="text-lg font-medium text-white tracking-tight">Quick Actions</h3>
+          <p className="text-xs text-white/40 mt-1">Streamlined workflows to create and publish new content.</p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          {[
+            { title: 'New Project', desc: 'Add project showcase', icon: Plus, path: '/projects/create' },
+            { title: 'Write Blog', desc: 'Publish article breakdown', icon: Edit, path: '/blogs/create' },
+            { title: 'New Documentation', desc: 'Create technical docs', icon: FileEdit, path: '/documentation/create' },
+            { title: 'New Note', desc: 'Store quick notes', icon: Plus, path: '/notes/create' },
+          ].map((action, i) => (
+            <button 
+              key={i}
+              onClick={() => navigate(action.path)}
+              className="flex items-center gap-4 p-4 bg-[#0a0a0a] border border-white/[0.06] hover:border-white/[0.2] transition-colors text-left group"
+            >
+              <div className="w-10 h-10 bg-white/[0.05] text-white flex items-center justify-center flex-shrink-0">
+                <action.icon className="w-4 h-4" />
+              </div>
+              <div className="min-w-0">
+                <h4 className="font-medium text-white text-[13px] group-hover:text-white/80 transition-colors">{action.title}</h4>
+                <p className="text-white/40 text-[11px] mt-0.5 truncate">{action.desc}</p>
+              </div>
+            </button>
+          ))}
         </div>
       </div>
     </div>

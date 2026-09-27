@@ -5,6 +5,29 @@
 @source "../src";
 @import "tw-animate-css";
 
+/* Add TipTap editor styles */
+.ProseMirror {
+  outline: none;
+}
+
+.ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  color: #adb5bd;
+  pointer-events: none;
+  height: 0;
+}
+
+/* AI Suggestion Overlay Styles */
+.ai-suggestion-overlay {
+  position: absolute;
+  top: 48px;
+  left: 0;
+  right: 0;
+  pointer-events: none;
+  z-index: 20;
+}
+
 
 
 @custom-variant dark (&:is(.dark *));
@@ -271,4 +294,42 @@
     color: oklch(0.42 0.012 70);
     margin-bottom: 3px;
   }
+}
+
+/* Fix Excalidraw huge SVG icons caused by Tailwind preflight */
+/* Tailwind sets svg { display: block; max-width: 100%; } globally
+   which causes Excalidraw's toolbar icons to fill the entire canvas */
+.excalidraw svg,
+.excalidraw .App-toolbar svg,
+.excalidraw .ToolIcon svg,
+.excalidraw button svg,
+.excalidraw label svg,
+.excalidraw .layer-ui__wrapper svg,
+.excalidraw .popover svg,
+.excalidraw .context-menu svg {
+  display: inline !important;
+  max-width: none !important;
+  width: auto !important;
+  height: auto !important;
+}
+
+/* Custom Premium Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.02);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.15) transparent;
 }

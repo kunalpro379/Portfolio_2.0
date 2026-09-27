@@ -15,13 +15,25 @@ await dbConnection.connect();
 // Get configured Express app using singleton
 const app = serverConfig.getApp();
 
+// Import new modular architecture & security middlewares
+import appsRouter from './apps/index.js';
+import { encryptResponse } from './middlewares/encryption.middleware.js';
+import { errorHandler } from './middlewares/error.middleware.js';
+import { attachEC2WebSocket } from './apps/ec2/ec2.ws.js';
+
+// Apply global encryption guardrail
+app.use(encryptResponse);
+
+// Register the new modular App architecture under /api/apps
+app.use('/api/apps', appsRouter);
+console.log('✓ Modular App routes registered at /api/apps');
+
 // Load routes
 async function loadRoutes() {
   try {
     const { default: authRoutes } = await import('./routes/auth.js');
     const { default: notesRoutes } = await import('./routes/notes.js');
     const { default: guideNotesRoutes } = await import('./routes/guide-notes.js');
-    const { default: codeRoutes } = await import('./routes/code.js');
     const { default: projectsRoutes } = await import('./routes/projects.js');
     const { default: todosRoutes } = await import('./routes/todos.js');
     const { default: diaryRoutes } = await import('./routes/diary.js');
@@ -29,11 +41,11 @@ async function loadRoutes() {
     const { default: documentationRoutes } = await import('./routes/documentation.js');
     const { default: dsaRoutes } = await import('./routes/dsa.js');
     const { default: healthRoutes } = await import('./routes/health.js');
+    const { default: premiumNotesRoutes } = await import('./routes/premium-notes.js');
     
     app.use('/api/auth', authRoutes);
     app.use('/api/notes', notesRoutes);
     app.use('/api/guide-notes', guideNotesRoutes);
-    app.use('/api/code', codeRoutes);
     app.use('/api/projects', projectsRoutes);
     app.use('/api/todos', todosRoutes);
     app.use('/api/diary', diaryRoutes);
@@ -41,6 +53,7 @@ async function loadRoutes() {
     app.use('/api/documentation', documentationRoutes);
     app.use('/api/dsa', dsaRoutes);
     app.use('/api/health', healthRoutes);
+    app.use('/api/premium-notes', premiumNotesRoutes);
 
     // Load AI Chat routes with error handling
     try {
@@ -216,8 +229,16 @@ app.post('/api/notes/files/upload/chunk/test', (req, res) => {
   res.json({ message: 'Test route works', received: true });
 });
 
+// Global Error Handling Guardrail
+app.use(errorHandler);
+
 // Start server using singleton pattern
-await serverConfig.startServer(CONFIG.SERVER.PORT);
+const httpServer = await serverConfig.startServer(CONFIG.SERVER.PORT);
+
+// Attach EC2 WebSocket terminal handler to the raw http.Server
+if (httpServer) {
+  attachEC2WebSocket(httpServer);
+}
 
 // Export app for Vercel serverless functions
 export default app;

@@ -1,6 +1,5 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
-
 const passwordSchema = new mongoose.Schema({
   key: {
     type: String,
@@ -17,8 +16,6 @@ const passwordSchema = new mongoose.Schema({
     default: Date.now
   }
 });
-
-// Static method to verify password
 passwordSchema.statics.verifyPassword = async function(key, plainPassword) {
   try {
     const passwordDoc = await this.findOne({ key });
@@ -31,26 +28,20 @@ passwordSchema.statics.verifyPassword = async function(key, plainPassword) {
     return false;
   }
 };
-
-// Static method to set/update password
 passwordSchema.statics.setPassword = async function(key, plainPassword) {
   try {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(plainPassword, salt);
-    
     await this.findOneAndUpdate(
       { key },
       { hashedPassword, updatedAt: new Date() },
       { upsert: true, new: true }
     );
-    
     return true;
   } catch (error) {
     console.error('Password set error:', error);
     return false;
   }
 };
-
 const Password = mongoose.model('Password', passwordSchema);
-
 export default Password;

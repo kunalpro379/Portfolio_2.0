@@ -154,10 +154,10 @@ export default function CodeEditor() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-        <div className="text-center">
-          <img src="/loading.gif" alt="Loading" className="w-12 h-12 object-contain mx-auto mb-4" />
-          <p className="text-white font-bold">Loading file</p>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center space-y-3">
+          <img src="/loading.gif" alt="Loading" className="w-10 h-10 object-contain mx-auto opacity-80" />
+          <p className="text-ink font-display text-sm">Loading code editor...</p>
         </div>
       </div>
     );
@@ -165,14 +165,14 @@ export default function CodeEditor() {
 
   if (!file) {
     return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-white text-xl font-bold mb-4">File not found</p>
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <div className="text-center space-y-4">
+          <p className="text-ink text-xl font-display">File not found</p>
           <button
             onClick={() => navigate('/code')}
-            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
+            className="px-4 py-2 bg-accent text-accent-contrast rounded-xl text-xs font-semibold hover:bg-accent-hover transition shadow-sm"
           >
-            Back to Code
+            Back to Code Workspace
           </button>
         </div>
       </div>
@@ -180,31 +180,31 @@ export default function CodeEditor() {
   }
 
   return (
-    <div className="h-screen bg-[#1E1E1E] flex flex-col overflow-hidden">
+    <div className="h-screen bg-background flex flex-col overflow-hidden">
       {/* Header */}
-      <div className="bg-[#2D2D30] border-b border-[#3E3E42] px-4 py-3 flex items-center justify-between flex-shrink-0">
+      <div className="bg-card border-b border-border px-5 py-3.5 flex items-center justify-between flex-shrink-0 shadow-xs">
         <div className="flex items-center gap-4">
           <button
             onClick={() => navigate('/code')}
-            className="flex items-center gap-2 text-[#CCCCCC] hover:text-white transition-colors px-3 py-1.5 rounded-md hover:bg-[#3E3E42]"
+            className="flex items-center gap-2 text-ink-muted hover:text-ink transition-colors px-3 py-1.5 rounded-xl border border-border bg-surface text-xs font-semibold"
           >
-            <ArrowLeft className="w-4 h-4" strokeWidth={2.5} />
-            <span className="font-medium">Back to Code</span>
+            <ArrowLeft className="w-4 h-4" />
+            <span>Back</span>
           </button>
           
           <div className="flex items-center gap-3">
-            <FileText className="w-5 h-5 text-[#4FC1FF]" strokeWidth={2.5} />
+            <FileText className="w-5 h-5 text-accent" />
             <div>
-              <h1 className="text-white font-bold text-lg">{file.filename}</h1>
-              <div className="flex items-center gap-3 text-sm text-[#CCCCCC]">
-                <div className="flex items-center gap-1">
-                  <Folder className="w-3 h-3" strokeWidth={2.5} />
+              <h1 className="text-ink font-display text-base leading-tight">{file.filename}</h1>
+              <div className="flex items-center gap-3 text-xs text-ink-muted mt-0.5">
+                <div className="flex items-center gap-1 font-mono">
+                  <Folder className="w-3 h-3 text-accent" />
                   <span>{file.folderPath}</span>
                 </div>
-                <span className={`px-2 py-0.5 text-xs font-bold border rounded ${getLanguageColor(file.language)}`}>
+                <span className="px-2 py-0.5 text-[10px] font-mono font-semibold uppercase tracking-wider bg-surface border border-border text-ink rounded-md">
                   {file.language}
                 </span>
-                <span>{formatFileSize(file.size)}</span>
+                <span className="font-mono">{formatFileSize(file.size)}</span>
               </div>
             </div>
           </div>
@@ -212,40 +212,38 @@ export default function CodeEditor() {
 
         <div className="flex items-center gap-4">
           {hasUnsavedChanges && (
-            <div className="flex items-center gap-2 text-[#FFCC02]">
-              <div className="w-2 h-2 bg-[#FFCC02] rounded-full animate-pulse"></div>
-              <span className="text-sm font-medium">Unsaved changes</span>
+            <div className="flex items-center gap-2 text-amber-700 bg-amber-50 border border-amber-200/60 px-2.5 py-1 rounded-lg text-xs font-medium">
+              <div className="w-1.5 h-1.5 bg-amber-500 rounded-full animate-pulse"></div>
+              <span>Unsaved changes</span>
             </div>
           )}
           
           {lastSaved && (
-            <div className="flex items-center gap-2 text-[#CCCCCC] text-sm">
-              <Clock className="w-3 h-3" strokeWidth={2.5} />
+            <div className="flex items-center gap-1.5 text-ink-muted text-xs font-mono">
+              <Clock className="w-3.5 h-3.5" />
               <span>Saved {lastSaved.toLocaleTimeString()}</span>
             </div>
           )}
 
-          {/* Status info moved from editor footer */}
-          <div className="flex items-center gap-4 text-[#CCCCCC] text-sm">
+          <div className="hidden md:flex items-center gap-3 text-ink-muted text-xs font-mono border-l border-border pl-4">
             <span>Ln {content.split('\n').length}, Col 1</span>
             <span>UTF-8</span>
             <span>{content.split('\n').length} lines</span>
-            <span>{content.length} chars</span>
           </div>
 
           <button
             onClick={saveFile}
             disabled={saving || !hasUnsavedChanges}
-            className="flex items-center gap-2 px-4 py-2 bg-[#0E639C] text-white rounded-md hover:bg-[#1177BB] transition disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+            className="flex items-center gap-2 px-4 py-2 bg-accent text-accent-contrast rounded-xl hover:bg-accent-hover transition disabled:opacity-50 disabled:cursor-not-allowed text-xs font-semibold shadow-sm"
           >
-            <Save className="w-4 h-4" strokeWidth={2.5} />
-            <span>{saving ? 'Saving...' : 'Save'}</span>
+            <Save className="w-4 h-4" />
+            <span>{saving ? 'Saving...' : 'Save File'}</span>
           </button>
         </div>
       </div>
 
       {/* Editor - Takes remaining screen height */}
-      <div className="flex-1 min-h-0">
+      <div className="flex-1 min-h-0 bg-[#1E1E1E]">
         <ProfessionalCodeEditor
           value={content}
           onChange={handleContentChange}

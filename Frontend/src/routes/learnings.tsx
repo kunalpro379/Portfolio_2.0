@@ -2,11 +2,10 @@ import { createFileRoute, Outlet, useMatches } from "@tanstack/react-router";
 import { useState } from "react";
 import { Header } from "@/components/learnings/Header";
 import { BlogsView } from "@/components/learnings/BlogsView";
-import { DiaryView } from "@/components/learnings/DiaryView";
+import { PremiumNotesView } from "@/components/learnings/PremiumNotesView";
 import { ArchitectureView } from "@/components/learnings/ArchitectureView";
 import { CodeView } from "@/components/learnings/CodeView";
 import { DocsView } from "@/components/learnings/DocsView";
-import { GuideView } from "@/components/learnings/GuideView";
 import { FilesView } from "@/components/learnings/FilesView";
 import { ProjectsView } from "@/components/learnings/ProjectsView";
 import { ComingSoonView } from "@/components/learnings/ComingSoonView";
@@ -16,7 +15,6 @@ export const Route = createFileRoute("/learnings")({ component: LearningsPage })
 const tabs = [
   { label: "Blogs", value: "blogs", bold: true },
   { label: "Docs", value: "docs" },
-  { label: "Guide", value: "guide" },
   { label: "Files", value: "files" },
   { label: "Diary", value: "diary" },
   { label: "Code", value: "code" },
@@ -33,11 +31,11 @@ function LearningsPage() {
   });
   const matches = useMatches();
   
-  const isDiaryTab = activeTab === "diary";
+  const isFullViewTab = activeTab === "diary" || activeTab === "code" || activeTab === "files";
   
   // Check if we're on a child route
-  const isOnChildRoute = matches.some(match => 
-    match.routeId === '/learnings/files/$folderId' || 
+  const isOnChildRoute = matches.some(match =>
+    match.routeId === '/learnings/files/$folderId' ||
     match.routeId === '/learnings/blogs/$blogId' ||
     match.routeId === '/learnings/docs/$docId' ||
     match.routeId === '/learnings/blogs/create' ||
@@ -45,13 +43,9 @@ function LearningsPage() {
     match.routeId === '/learnings/docs/create' ||
     match.routeId === '/learnings/docs/$docId/edit'
   );
-  
-  console.log('LearningsPage - matches:', matches.map(m => m.routeId));
-  console.log('LearningsPage - isOnChildRoute:', isOnChildRoute);
-  
+
   // If on child route, just render the outlet
   if (isOnChildRoute) {
-    console.log('Rendering Outlet for child route');
     return <Outlet />;
   }
 
@@ -68,12 +62,10 @@ function LearningsPage() {
         return <DocsView search={search} />;
       case "projects":
         return <ProjectsView search={search} />;
-      case "guide":
-        return <GuideView search={search} />;
       case "files":
-        return <FilesView search={search} />;
+        return <FilesView search={search} setSearch={setSearch} />;
       case "diary":
-        return <DiaryView />;
+        return <PremiumNotesView />;
       case "code":
         return <CodeView search={search} />;
       case "architectures":
@@ -84,34 +76,42 @@ function LearningsPage() {
   };
 
   return (
-    <main className={isDiaryTab ? "flex h-screen flex-col overflow-hidden" : "min-h-screen"}>
+    <main 
+      className={isFullViewTab ? "flex h-screen flex-col overflow-hidden" : "min-h-screen"}
+      style={{ 
+        backgroundImage: "linear-gradient(rgba(255, 255, 255, 0.4), rgba(209, 213, 219, 0.5)), url('/page5.png')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundAttachment: "fixed"
+      }}
+    >
       <Header activeTab={activeTab} onTabChange={setActiveTab} tabs={tabs} />
-      {isDiaryTab ? (
-        <div className="h-full min-h-0 overflow-hidden px-0 py-0 lg:px-3">
+      {isFullViewTab ? (
+        <div className="h-full w-full min-h-0 overflow-hidden px-0 py-0">
           {renderContent()}
         </div>
       ) : (
-        <div className="page-container py-2 sm:py-3">
-          <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-            <h1 className="font-display text-[1.75rem] font-bold leading-tight text-[#8B4513] sm:text-[3.5rem]">
+        <div className={`page-container py-4 sm:py-6 ${activeTab === "files" ? "flex flex-col h-[calc(100vh-60px)]" : ""}`}>
+          <div className="mb-4 sm:mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between shrink-0">
+            <h1 className="text-2xl font-semibold tracking-tight text-gray-900 sm:text-3xl">
               {getActiveLabel()}
             </h1>
 
-            <div className="relative w-full sm:max-w-2xl sm:flex-1">
-              <svg className="absolute left-5 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-black/55" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="relative w-full sm:max-w-md">
+              <svg className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
               <input
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search blogs, docs, guides..."
-                className="h-10 w-full rounded-full border-2 border-black bg-white pl-11 pr-4 text-[12px] font-medium text-black placeholder:text-black/35 transition-all focus:outline-none focus:ring-0 hover:shadow-[3px_3px_0_0_rgba(0,0,0,0.08)] sm:h-12 sm:pl-14 sm:pr-5 sm:text-[14px]"
+                placeholder="Search..."
+                className="h-9 w-full rounded-md border border-gray-200 bg-gray-50 pl-9 pr-4 text-sm font-medium text-gray-900 placeholder:text-gray-500 transition-colors focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 shadow-sm"
               />
             </div>
           </div>
 
-          <div className="mt-6">
+          <div className={`mt-2 sm:mt-4 ${activeTab === "files" ? "flex-1 min-h-0" : ""}`}>
             {renderContent()}
           </div>
         </div>

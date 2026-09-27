@@ -100,194 +100,200 @@ export default function Views() {
   }
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-4xl font-black text-black mb-2" style={{ fontFamily: 'Comic Sans MS, cursive' }}>
-              Visitor Analytics
-            </h1>
-            <p className="text-gray-600 font-medium">Track and analyze your website visitors</p>
+    <div className="max-w-7xl mx-auto space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-card border border-border rounded-xl p-6 shadow-sm">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-display font-bold text-foreground tracking-tight">
+            Visitor Analytics
+          </h1>
+          <p className="text-muted-foreground text-sm mt-0.5">Track and analyze your website traffic and user engagement</p>
+        </div>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={handleRefresh}
+            className="flex items-center gap-2 px-4 py-2 bg-cream-soft hover:bg-cream-deep border border-border rounded-lg font-semibold text-foreground text-sm transition shadow-sm"
+          >
+            <RefreshCw className="w-4 h-4 text-accent" />
+            Refresh
+          </button>
+          <button
+            onClick={handleClearAll}
+            className="flex items-center gap-2 px-4 py-2 bg-destructive/10 hover:bg-destructive/20 text-destructive border border-destructive/30 rounded-lg font-semibold text-sm transition"
+          >
+            <Trash2 className="w-4 h-4" />
+            Clear All
+          </button>
+        </div>
+      </div>
+
+      {/* Stats Cards */}
+      {stats && (
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="bg-card border border-border rounded-xl p-5 shadow-sm">
+            <div className="flex items-center justify-between mb-3">
+              <span className="label-mono text-xs uppercase text-muted-foreground font-semibold">Total Views</span>
+              <div className="w-8 h-8 rounded-lg bg-accent/15 text-accent flex items-center justify-center">
+                <Eye className="w-4 h-4" />
+              </div>
+            </div>
+            <p className="text-2xl sm:text-4xl font-display font-bold text-foreground">{stats.total.toLocaleString()}</p>
           </div>
-          <div className="flex gap-3">
-            <button
-              onClick={handleRefresh}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-200 border-3 border-black rounded-xl font-bold hover:bg-blue-300 transition shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
-            >
-              <RefreshCw className="w-5 h-5" strokeWidth={2.5} />
-              Refresh
-            </button>
-            <button
-              onClick={handleClearAll}
-              className="flex items-center gap-2 px-4 py-2 bg-red-200 border-3 border-black rounded-xl font-bold hover:bg-red-300 transition shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
-            >
-              <Trash2 className="w-5 h-5" strokeWidth={2.5} />
-              Clear All
-            </button>
+
+          <div className="bg-card border border-border rounded-xl p-5 shadow-sm">
+            <div className="flex items-center justify-between mb-3">
+              <span className="label-mono text-xs uppercase text-muted-foreground font-semibold">Unique Visitors</span>
+              <div className="w-8 h-8 rounded-lg bg-emerald-500/15 text-emerald-700 flex items-center justify-center">
+                <Globe className="w-4 h-4" />
+              </div>
+            </div>
+            <p className="text-2xl sm:text-4xl font-display font-bold text-foreground">{stats.uniqueVisitors.toLocaleString()}</p>
+          </div>
+
+          <div className="bg-card border border-border rounded-xl p-5 shadow-sm">
+            <div className="flex items-center justify-between mb-3">
+              <span className="label-mono text-xs uppercase text-muted-foreground font-semibold">Last 24 Hours</span>
+              <div className="w-8 h-8 rounded-lg bg-amber-500/15 text-amber-700 flex items-center justify-center">
+                <span className="label-mono text-xs font-bold">24h</span>
+              </div>
+            </div>
+            <p className="text-2xl sm:text-4xl font-display font-bold text-foreground">{stats.last24h.toLocaleString()}</p>
+          </div>
+
+          <div className="bg-card border border-border rounded-xl p-5 shadow-sm">
+            <div className="flex items-center justify-between mb-3">
+              <span className="label-mono text-xs uppercase text-muted-foreground font-semibold">Last 7 Days</span>
+              <div className="w-8 h-8 rounded-lg bg-indigo-500/15 text-indigo-700 flex items-center justify-center">
+                <span className="label-mono text-xs font-bold">7d</span>
+              </div>
+            </div>
+            <p className="text-2xl sm:text-4xl font-display font-bold text-foreground">{stats.last7days.toLocaleString()}</p>
           </div>
         </div>
+      )}
 
-        {/* Stats Cards */}
-        {stats && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-            <div className="bg-gradient-to-br from-blue-200 to-blue-100 border-4 border-black rounded-2xl p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-              <div className="flex items-center justify-between mb-2">
-                <Eye className="w-8 h-8" strokeWidth={2.5} />
-                <span className="text-3xl font-black">{stats.total.toLocaleString()}</span>
-              </div>
-              <p className="text-sm font-bold uppercase">Total Views</p>
-            </div>
-
-            <div className="bg-gradient-to-br from-green-200 to-green-100 border-4 border-black rounded-2xl p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-              <div className="flex items-center justify-between mb-2">
-                <Globe className="w-8 h-8" strokeWidth={2.5} />
-                <span className="text-3xl font-black">{stats.uniqueVisitors.toLocaleString()}</span>
-              </div>
-              <p className="text-sm font-bold uppercase">Unique Visitors</p>
-            </div>
-
-            <div className="bg-gradient-to-br from-purple-200 to-purple-100 border-4 border-black rounded-2xl p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-2xl font-black">24h</span>
-                <span className="text-3xl font-black">{stats.last24h.toLocaleString()}</span>
-              </div>
-              <p className="text-sm font-bold uppercase">Last 24 Hours</p>
-            </div>
-
-            <div className="bg-gradient-to-br from-yellow-200 to-yellow-100 border-4 border-black rounded-2xl p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-2xl font-black">7d</span>
-                <span className="text-3xl font-black">{stats.last7days.toLocaleString()}</span>
-              </div>
-              <p className="text-sm font-bold uppercase">Last 7 Days</p>
+      {/* Top Pages & Device Stats */}
+      {stats && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Top Pages */}
+          <div className="bg-card border border-border rounded-xl p-6 shadow-sm">
+            <h3 className="text-lg font-display font-bold text-foreground mb-4">Top Pages</h3>
+            <div className="space-y-2">
+              {stats.topPages.map((p, idx) => (
+                <div key={idx} className="flex items-center justify-between p-3 bg-background border border-border rounded-lg">
+                  <span className="label-mono font-medium text-xs sm:text-sm text-foreground truncate flex-1">{p._id}</span>
+                  <span className="px-2.5 py-1 bg-accent/15 text-accent border border-accent/20 rounded label-mono text-xs font-bold ml-2">
+                    {p.count}
+                  </span>
+                </div>
+              ))}
             </div>
           </div>
-        )}
 
-        {/* Top Pages & Device Stats */}
-        {stats && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            {/* Top Pages */}
-            <div className="bg-white border-4 border-black rounded-2xl p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-              <h3 className="text-xl font-black mb-4">Top Pages</h3>
-              <div className="space-y-2">
-                {stats.topPages.map((page, idx) => (
-                  <div key={idx} className="flex items-center justify-between p-3 bg-gray-50 border-2 border-black rounded-lg">
-                    <span className="font-bold text-sm truncate flex-1">{page._id}</span>
-                    <span className="px-3 py-1 bg-blue-200 border-2 border-black rounded-lg text-sm font-black">
-                      {page.count}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Device & Browser Stats */}
-            <div className="bg-white border-4 border-black rounded-2xl p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-              <h3 className="text-xl font-black mb-4">Devices & Browsers</h3>
-              <div className="space-y-4">
-                <div>
-                  <p className="text-sm font-bold uppercase mb-2">Devices</p>
-                  <div className="space-y-2">
-                    {stats.deviceStats.map((device, idx) => (
-                      <div key={idx} className="flex items-center justify-between p-2 bg-gray-50 border-2 border-black rounded-lg">
-                        <div className="flex items-center gap-2">
-                          {getDeviceIcon(device._id)}
-                          <span className="font-bold text-sm">{device._id}</span>
-                        </div>
-                        <span className="px-2 py-1 bg-green-200 border-2 border-black rounded text-xs font-black">
-                          {device.count}
-                        </span>
+          {/* Device & Browser Stats */}
+          <div className="bg-card border border-border rounded-xl p-6 shadow-sm">
+            <h3 className="text-lg font-display font-bold text-foreground mb-4">Devices & Browsers</h3>
+            <div className="space-y-5">
+              <div>
+                <p className="label-mono text-xs uppercase text-muted-foreground font-semibold mb-2.5">Devices</p>
+                <div className="space-y-2">
+                  {stats.deviceStats.map((device, idx) => (
+                    <div key={idx} className="flex items-center justify-between p-2.5 bg-background border border-border rounded-lg">
+                      <div className="flex items-center gap-2.5 text-foreground">
+                        {getDeviceIcon(device._id)}
+                        <span className="font-medium text-sm">{device._id}</span>
                       </div>
-                    ))}
-                  </div>
+                      <span className="px-2 py-0.5 bg-cream-deep border border-border rounded label-mono text-xs font-bold text-foreground">
+                        {device.count}
+                      </span>
+                    </div>
+                  ))}
                 </div>
+              </div>
 
-                <div>
-                  <p className="text-sm font-bold uppercase mb-2">Browsers</p>
-                  <div className="space-y-2">
-                    {stats.browserStats.map((browser, idx) => (
-                      <div key={idx} className="flex items-center justify-between p-2 bg-gray-50 border-2 border-black rounded-lg">
-                        <span className="font-bold text-sm">{browser._id}</span>
-                        <span className="px-2 py-1 bg-purple-200 border-2 border-black rounded text-xs font-black">
-                          {browser.count}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
+              <div>
+                <p className="label-mono text-xs uppercase text-muted-foreground font-semibold mb-2.5">Browsers</p>
+                <div className="space-y-2">
+                  {stats.browserStats.map((browser, idx) => (
+                    <div key={idx} className="flex items-center justify-between p-2.5 bg-background border border-border rounded-lg">
+                      <span className="font-medium text-sm text-foreground">{browser._id}</span>
+                      <span className="px-2 py-0.5 bg-cream-deep border border-border rounded label-mono text-xs font-bold text-foreground">
+                        {browser.count}
+                      </span>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
           </div>
-        )}
+        </div>
+      )}
 
-        {/* Views Table */}
-        <div className="bg-white border-4 border-black rounded-2xl overflow-hidden shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-black text-white">
-                <tr>
-                  <th className="px-4 py-3 text-left text-sm font-black uppercase">Time</th>
-                  <th className="px-4 py-3 text-left text-sm font-black uppercase">IP Address</th>
-                  <th className="px-4 py-3 text-left text-sm font-black uppercase">Path</th>
-                  <th className="px-4 py-3 text-left text-sm font-black uppercase">Device</th>
-                  <th className="px-4 py-3 text-left text-sm font-black uppercase">Browser</th>
-                  <th className="px-4 py-3 text-left text-sm font-black uppercase">Referrer</th>
+      {/* Views Table */}
+      <div className="bg-card border border-border rounded-xl overflow-hidden shadow-sm">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left">
+            <thead className="bg-cream-deep border-b border-border text-foreground">
+              <tr>
+                <th className="px-4 py-3 text-xs font-bold label-mono uppercase">Time</th>
+                <th className="px-4 py-3 text-xs font-bold label-mono uppercase">IP Address</th>
+                <th className="px-4 py-3 text-xs font-bold label-mono uppercase">Path</th>
+                <th className="px-4 py-3 text-xs font-bold label-mono uppercase">Device</th>
+                <th className="px-4 py-3 text-xs font-bold label-mono uppercase">Browser</th>
+                <th className="px-4 py-3 text-xs font-bold label-mono uppercase">Referrer</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border">
+              {views.map((view) => (
+                <tr key={view.viewId} className="hover:bg-cream-soft transition-colors">
+                  <td className="px-4 py-3 text-xs label-mono text-muted-foreground whitespace-nowrap">
+                    {new Date(view.timestamp).toLocaleString('en-US', {
+                      month: 'short',
+                      day: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    })}
+                  </td>
+                  <td className="px-4 py-3 text-xs label-mono font-semibold text-foreground whitespace-nowrap">{view.ipAddress}</td>
+                  <td className="px-4 py-3 text-xs label-mono font-medium text-foreground">{view.path}</td>
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-2 text-xs text-foreground">
+                      {getDeviceIcon(view.device)}
+                      <span>{view.device}</span>
+                    </div>
+                  </td>
+                  <td className="px-4 py-3 text-xs text-foreground">{view.browser}</td>
+                  <td className="px-4 py-3 text-xs text-muted-foreground truncate max-w-xs">
+                    {view.referrer || '-'}
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {views.map((view, idx) => (
-                  <tr key={view.viewId} className={idx % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
-                    <td className="px-4 py-3 text-sm font-medium">
-                      {new Date(view.timestamp).toLocaleString('en-US', {
-                        month: 'short',
-                        day: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                      })}
-                    </td>
-                    <td className="px-4 py-3 text-sm font-bold">{view.ipAddress}</td>
-                    <td className="px-4 py-3 text-sm font-medium">{view.path}</td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-2">
-                        {getDeviceIcon(view.device)}
-                        <span className="text-sm font-medium">{view.device}</span>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3 text-sm font-medium">{view.browser}</td>
-                    <td className="px-4 py-3 text-sm font-medium truncate max-w-xs">
-                      {view.referrer || '-'}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="border-t-4 border-black p-4 flex items-center justify-between">
-              <button
-                onClick={() => setPage(p => Math.max(1, p - 1))}
-                disabled={page === 1}
-                className="px-4 py-2 bg-gray-200 border-3 border-black rounded-lg font-bold hover:bg-gray-300 transition disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Previous
-              </button>
-              <span className="font-bold">
-                Page {page} of {totalPages}
-              </span>
-              <button
-                onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-                disabled={page === totalPages}
-                className="px-4 py-2 bg-gray-200 border-3 border-black rounded-lg font-bold hover:bg-gray-300 transition disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Next
-              </button>
-            </div>
-          )}
+              ))}
+            </tbody>
+          </table>
         </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="border-t border-border p-4 flex items-center justify-between">
+            <button
+              onClick={() => setPage(p => Math.max(1, p - 1))}
+              disabled={page === 1}
+              className="px-3.5 py-1.5 bg-background border border-border rounded-md text-xs font-semibold text-foreground hover:bg-cream-soft transition disabled:opacity-40"
+            >
+              Previous
+            </button>
+            <span className="label-mono text-xs text-muted-foreground font-medium">
+              Page {page} of {totalPages}
+            </span>
+            <button
+              onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+              disabled={page === totalPages}
+              className="px-3.5 py-1.5 bg-background border border-border rounded-md text-xs font-semibold text-foreground hover:bg-cream-soft transition disabled:opacity-40"
+            >
+              Next
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

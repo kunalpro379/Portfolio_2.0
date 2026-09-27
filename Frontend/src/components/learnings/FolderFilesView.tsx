@@ -68,6 +68,27 @@ function getFileIcon(filename: string, fileType: string) {
   return File;
 }
 
+function IframePreviewWithLoader({ url, filename }: { url: string; filename: string }) {
+  const [isLoading, setIsLoading] = useState(true);
+
+  return (
+    <div className="h-full w-full relative bg-[#FFF8F0]">
+      {isLoading && (
+        <div className="absolute inset-0 flex items-center justify-center z-10 bg-[#FFF8F0]">
+          <PremiumLoader />
+          <span className="ml-3 text-sm font-medium text-black/60 tracking-wide">Loading {filename}...</span>
+        </div>
+      )}
+      <iframe 
+        src={url} 
+        className={`h-full w-full border-0 absolute inset-0 transition-opacity duration-300 ${isLoading ? 'opacity-0 z-0' : 'opacity-100 z-20'}`}
+        title={filename}
+        onLoad={() => setIsLoading(false)}
+      />
+    </div>
+  );
+}
+
 export function FolderFilesView({ folderId }: FolderFilesViewProps) {
   const navigate = useNavigate();
   const [selectedFileId, setSelectedFileId] = useState<string | null>(null);
@@ -131,32 +152,40 @@ export function FolderFilesView({ folderId }: FolderFilesViewProps) {
 
     if (fileType?.startsWith("image/")) {
       return (
-        <div className="h-full overflow-auto p-4 sm:p-6">
-          <img src={cloudinaryUrl} alt={filename} className="mx-auto max-w-full" />
+        <div className="h-full overflow-auto p-4 sm:p-6 flex items-center justify-center">
+          <img src={cloudinaryUrl} alt={filename} className="max-h-full max-w-full rounded shadow-sm" />
         </div>
-      );
-    }
-
-    if (fileType === "application/pdf") {
-      return (
-        <iframe src={cloudinaryUrl} className="h-full w-full border-0" title={filename} />
       );
     }
 
     if (fileType?.startsWith("video/")) {
       return (
-        <div className="flex h-full items-center justify-center p-6">
-          <video controls className="max-h-full max-w-full">
+        <div className="flex h-full items-center justify-center p-6 bg-black">
+          <video controls className="max-h-full max-w-full rounded">
             <source src={cloudinaryUrl} type={fileType} />
           </video>
         </div>
       );
     }
 
-    if (fileType?.startsWith("text/") || fileType?.includes("json")) {
-      return (
-        <iframe src={cloudinaryUrl} className="h-full w-full border-0" title={filename} />
-      );
+    const isOfficeDoc = 
+      filename.toLowerCase().match(/\.(doc|docx|xls|xlsx|ppt|pptx)$/) || 
+      fileType?.includes("msword") || 
+      fileType?.includes("presentation") || 
+      fileType?.includes("spreadsheet") ||
+      fileType?.includes("officedocument");
+
+    const isPdf = fileType === "application/pdf" || filename.toLowerCase().endsWith(".pdf");
+    const isText = fileType?.startsWith("text/") || fileType?.includes("json");
+
+    if (isOfficeDoc || isPdf || isText) {
+      let embedUrl = cloudinaryUrl;
+      
+      if (isOfficeDoc) {
+        embedUrl = `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(cloudinaryUrl)}`;
+      }
+
+      return <IframePreviewWithLoader url={embedUrl} filename={filename} />;
     }
 
     return (

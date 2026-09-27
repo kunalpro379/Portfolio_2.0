@@ -1,6 +1,4 @@
 import mongoose from 'mongoose';
-
-// Document schema (markdown files, diagrams, attachments within a title)
 const documentSchema = new mongoose.Schema({
   documentId: {
     type: String,
@@ -16,13 +14,13 @@ const documentSchema = new mongoose.Schema({
     required: true
   },
   content: {
-    type: String, // Markdown content or diagram data
+    type: String, 
     default: ''
   },
-  fileType: String, // For attachments
-  size: Number, // For attachments
-  azurePath: String, // For attachments
-  azureUrl: String, // For attachments
+  fileType: String, 
+  size: Number, 
+  azurePath: String, 
+  azureUrl: String, 
   createdAt: {
     type: Date,
     default: Date.now
@@ -32,8 +30,6 @@ const documentSchema = new mongoose.Schema({
     default: Date.now
   }
 });
-
-// Title schema (contains multiple documents)
 const titleSchema = new mongoose.Schema({
   titleId: {
     type: String,
@@ -61,8 +57,6 @@ const titleSchema = new mongoose.Schema({
     default: Date.now
   }
 });
-
-// Main Guide schema
 const guideNoteSchema = new mongoose.Schema({
   guideId: {
     type: String,
@@ -97,13 +91,9 @@ const guideNoteSchema = new mongoose.Schema({
     default: Date.now
   }
 });
-
-// Update the updatedAt timestamp before saving
 guideNoteSchema.pre('save', function(next) {
   this.updatedAt = new Date();
   next();
 });
-
 const GuideNote = mongoose.model('GuideNote', guideNoteSchema);
-
 export default GuideNote;

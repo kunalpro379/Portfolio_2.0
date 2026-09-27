@@ -11,16 +11,28 @@ export default function LoadingAnimation({ className = 'w-24 h-24' }: LoadingAni
   useEffect(() => {
     if (!containerRef.current) return;
 
-    const animation = lottie.loadAnimation({
-      container: containerRef.current,
-      renderer: 'svg',
-      loop: true,
-      autoplay: true,
-      path: '/loading.json'
-    });
+    let animation: any = null;
+    let isCancelled = false;
+
+    fetch('/loading.json')
+      .then(res => res.json())
+      .then(data => {
+        if (isCancelled || !containerRef.current) return;
+        animation = lottie.loadAnimation({
+          container: containerRef.current,
+          renderer: 'svg',
+          loop: true,
+          autoplay: true,
+          animationData: data
+        });
+      })
+      .catch(err => console.error('Error loading animation:', err));
 
     return () => {
-      animation.destroy();
+      isCancelled = true;
+      if (animation) {
+        animation.destroy();
+      }
     };
   }, []);
 

@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-
 const sessionSchema = new mongoose.Schema({
   sessionHash: {
     type: String,
@@ -18,8 +17,7 @@ const sessionSchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now,
-    expires: 25200 // TTL: 7 hours (25200 seconds)
+    expires: 25200 
   }
 });
-
 export default mongoose.model('Session', sessionSchema, 'sessions');

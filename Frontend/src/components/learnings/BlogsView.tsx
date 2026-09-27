@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { config } from "@/config/config";
 import { ContentCard } from "./ContentCard";
+import { PremiumLoaderFullScreen } from "./PremiumLoader";
 
 const API_BASE_URL = config.apiUrl;
 
@@ -36,15 +37,8 @@ export function BlogsView({ search }: BlogsViewProps) {
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-2 gap-0 md:grid-cols-3 lg:grid-cols-5">
-        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((i) => (
-          <div key={i} className="animate-pulse">
-            <div className="aspect-[16/10] bg-black/10 mb-4"></div>
-            <div className="h-6 bg-black/10 mb-3 w-3/4"></div>
-            <div className="h-4 bg-black/10 mb-2"></div>
-            <div className="h-4 bg-black/10 w-5/6"></div>
-          </div>
-        ))}
+      <div className="flex-1 flex items-center justify-center min-h-[50vh]">
+        <PremiumLoaderFullScreen />
       </div>
     );
   }

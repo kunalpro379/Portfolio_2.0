@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Save, X, Upload, Trash2, Link as LinkIcon } from 'lucide-react';
-import MDEditor from '@uiw/react-md-editor';
+import { Save, X, Upload, Trash2, Link as LinkIcon, Settings, PenLine, Eye, Layout, Image as ImageIcon } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import config from '../config/config';
 import PageShimmer from '../components/PageShimmer';
 
@@ -20,9 +21,10 @@ export default function EditBlog() {
   const { blogId } = useParams();
   const navigate = useNavigate();
   
-  const [activeTab, setActiveTab] = useState<'metadata' | 'markdown'>('metadata');
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
+  const [showSidebar, setShowSidebar] = useState(false);
+  const [editorMode, setEditorMode] = useState<'split' | 'edit' | 'preview'>('split');
   
   const [title, setTitle] = useState('');
   const [tagline, setTagline] = useState('');
@@ -36,15 +38,33 @@ export default function EditBlog() {
   const [assets, setAssets] = useState<Asset[]>([]);
   const [coverImage, setCoverImage] = useState('');
 
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
   useEffect(() => {
     fetchBlog();
   }, [blogId]);
 
   const fetchBlog = async () => {
     try {
+      const isCreate = window.location.pathname.includes('/create/');
+      if (isCreate) {
+        setTitle('');
+        setLoading(false);
+        return;
+      }
+
       const response = await fetch(config.api.endpoints.blogById(blogId!));
+      if (!response.ok) {
+        if (response.status === 404) {
+          console.warn('Blog not found, initializing empty form');
+          setLoading(false);
+          return;
+        }
+        throw new Error('Failed to fetch');
+      }
+
       const data = await response.json();
-      const blog = data.blog;
+      const blog = data.blog || {};
 
       setTitle(blog.title || '');
       setTagline(blog.tagline || '');
@@ -57,12 +77,13 @@ export default function EditBlog() {
       setAssets(blog.assets || []);
       setCoverImage(blog.coverImage || '');
 
-      // Fetch MD content if exists
       if (blog.mdFiles && blog.mdFiles.length > 0) {
         const mdResponse = await fetch(config.api.endpoints.blogMdContent(blogId!));
-        const mdData = await mdResponse.json();
-        if (mdData.exists) {
-          setMdContent(mdData.content);
+        if (mdResponse.ok) {
+          const mdData = await mdResponse.json();
+          if (mdData.exists) {
+            setMdContent(mdData.content);
+          }
         }
       }
     } catch (error) {
@@ -72,14 +93,8 @@ export default function EditBlog() {
     }
   };
 
-  const addBlogLink = () => {
-    setBlogLinks([...blogLinks, { platform: '', url: '' }]);
-  };
-
-  const removeBlogLink = (index: number) => {
-    setBlogLinks(blogLinks.filter((_, i) => i !== index));
-  };
-
+  const addBlogLink = () => setBlogLinks([...blogLinks, { platform: '', url: '' }]);
+  const removeBlogLink = (index: number) => setBlogLinks(blogLinks.filter((_, i) => i !== index));
   const updateBlogLink = (index: number, field: 'platform' | 'url', value: string) => {
     const newLinks = [...blogLinks];
     newLinks[index][field] = value;
@@ -89,15 +104,10 @@ export default function EditBlog() {
   const handleSave = async () => {
     setUploading(true);
     try {
-      // Update blog metadata
       const updateData = {
-        title,
-        tagline,
-        subject,
-        shortDescription,
+        title, tagline, subject, shortDescription,
         tags: tags.split(',').map(t => t.trim()).filter(t => t),
-        datetime,
-        footer,
+        datetime, footer,
         blogLinks: blogLinks.filter(l => l.platform && l.url)
       };
 
@@ -107,8 +117,7 @@ export default function EditBlog() {
         body: JSON.stringify(updateData)
       });
 
-      // Save MD file if content exists
-      if (mdContent) {
+      if (mdContent !== undefined) {
         let processedContent = mdContent;
         assets.forEach(asset => {
           if (typeof asset !== 'string' && asset.name) {
@@ -142,9 +151,7 @@ export default function EditBlog() {
     setUploading(true);
     try {
       const formData = new FormData();
-      Array.from(files).forEach(file => {
-        formData.append('assets', file);
-      });
+      Array.from(files).forEach(file => formData.append('assets', file));
 
       const response = await fetch(config.api.endpoints.blogAssets(blogId!), {
         method: 'POST',
@@ -186,12 +193,8 @@ export default function EditBlog() {
 
   const deleteAsset = async (index: number) => {
     if (!confirm('Delete this asset?')) return;
-
     try {
-      const response = await fetch(config.api.endpoints.blogAssetByIndex(blogId!, index), {
-        method: 'DELETE'
-      });
-
+      const response = await fetch(config.api.endpoints.blogAssetByIndex(blogId!, index), { method: 'DELETE' });
       if (response.ok) {
         const data = await response.json();
         setAssets(data.blog.assets);
@@ -208,7 +211,6 @@ export default function EditBlog() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: newName })
       });
-
       if (response.ok) {
         const data = await response.json();
         setAssets(data.blog.assets);
@@ -218,359 +220,244 @@ export default function EditBlog() {
     }
   };
 
-  if (loading) {
-    return <PageShimmer />;
-  }
+  const handleTabPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Tab') {
+      e.preventDefault();
+      const start = textareaRef.current!.selectionStart;
+      const end = textareaRef.current!.selectionEnd;
+      setMdContent(mdContent.substring(0, start) + '  ' + mdContent.substring(end));
+      setTimeout(() => {
+        textareaRef.current!.selectionStart = textareaRef.current!.selectionEnd = start + 2;
+      }, 0);
+    }
+  };
+
+  if (loading) return <PageShimmer />;
 
   return (
-    <div className="h-screen overflow-y-auto bg-gray-50">
-      <div className="p-4 md:p-6">
-        {uploading && (
-          <div className="fixed top-0 left-0 right-0 z-50 bg-blue-500 text-white text-center py-3 font-bold">
-            Uploading... Please wait
-          </div>
-        )}
+    <div className="absolute inset-0 flex flex-col bg-[#0a0a0a]/90 backdrop-blur-md text-white overflow-hidden z-10">
+      {uploading && (
+        <div className="absolute top-0 left-0 right-0 z-[100] h-1 bg-white/10 overflow-hidden">
+          <div className="h-full bg-white animate-pulse" style={{ width: '100%' }} />
+        </div>
+      )}
 
-        <div className="max-w-[1800px] mx-auto">
-        {/* Header */}
-        <div className="bg-white border-4 border-black rounded-2xl p-4 md:p-6 mb-4 md:mb-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-            <div>
-              <h1 className="text-2xl md:text-3xl font-black text-black mb-2" style={{ fontFamily: 'Comic Sans MS, cursive' }}>
-                Edit Blog
-              </h1>
-              <p className="text-sm md:text-base text-gray-600 font-medium">
-                Blog ID: <span className="font-black text-black">{blogId}</span>
-              </p>
-            </div>
-            <div className="flex gap-2 md:gap-3 w-full sm:w-auto">
-              <button
-                onClick={() => navigate('/blogs')}
-                className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 md:px-5 py-2 md:py-3 bg-white border-3 border-black rounded-xl font-bold hover:bg-gray-50 transition shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] text-sm md:text-base"
-              >
-                <X className="w-4 h-4 md:w-5 md:h-5" strokeWidth={2.5} />
-                Cancel
-              </button>
-              <button
-                onClick={handleSave}
-                disabled={uploading}
-                className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 md:px-6 py-2 md:py-3 bg-black text-white border-3 border-black rounded-xl font-bold hover:bg-gray-800 transition shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] disabled:opacity-50 text-sm md:text-base"
-              >
-                <Save className="w-4 h-4 md:w-5 md:h-5" strokeWidth={2.5} />
-                Save Changes
-              </button>
-            </div>
+      {/* Editor Topbar */}
+      <div className="flex-shrink-0 h-14 bg-[#0d0d0d] border-b border-white/[0.06] flex items-center justify-between px-4 sm:px-6">
+        <div className="flex items-center gap-4">
+          <button 
+            onClick={() => navigate('/blogs')}
+            className="p-1.5 rounded text-white/60 hover:text-white hover:bg-white/[0.05] transition"
+          >
+            <X className="w-5 h-5" />
+          </button>
+          <div className="h-4 w-px bg-white/20 mx-1"></div>
+          <div>
+            <div className="text-[10px] font-mono text-white/40 uppercase tracking-widest">{blogId}</div>
+            <div className="text-sm font-semibold truncate max-w-[200px] sm:max-w-md">{title || 'Untitled Blog'}</div>
           </div>
         </div>
 
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6">
-          {/* Left Section */}
-          <div className="lg:col-span-9 space-y-4 md:space-y-6 order-1">
-            {/* Tabs */}
-            <div className="bg-white border-4 border-black rounded-2xl p-2 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setActiveTab('metadata')}
-                  className={`flex-1 px-4 md:px-6 py-2 md:py-3 rounded-xl font-black uppercase tracking-wide transition-all border-3 border-black text-xs md:text-base ${
-                    activeTab === 'metadata'
-                      ? 'bg-black text-white shadow-[4px_4px_0px_0px_rgba(0,0,0,0.3)]'
-                      : 'bg-white text-black hover:bg-gray-50 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
-                  }`}
-                >
-                  METADATA
-                </button>
-                <button
-                  onClick={() => setActiveTab('markdown')}
-                  className={`flex-1 px-4 md:px-6 py-2 md:py-3 rounded-xl font-black uppercase tracking-wide transition-all border-3 border-black text-xs md:text-base ${
-                    activeTab === 'markdown'
-                      ? 'bg-black text-white shadow-[4px_4px_0px_0px_rgba(0,0,0,0.3)]'
-                      : 'bg-white text-black hover:bg-gray-50 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
-                  }`}
-                >
-                  MARKDOWN
-                </button>
+        <div className="flex items-center gap-3">
+          {/* View Modes */}
+          <div className="hidden md:flex bg-white/[0.03] border border-white/[0.06] rounded-none">
+            <button onClick={() => setEditorMode('edit')} className={`p-1.5 ${editorMode === 'edit' ? 'bg-white text-black' : 'text-white/40 hover:text-white'}`} title="Edit Only">
+              <PenLine className="w-4 h-4" />
+            </button>
+            <button onClick={() => setEditorMode('split')} className={`p-1.5 ${editorMode === 'split' ? 'bg-white text-black' : 'text-white/40 hover:text-white'}`} title="Split View">
+              <Layout className="w-4 h-4" />
+            </button>
+            <button onClick={() => setEditorMode('preview')} className={`p-1.5 ${editorMode === 'preview' ? 'bg-white text-black' : 'text-white/40 hover:text-white'}`} title="Preview Only">
+              <Eye className="w-4 h-4" />
+            </button>
+          </div>
+
+          <div className="h-4 w-px bg-white/20 mx-2 hidden sm:block"></div>
+
+          <button
+            onClick={() => setShowSidebar(!showSidebar)}
+            className={`flex items-center gap-2 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider transition border ${showSidebar ? 'bg-white/[0.1] border-white/20 text-white' : 'bg-transparent border-transparent text-white/60 hover:text-white hover:bg-white/[0.05]'}`}
+          >
+            <Settings className="w-4 h-4" />
+            <span className="hidden sm:inline">Settings</span>
+          </button>
+
+          <button
+            onClick={handleSave}
+            disabled={uploading}
+            className="flex items-center gap-2 px-4 py-1.5 bg-white text-black font-semibold text-[11px] uppercase tracking-wider hover:bg-white/90 transition disabled:opacity-50"
+          >
+            <Save className="w-4 h-4" />
+            <span className="hidden sm:inline">{uploading ? 'Saving' : 'Save'}</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Main Workspace */}
+      <div className="flex-1 flex overflow-hidden relative">
+        {/* Editor Area */}
+        <div className="flex-1 flex flex-col md:flex-row overflow-hidden relative transition-all duration-300">
+          {/* Markdown Input */}
+          {(editorMode === 'edit' || editorMode === 'split') && (
+            <div className={`flex-1 flex flex-col ${editorMode === 'split' ? 'border-r border-white/[0.06]' : ''}`}>
+              <div className="h-10 bg-[#0a0a0a] border-b border-white/[0.06] flex items-center px-4 flex-shrink-0">
+                <span className="text-[10px] font-mono uppercase tracking-widest text-white/40">Markdown</span>
+              </div>
+              <textarea
+                ref={textareaRef}
+                value={mdContent}
+                onChange={(e) => setMdContent(e.target.value)}
+                onKeyDown={handleTabPress}
+                placeholder="# Start writing your blog..."
+                className="flex-1 w-full bg-transparent text-white p-6 resize-none focus:outline-none font-mono text-sm leading-relaxed custom-scrollbar"
+                spellCheck="false"
+              />
+            </div>
+          )}
+
+          {/* Live Preview */}
+          {(editorMode === 'preview' || editorMode === 'split') && (
+            <div className="flex-1 flex flex-col bg-[#0d0d0d] overflow-hidden">
+              <div className="h-10 border-b border-white/[0.06] flex items-center px-4 flex-shrink-0">
+                <span className="text-[10px] font-mono uppercase tracking-widest text-white/40">Preview</span>
+              </div>
+              <div className="flex-1 overflow-y-auto p-6 md:p-10 custom-scrollbar">
+                <div className="max-w-3xl mx-auto prose prose-invert prose-pre:bg-black/50 prose-pre:border prose-pre:border-white/10 prose-img:rounded-none w-full">
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    {mdContent || '*Preview will appear here*'}
+                  </ReactMarkdown>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Sliding Settings Sidebar */}
+        <div 
+          className={`absolute top-0 right-0 bottom-0 w-80 sm:w-96 bg-[#0d0d0d] border-l border-white/[0.06] transform transition-transform duration-300 ease-in-out z-40 flex flex-col shadow-2xl ${showSidebar ? 'translate-x-0' : 'translate-x-full'}`}
+        >
+          <div className="h-14 border-b border-white/[0.06] flex items-center justify-between px-6 flex-shrink-0 bg-[#0a0a0a]">
+            <span className="text-xs font-semibold uppercase tracking-wider">Blog Metadata</span>
+            <button onClick={() => setShowSidebar(false)} className="p-1.5 text-white/40 hover:text-white transition">
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+
+          <div className="flex-1 overflow-y-auto p-6 space-y-8 custom-scrollbar">
+            {/* Basic Info */}
+            <div className="space-y-4">
+              <h3 className="text-[10px] font-mono uppercase tracking-widest text-white/40 border-b border-white/[0.06] pb-2">Basic Info</h3>
+              
+              <div>
+                <label className="block text-[10px] font-mono uppercase text-white/60 mb-1.5">Title *</label>
+                <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} className="w-full px-3 py-2 bg-black/40 border border-white/[0.1] rounded-none text-xs text-white focus:outline-none focus:border-white/30" placeholder="Blog Title" />
+              </div>
+              <div>
+                <label className="block text-[10px] font-mono uppercase text-white/60 mb-1.5">Tagline</label>
+                <input type="text" value={tagline} onChange={(e) => setTagline(e.target.value)} className="w-full px-3 py-2 bg-black/40 border border-white/[0.1] rounded-none text-xs text-white focus:outline-none focus:border-white/30" placeholder="Short tagline" />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[10px] font-mono uppercase text-white/60 mb-1.5">Subject</label>
+                  <input type="text" value={subject} onChange={(e) => setSubject(e.target.value)} className="w-full px-3 py-2 bg-black/40 border border-white/[0.1] rounded-none text-xs text-white focus:outline-none focus:border-white/30" />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-mono uppercase text-white/60 mb-1.5">Date</label>
+                  <input type="date" value={datetime} onChange={(e) => setDatetime(e.target.value)} className="w-full px-3 py-2 bg-black/40 border border-white/[0.1] rounded-none text-xs text-white focus:outline-none focus:border-white/30 [&::-webkit-calendar-picker-indicator]:invert" />
+                </div>
+              </div>
+              <div>
+                <label className="block text-[10px] font-mono uppercase text-white/60 mb-1.5">Description</label>
+                <textarea value={shortDescription} onChange={(e) => setShortDescription(e.target.value)} rows={3} className="w-full px-3 py-2 bg-black/40 border border-white/[0.1] rounded-none text-xs text-white focus:outline-none focus:border-white/30 resize-none custom-scrollbar" />
+              </div>
+              <div>
+                <label className="block text-[10px] font-mono uppercase text-white/60 mb-1.5">Tags (comma separated)</label>
+                <input type="text" value={tags} onChange={(e) => setTags(e.target.value)} className="w-full px-3 py-2 bg-black/40 border border-white/[0.1] rounded-none text-xs text-white focus:outline-none focus:border-white/30" />
+              </div>
+              <div>
+                <label className="block text-[10px] font-mono uppercase text-white/60 mb-1.5">Footer</label>
+                <input type="text" value={footer} onChange={(e) => setFooter(e.target.value)} className="w-full px-3 py-2 bg-black/40 border border-white/[0.1] rounded-none text-xs text-white focus:outline-none focus:border-white/30" />
               </div>
             </div>
 
-            {/* Metadata Tab */}
-            {activeTab === 'metadata' && (
-              <>
-                {/* Basic Info Card */}
-                <div className="bg-white border-4 border-black rounded-2xl p-4 md:p-6 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
-                  <h2 className="text-xl md:text-2xl font-black text-black mb-4 md:mb-6" style={{ fontFamily: 'Comic Sans MS, cursive' }}>
-                    Basic Information
-                  </h2>
-              
-                  <div className="space-y-5">
-                    <div>
-                      <label className="block text-sm font-black text-black mb-2 uppercase tracking-wide">Title *</label>
-                      <input
-                        type="text"
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
-                        className="w-full px-4 py-3 bg-white border-3 border-black rounded-xl font-medium focus:outline-none focus:ring-4 focus:ring-black/20 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]"
-                        placeholder="Enter blog title"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-black text-black mb-2 uppercase tracking-wide">Tagline</label>
-                      <input
-                        type="text"
-                        value={tagline}
-                        onChange={(e) => setTagline(e.target.value)}
-                        className="w-full px-4 py-3 bg-white border-3 border-black rounded-xl font-medium focus:outline-none focus:ring-4 focus:ring-black/20 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]"
-                        placeholder="Short catchy tagline"
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-black text-black mb-2 uppercase tracking-wide">Subject</label>
-                        <input
-                          type="text"
-                          value={subject}
-                          onChange={(e) => setSubject(e.target.value)}
-                          className="w-full px-4 py-3 bg-white border-3 border-black rounded-xl font-medium focus:outline-none focus:ring-4 focus:ring-black/20 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]"
-                          placeholder="e.g., DevOps, React"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-black text-black mb-2 uppercase tracking-wide">Date</label>
-                        <input
-                          type="date"
-                          value={datetime}
-                          onChange={(e) => setDatetime(e.target.value)}
-                          className="w-full px-4 py-3 bg-white border-3 border-black rounded-xl font-medium focus:outline-none focus:ring-4 focus:ring-black/20 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]"
-                        />
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-black text-black mb-2 uppercase tracking-wide">Short Description</label>
-                      <textarea
-                        value={shortDescription}
-                        onChange={(e) => setShortDescription(e.target.value)}
-                        rows={3}
-                        className="w-full px-4 py-3 bg-white border-3 border-black rounded-xl font-medium focus:outline-none focus:ring-4 focus:ring-black/20 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] resize-none"
-                        placeholder="Brief description for preview"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-black text-black mb-2 uppercase tracking-wide">Tags</label>
-                      <input
-                        type="text"
-                        value={tags}
-                        onChange={(e) => setTags(e.target.value)}
-                        className="w-full px-4 py-3 bg-white border-3 border-black rounded-xl font-medium focus:outline-none focus:ring-4 focus:ring-black/20 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]"
-                        placeholder="AWS, VPC, Networking (comma separated)"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-black text-black mb-2 uppercase tracking-wide">Footer</label>
-                      <input
-                        type="text"
-                        value={footer}
-                        onChange={(e) => setFooter(e.target.value)}
-                        className="w-full px-4 py-3 bg-white border-3 border-black rounded-xl font-medium focus:outline-none focus:ring-4 focus:ring-black/20 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]"
-                        placeholder="Footer text"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Blog Links Card */}
-                <div className="bg-white border-4 border-black rounded-2xl p-4 md:p-6 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 md:mb-6 gap-3">
-                    <h2 className="text-xl md:text-2xl font-black text-black" style={{ fontFamily: 'Comic Sans MS, cursive' }}>
-                      Blog Links
-                    </h2>
-                    <button
-                      onClick={addBlogLink}
-                      className="flex items-center gap-2 px-3 md:px-4 py-2 bg-blue-200 border-3 border-black rounded-xl font-bold hover:bg-blue-300 transition shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] text-sm md:text-base whitespace-nowrap"
-                    >
-                      <LinkIcon className="w-4 h-4" strokeWidth={2.5} />
-                      Add Link
-                    </button>
-                  </div>
-
-                  <div className="space-y-4">
-                    {blogLinks.map((link, index) => (
-                      <div key={index} className="flex flex-col sm:flex-row gap-3 items-start">
-                        <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-3 w-full">
-                          <input
-                            type="text"
-                            value={link.platform}
-                            onChange={(e) => updateBlogLink(index, 'platform', e.target.value)}
-                            className="px-4 py-3 bg-white border-3 border-black rounded-xl font-medium focus:outline-none focus:ring-4 focus:ring-black/20 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]"
-                            placeholder="Platform"
-                          />
-                          <input
-                            type="url"
-                            value={link.url}
-                            onChange={(e) => updateBlogLink(index, 'url', e.target.value)}
-                            className="px-4 py-3 bg-white border-3 border-black rounded-xl font-medium focus:outline-none focus:ring-4 focus:ring-black/20 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]"
-                            placeholder="URL"
-                          />
-                        </div>
-                        {blogLinks.length > 1 && (
-                          <button
-                            onClick={() => removeBlogLink(index)}
-                            className="p-2 md:p-3 bg-red-100 border-3 border-black rounded-xl hover:bg-red-200 transition shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] w-full sm:w-auto"
-                          >
-                            <Trash2 className="w-5 h-5 md:w-6 md:h-6 text-black mx-auto" strokeWidth={2.5} />
-                          </button>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </>
-            )}
-
-            {/* Markdown Tab */}
-            {activeTab === 'markdown' && (
-              <div className="bg-white border-4 border-black rounded-2xl p-4 md:p-6 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
-                <h2 className="text-xl md:text-2xl font-black text-black mb-4 md:mb-6" style={{ fontFamily: 'Comic Sans MS, cursive' }}>
-                  Content Editor
-                </h2>
-                <div className="border-3 border-black rounded-xl overflow-hidden shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-                  <MDEditor
-                    value={mdContent}
-                    onChange={(val) => setMdContent(val || '')}
-                    height={600}
-                    preview="live"
-                  />
-                </div>
-                <div className="mt-4 p-4 bg-yellow-50 border-3 border-black rounded-xl">
-                  <p className="text-sm font-black text-black mb-2 uppercase">How to use assets:</p>
-                  <ol className="text-sm text-gray-700 space-y-1 ml-4 list-decimal">
-                    <li>Upload assets in the right panel</li>
-                    <li>Give each asset a unique name (e.g., "diagram-1")</li>
-                    <li>Use {`{{asset-name}}`} in markdown: {`![Alt]({{diagram-1}})`}</li>
-                    <li>Placeholders will be replaced with actual URLs when you save</li>
-                  </ol>
-                  {assets.length > 0 && (
-                    <div className="mt-3 pt-3 border-t-2 border-black">
-                      <p className="text-xs font-black text-black mb-2">Available Assets:</p>
-                      <div className="flex flex-wrap gap-2">
-                        {assets.map((asset, idx) => {
-                          const assetName = typeof asset === 'string' ? '' : asset.name;
-                          return assetName ? (
-                            <code key={idx} className="px-2 py-1 bg-white border-2 border-black rounded text-xs font-mono">
-                              {`{{${assetName}}}`}
-                            </code>
-                          ) : null;
-                        })}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Right Section - Assets */}
-          <div className="lg:col-span-3 flex flex-col gap-4 md:gap-6 order-2">
             {/* Cover Image */}
-            <div className="bg-white border-4 border-black rounded-2xl p-4 md:p-6 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
-              <h2 className="text-xl md:text-2xl font-black text-black mb-3 md:mb-4" style={{ fontFamily: 'Comic Sans MS, cursive' }}>
-                Cover Image
-              </h2>
-              
+            <div className="space-y-4">
+              <h3 className="text-[10px] font-mono uppercase tracking-widest text-white/40 border-b border-white/[0.06] pb-2">Cover Image</h3>
               <label className="block">
-                <div className="w-full p-3 md:p-4 bg-purple-200 border-3 border-black rounded-xl text-center font-bold cursor-pointer hover:bg-purple-300 transition text-sm md:text-base">
+                <div className="w-full py-2 bg-transparent border border-white/20 text-center text-xs font-semibold text-white/80 cursor-pointer hover:bg-white/[0.05] transition">
                   {coverImage ? 'Change Cover' : 'Upload Cover'}
                 </div>
-                <input
-                  type="file"
-                  onChange={(e) => e.target.files && uploadCover(e.target.files[0])}
-                  className="hidden"
-                  accept="image/*"
-                />
+                <input type="file" onChange={(e) => e.target.files && uploadCover(e.target.files[0])} className="hidden" accept="image/*" />
               </label>
-
               {coverImage && (
-                <div className="mt-4">
-                  <img src={coverImage} alt="Cover" className="w-full h-40 object-cover rounded border-3 border-black" />
-                </div>
+                <img src={coverImage} alt="Cover" className="w-full h-32 object-cover border border-white/[0.1]" />
               )}
             </div>
 
+            {/* Blog Links */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between border-b border-white/[0.06] pb-2">
+                <h3 className="text-[10px] font-mono uppercase tracking-widest text-white/40">Links</h3>
+                <button onClick={addBlogLink} className="text-[10px] text-white hover:underline flex items-center gap-1"><LinkIcon className="w-3 h-3"/> Add</button>
+              </div>
+              {blogLinks.map((link, index) => (
+                <div key={index} className="flex gap-2 items-start">
+                  <div className="flex-1 space-y-2">
+                    <input type="text" value={link.platform} onChange={(e) => updateBlogLink(index, 'platform', e.target.value)} placeholder="Platform" className="w-full px-3 py-1.5 bg-black/40 border border-white/[0.1] text-xs text-white focus:outline-none focus:border-white/30" />
+                    <input type="url" value={link.url} onChange={(e) => updateBlogLink(index, 'url', e.target.value)} placeholder="URL" className="w-full px-3 py-1.5 bg-black/40 border border-white/[0.1] text-xs text-white focus:outline-none focus:border-white/30" />
+                  </div>
+                  {blogLinks.length > 1 && (
+                    <button onClick={() => removeBlogLink(index)} className="p-2 border border-red-500/30 text-red-500 hover:bg-red-500/10 transition mt-1">
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+
             {/* Assets */}
-            <div className="bg-white border-4 border-black rounded-2xl p-4 md:p-6 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] flex-1 flex flex-col">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 md:mb-6 gap-3">
-                <h2 className="text-xl md:text-2xl font-black text-black" style={{ fontFamily: 'Comic Sans MS, cursive' }}>
-                  Assets
-                </h2>
-                <label className="flex items-center gap-2 px-3 md:px-4 py-2 bg-green-200 border-3 border-black rounded-xl font-bold hover:bg-green-300 transition shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] cursor-pointer text-sm md:text-base whitespace-nowrap">
-                  <Upload className="w-4 h-4" strokeWidth={2.5} />
-                  Add
-                  <input
-                    type="file"
-                    multiple
-                    onChange={(e) => e.target.files && uploadAssets(e.target.files)}
-                    className="hidden"
-                  />
+            <div className="space-y-4 pb-10">
+              <div className="flex items-center justify-between border-b border-white/[0.06] pb-2">
+                <h3 className="text-[10px] font-mono uppercase tracking-widest text-white/40">Assets</h3>
+                <label className="text-[10px] text-white hover:underline flex items-center gap-1 cursor-pointer">
+                  <Upload className="w-3 h-3"/> Upload
+                  <input type="file" multiple onChange={(e) => e.target.files && uploadAssets(e.target.files)} className="hidden" />
                 </label>
               </div>
-
-              <div className="space-y-3 flex-1 overflow-y-auto">
-                {assets.length === 0 ? (
-                  <p className="text-center text-gray-600 py-8">No assets yet</p>
-                ) : (
-                  assets.map((asset, index) => {
-                    const assetUrl = typeof asset === 'string' ? asset : asset.url;
-                    const assetName = typeof asset === 'string' ? '' : asset.name;
-                    const assetFilename = typeof asset === 'string' ? '' : asset.filename;
-
-                    return (
-                      <div key={index} className="border-3 border-black rounded-xl p-2 bg-gray-50 space-y-2">
-                        <img src={assetUrl} alt="Asset" className="w-full h-24 object-cover rounded border-2 border-black" />
-                        
-                        <div>
-                          <label className="block text-xs font-black text-black mb-1 uppercase text-[10px]">Filename</label>
-                          <input
-                            type="text"
-                            value={assetFilename}
-                            readOnly
-                            className="w-full px-2 py-1 bg-gray-200 border-2 border-black rounded-lg text-xs font-medium"
-                          />
-                        </div>
-
-                        <div>
-                          <label className="block text-xs font-black text-black mb-1 uppercase text-[10px]">Asset Name *</label>
-                          <input
-                            type="text"
-                            value={assetName}
-                            onChange={(e) => updateAssetName(index, e.target.value)}
-                            className="w-full px-2 py-1 bg-white border-2 border-black rounded-lg text-xs font-medium focus:outline-none focus:ring-2 focus:ring-black/20"
-                            placeholder="e.g., diagram-1"
-                          />
-                          <p className="text-[10px] text-gray-600 mt-1">Use: {`{{${assetName || 'name'}}}`}</p>
-                        </div>
-
-                        <button
-                          onClick={() => deleteAsset(index)}
-                          className="w-full flex items-center justify-center gap-1 p-1.5 bg-red-100 border-2 border-black rounded-lg hover:bg-red-200 font-bold text-xs"
-                        >
-                          <Trash2 className="w-3 h-3" strokeWidth={2.5} />
-                          Delete
-                        </button>
+              
+              <div className="space-y-3">
+                {assets.length === 0 && <p className="text-[10px] text-white/30 font-mono text-center">No assets uploaded</p>}
+                {assets.map((asset, index) => {
+                  const assetUrl = typeof asset === 'string' ? asset : asset.url;
+                  const assetName = typeof asset === 'string' ? '' : asset.name;
+                  return (
+                    <div key={index} className="bg-black/40 border border-white/[0.06] p-2 space-y-2">
+                      <img src={assetUrl} alt="Asset" className="w-full h-20 object-cover border border-white/10" />
+                      <div>
+                        <label className="text-[9px] font-mono uppercase text-white/40">Reference Name</label>
+                        <input type="text" value={assetName} onChange={(e) => updateAssetName(index, e.target.value)} placeholder="e.g. image-1" className="w-full px-2 py-1 bg-black text-xs border border-white/[0.1] focus:outline-none focus:border-white/30" />
                       </div>
-                    );
-                  })
-                )}
+                      <div className="flex items-center justify-between mt-1">
+                        <code className="text-[9px] font-mono text-white/70 bg-white/5 px-1 py-0.5">{assetName ? `{{${assetName}}}` : 'Set name first'}</code>
+                        <button onClick={() => deleteAsset(index)} className="text-red-500 hover:text-red-400 p-1"><Trash2 className="w-3.5 h-3.5"/></button>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
+
           </div>
         </div>
+        
+        {/* Overlay when sidebar is open on mobile */}
+        {showSidebar && (
+          <div 
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm z-30 md:hidden"
+            onClick={() => setShowSidebar(false)}
+          />
+        )}
       </div>
-    </div>
     </div>
   );
 }

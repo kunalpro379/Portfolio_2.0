@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-
 const projectSchema = new mongoose.Schema({
   projectId: {
     type: String,
@@ -22,13 +21,13 @@ const projectSchema = new mongoose.Schema({
     name: String,
     url: String
   }],
-  mdFiles: [String], // Cloudinary URLs
+  mdFiles: [String], 
   assets: [{
-    name: String,      // Custom asset name (e.g., "hero-image")
-    url: String,       // Cloudinary URL
-    filename: String   // Original filename
+    name: String,      
+    url: String,       
+    filename: String   
   }],
-  cardasset: [String], // Cloudinary URLs
+  cardasset: [String], 
   featured: {
     type: Boolean,
     default: false
@@ -46,8 +45,5 @@ const projectSchema = new mongoose.Schema({
     default: Date.now
   }
 });
-
-// Only index created_at since projectId and slug already have unique indexes
 projectSchema.index({ created_at: -1 });
-
 export default mongoose.model('Project', projectSchema, 'projects');

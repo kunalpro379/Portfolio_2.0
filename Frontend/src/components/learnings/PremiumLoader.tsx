@@ -24,8 +24,8 @@ export function PremiumLoader({ showText = false }: { showText?: boolean }) {
   return (
     <div className="flex flex-col items-center justify-center gap-4">
       <div className="w-32 h-32">
-        <Lottie 
-          animationData={animationData} 
+        <Lottie
+          animationData={animationData}
           loop={true}
           autoplay={true}
         />

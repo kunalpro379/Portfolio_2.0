@@ -60,36 +60,9 @@ body {
     display: block !important;
   }
 
-  /* Reduce border width on mobile */
-  .border-3 {
-    border-width: 2px !important;
-  }
-
-  .border-4 {
-    border-width: 3px !important;
-  }
-
-  /* Smaller shadows on mobile */
-  .shadow-\[8px_8px_0px_0px_rgba\(0\,0\,0\,1\)\] {
-    box-shadow: 4px 4px 0px 0px rgba(0,0,0,1) !important;
-  }
-
-  .shadow-\[6px_6px_0px_0px_rgba\(0\,0\,0\,1\)\] {
-    box-shadow: 3px 3px 0px 0px rgba(0,0,0,1) !important;
-  }
-
-  .shadow-\[4px_4px_0px_0px_rgba\(0\,0\,0\,1\)\] {
-    box-shadow: 2px 2px 0px 0px rgba(0,0,0,1) !important;
-  }
-
   /* Responsive spacing */
   .admin-space-y-responsive > * + * {
     margin-top: 1rem !important;
-  }
-
-  /* Responsive rounded corners */
-  .rounded-2xl {
-    border-radius: 1rem !important;
   }
 
   /* Asset grid responsive */

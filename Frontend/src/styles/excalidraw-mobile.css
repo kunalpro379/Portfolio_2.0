@@ -74,3 +74,20 @@
     touch-action: pinch-zoom !important;
   }
 }
+
+/* =====================================================
+   CRITICAL: Fix Tailwind preflight breaking Excalidraw
+   Tailwind v4 sets: svg { display:block; max-width:100% }
+   This inflates every uncontained SVG to fill 100% width
+   ===================================================== */
+.excalidraw * {
+  max-width: unset !important;
+}
+
+.excalidraw svg {
+  display: inline !important;
+  max-width: unset !important;
+  width: unset !important;
+  height: unset !important;
+  flex-shrink: unset !important;
+}

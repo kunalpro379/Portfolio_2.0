@@ -5,6 +5,8 @@ import {
   createRootRouteWithContext,
   useRouter,
 } from "@tanstack/react-router";
+import { useState } from "react";
+import { GlobalChatFAB } from "@/components/GlobalChatFAB";
 
 function NotFoundComponent() {
   return (
@@ -42,5 +44,27 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 });
 
 function RootComponent() {
-  return <Outlet />;
+  const [isChatOpen, setIsChatOpen] = useState(false);
+
+  return (
+    <div 
+      className="relative min-h-screen bg-background"
+      style={{
+        backgroundImage: "linear-gradient(rgba(0, 0, 0, 0.06), rgba(0, 0, 0, 0.06)), url('/page5.png'), url('/page5.png')",
+        backgroundSize: '100%, 80px, 40px',
+        backgroundAttachment: 'fixed, fixed, fixed',
+        backgroundRepeat: 'no-repeat, repeat, repeat',
+        backgroundPosition: '0 0, 0 0, 20px 20px',
+        backgroundBlendMode: 'normal, multiply, multiply'
+      }}
+    >
+      <div 
+        className="transition-[margin] duration-300 ease-in-out min-h-screen"
+        style={{ marginRight: isChatOpen ? "300px" : "0px" }}
+      >
+        <Outlet />
+      </div>
+      <GlobalChatFAB isOpen={isChatOpen} setIsOpen={setIsChatOpen} />
+    </div>
+  );
 }

@@ -1,7 +1,6 @@
-import { useState, FormEvent } from 'react';
+﻿import { useState, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Lock, User, AlertCircle, Sparkles } from 'lucide-react';
 
 export default function Login() {
   const [username, setUsername] = useState('');
@@ -15,147 +14,109 @@ export default function Login() {
     e.preventDefault();
     setError('');
     setLoading(true);
-
     try {
       await login(username, password);
       navigate('/dashboard');
     } catch (err: any) {
-      setError(err.message || 'Login failed. Please check your credentials.');
+      setError(err.message || 'Invalid credentials. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-white relative overflow-hidden flex items-center justify-center p-4">
-      {/* Hand-drawn background elements */}
-      <div className="absolute inset-0 opacity-5">
-        <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <pattern id="sketch-pattern" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse">
-              <path d="M10 10 Q 30 5, 50 10 T 90 10" stroke="black" fill="none" strokeWidth="0.5"/>
-              <circle cx="20" cy="50" r="15" stroke="black" fill="none" strokeWidth="0.5"/>
-              <path d="M60 60 L 80 80 M 80 60 L 60 80" stroke="black" strokeWidth="0.5"/>
-            </pattern>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#sketch-pattern)"/>
-        </svg>
-      </div>
+    <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Grid texture */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          backgroundImage:
+            'linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)',
+          backgroundSize: '40px 40px',
+        }}
+      />
+      {/* Top edge line */}
+      <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" />
+      {/* Bottom edge line */}
+      <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
 
-      {/* Floating sketch elements */}
-      <div className="absolute top-10 left-10 w-32 h-32 border-2 border-black rounded-full opacity-10 animate-float" 
-           style={{ animationDelay: '0s', animationDuration: '6s' }}></div>
-      <div className="absolute bottom-20 right-20 w-24 h-24 border-2 border-black opacity-10 animate-float"
-           style={{ animationDelay: '2s', animationDuration: '8s', transform: 'rotate(45deg)' }}></div>
-      <div className="absolute top-1/3 right-10 w-16 h-16 border-2 border-black rounded-full opacity-10 animate-float"
-           style={{ animationDelay: '4s', animationDuration: '7s' }}></div>
-
-      <div className="w-full max-w-md relative z-10">
-        {/* Main card with hand-drawn border effect */}
-        <div className="bg-white relative">
-          {/* Hand-drawn border effect */}
-          <div className="absolute inset-0 border-4 border-black rounded-3xl transform rotate-1"></div>
-          <div className="absolute inset-0 border-4 border-black rounded-3xl transform -rotate-1"></div>
-          
-          <div className="relative bg-white border-4 border-black rounded-3xl p-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-            {/* Header with sketch icon */}
-            <div className="text-center mb-8">
-              <div className="inline-block relative mb-4">
-                <div className="w-20 h-20 border-4 border-black rounded-full flex items-center justify-center bg-white transform -rotate-3 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-                  <Lock className="w-10 h-10 text-black" strokeWidth={2.5} />
-                </div>
-                <Sparkles className="absolute -top-2 -right-2 w-6 h-6 text-black animate-pulse" />
-              </div>
-              
-              <h1 className="text-4xl font-black text-black mb-2 tracking-tight" 
-                  style={{ fontFamily: 'Comic Sans MS, cursive' }}>
-                Admin Panel
-              </h1>
-              <div className="relative inline-block">
-                <p className="text-gray-600 font-medium">Sign in to access the dashboard</p>
-                <svg className="absolute -bottom-1 left-0 w-full" height="4" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M0 2 Q 50 4, 100 2 T 200 2" stroke="black" fill="none" strokeWidth="1" opacity="0.3"/>
-                </svg>
-              </div>
+      <div className="relative z-10 w-full max-w-[400px]">
+        {/* Icon + Brand */}
+        <div className="mb-10">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-9 h-9 border border-white/15 bg-white/5 flex items-center justify-center">
+              <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="square" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+              </svg>
             </div>
-
-            {/* Error message with sketch style */}
-            {error && (
-              <div className="mb-6 p-4 bg-red-50 border-3 border-black rounded-xl relative transform -rotate-1 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-                <div className="flex items-start gap-3">
-                  <AlertCircle className="w-5 h-5 text-black flex-shrink-0 mt-0.5" strokeWidth={2.5} />
-                  <p className="text-black text-sm font-semibold">{error}</p>
-                </div>
-              </div>
-            )}
-
-            {/* Form */}
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div>
-                <label htmlFor="username" className="block text-sm font-black text-black mb-2 uppercase tracking-wide">
-                  Username
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <User className="h-5 w-5 text-black" strokeWidth={2.5} />
-                  </div>
-                  <input
-                    id="username"
-                    type="text"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    className="block w-full pl-12 pr-4 py-3 bg-white border-3 border-black rounded-xl text-black placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-black/20 transition font-medium shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]"
-                    placeholder="Enter your username"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label htmlFor="password" className="block text-sm font-black text-black mb-2 uppercase tracking-wide">
-                  Password
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <Lock className="h-5 w-5 text-black" strokeWidth={2.5} />
-                  </div>
-                  <input
-                    id="password"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="block w-full pl-12 pr-4 py-3 bg-white border-3 border-black rounded-xl text-black placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-black/20 transition font-medium shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]"
-                    placeholder="Enter your password"
-                    required
-                  />
-                </div>
-              </div>
-
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-black hover:bg-gray-800 text-white font-black py-4 px-4 rounded-xl transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed border-3 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[-2px] hover:translate-y-[-2px] active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] uppercase tracking-wider"
-              >
-                {loading ? (
-                  <span className="flex items-center justify-center">
-                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Signing in...
-                  </span>
-                ) : (
-                  'Sign In'
-                )}
-              </button>
-            </form>
+            <span className="label-mono text-[10px] uppercase tracking-[0.3em] text-white/35">Admin Portal</span>
           </div>
+          <h1 className="text-[2.25rem] font-bold leading-none tracking-tight text-white mb-2">Sign in</h1>
+          <p className="text-[13px] text-white/35 leading-relaxed">Enter your admin credentials to continue.</p>
         </div>
 
-        {/* Footer with hand-drawn underline */}
-        <div className="text-center mt-8 relative">
-          <p className="text-gray-600 text-sm font-medium inline-block">
-            © 2026 Admin Panel. All rights reserved.
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="label-mono block text-[10px] font-semibold uppercase tracking-[0.22em] text-white/35 mb-2">
+              Username
+            </label>
+            <input
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              autoFocus
+              autoComplete="username"
+              placeholder="Enter your username"
+              required
+              className="w-full h-11 bg-white/5 border border-white/10 px-4 text-[13px] text-white placeholder:text-white/20 focus:outline-none focus:border-white/30 focus:bg-white/8 transition-colors"
+            />
+          </div>
+
+          <div>
+            <label className="label-mono block text-[10px] font-semibold uppercase tracking-[0.22em] text-white/35 mb-2">
+              Password
+            </label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              autoComplete="current-password"
+              placeholder="Enter your password"
+              required
+              className="w-full h-11 bg-white/5 border border-white/10 px-4 text-[13px] text-white placeholder:text-white/20 focus:outline-none focus:border-white/30 focus:bg-white/8 transition-colors"
+            />
+          </div>
+
+          {error && (
+            <div className="border border-red-500/20 bg-red-500/8 px-4 py-3">
+              <p className="label-mono text-[11px] text-red-400">{error}</p>
+            </div>
+          )}
+
+          <div className="pt-2">
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full h-11 bg-white text-black label-mono text-[11px] font-bold uppercase tracking-[0.22em] hover:bg-white/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              {loading ? (
+                <span className="flex items-center justify-center gap-2">
+                  <svg className="animate-spin h-3.5 w-3.5" viewBox="0 0 24 24" fill="none">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
+                  </svg>
+                  Authenticating...
+                </span>
+              ) : 'Sign In'}
+            </button>
+          </div>
+        </form>
+
+        {/* Footer */}
+        <div className="mt-12 pt-5 border-t border-white/5">
+          <p className="label-mono text-[10px] text-white/20 text-center uppercase tracking-widest">
+            Kunal Patil &middot; Admin Console &middot; 2026
           </p>
         </div>
       </div>

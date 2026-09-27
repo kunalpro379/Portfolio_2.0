@@ -512,14 +512,13 @@ export default function AIKnowledgeBase() {
   };
 
   return (
-    <div className="p-3 sm:p-4 md:p-6 lg:p-8">
+    <div className="max-w-7xl mx-auto space-y-6">
       {/* Global Loading Bar */}
       {(loading || showUploadProgress || processingExisting) && (
         <div className="fixed top-0 left-0 right-0 z-50">
-          {/* Animated Progress Bar */}
-          <div className="relative h-1 bg-gray-200">
+          <div className="relative h-1 bg-cream-deep">
             <div 
-              className="absolute top-0 left-0 h-full bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-300"
+              className="absolute top-0 left-0 h-full bg-accent transition-all duration-300"
               style={{ 
                 width: showUploadProgress 
                   ? `${uploadProgress.reduce((acc, curr) => acc + curr.overallProgress, 0) / Math.max(uploadProgress.length, 1)}%`
@@ -528,22 +527,20 @@ export default function AIKnowledgeBase() {
                   : '50%'
               }}
             />
-            <div className="absolute top-0 left-0 w-full h-full bg-blue-500 opacity-30 animate-pulse"></div>
           </div>
           
           {/* Status Bar */}
-          <div className="bg-white border-b-2 border-black px-4 py-2 flex items-center justify-between shadow-lg">
+          <div className="bg-card border-b border-border px-4 py-2 flex items-center justify-between shadow-md">
             <div className="flex items-center gap-2">
-              <img src="/loading.gif" alt="Loading" className="w-6 h-6 object-contain" />
-              <span className="text-sm font-bold text-black">
+              <Loader2 className="w-4 h-4 animate-spin text-accent" />
+              <span className="text-xs font-semibold text-foreground">
                 {showUploadProgress ? `Uploading ${uploadProgress.length} file${uploadProgress.length !== 1 ? 's' : ''}...` : 
                  processingExisting ? `Processing ${existingContent.filter(c => c.selected).length} item${existingContent.filter(c => c.selected).length !== 1 ? 's' : ''}...` : 
                  'Loading'}
               </span>
             </div>
             
-            {/* Progress Stats */}
-            <div className="text-xs font-medium text-gray-600">
+            <div className="text-xs label-mono text-muted-foreground">
               {showUploadProgress && (
                 <span>{uploadProgress.filter(p => p.status === 'completed').length} / {uploadProgress.length} completed</span>
               )}
@@ -555,31 +552,29 @@ export default function AIKnowledgeBase() {
         </div>
       )}
 
-      {/* Add top padding when loading bar is visible */}
-      <div className={`max-w-7xl mx-auto ${(loading || showUploadProgress || processingExisting) ? 'pt-16' : ''}`}>
+      {/* Main Wrapper */}
+      <div className="space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-black mb-2" style={{ fontFamily: 'Comic Sans MS, cursive' }}>
-              AI Knowledge Base
-            </h1>
-            <p className="text-sm lg:text-base text-gray-600 font-medium">
-              Upload files or push existing content to the knowledge base
-            </p>
-          </div>
+        <div className="bg-card border border-border rounded-xl p-6 shadow-sm">
+          <h1 className="text-2xl sm:text-3xl font-display font-bold text-foreground tracking-tight mb-1">
+            AI Knowledge Base
+          </h1>
+          <p className="text-muted-foreground text-sm">
+            Upload custom files or push existing portfolio content to the AI vector store
+          </p>
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex gap-2 mb-6">
+        <div className="flex gap-2">
           <button
             onClick={() => setActiveTab('upload')}
-            className={`flex items-center gap-2 px-4 py-2 border-2 border-black rounded-lg font-bold text-sm transition ${
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-lg font-semibold text-xs sm:text-sm transition ${
               activeTab === 'upload'
-                ? 'bg-blue-200 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
-                : 'bg-white hover:bg-gray-50'
+                ? 'bg-foreground text-background shadow-sm'
+                : 'bg-card border border-border text-foreground hover:bg-cream-soft'
             }`}
           >
-            <Upload className="w-4 h-4" strokeWidth={2.5} />
+            <Upload className="w-4 h-4" />
             Upload New Files
           </button>
           <button
@@ -589,186 +584,178 @@ export default function AIKnowledgeBase() {
                 fetchExistingContent();
               }
             }}
-            className={`flex items-center gap-2 px-4 py-2 border-2 border-black rounded-lg font-bold text-sm transition ${
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-lg font-semibold text-xs sm:text-sm transition ${
               activeTab === 'existing'
-                ? 'bg-green-200 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
-                : 'bg-white hover:bg-gray-50'
+                ? 'bg-foreground text-background shadow-sm'
+                : 'bg-card border border-border text-foreground hover:bg-cream-soft'
             }`}
           >
-            <Database className="w-4 h-4" strokeWidth={2.5} />
+            <Database className="w-4 h-4" />
             Push Existing Info
           </button>
         </div>
 
         {/* Upload New Files Tab */}
         {activeTab === 'upload' && (
-          <div className="space-y-6">
-            {/* Upload Section */}
-            <div className="bg-white border-2 border-black rounded-xl p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-              <h2 className="text-xl font-black text-black mb-4" style={{ fontFamily: 'Comic Sans MS, cursive' }}>
-                Upload New Files
-              </h2>
+          <div className="bg-card border border-border rounded-xl p-6 shadow-sm space-y-4">
+            <h2 className="text-lg font-display font-bold text-foreground">
+              Upload New Files
+            </h2>
+            
+            <div className="border-2 border-dashed border-accent/30 bg-cream-soft/40 hover:bg-cream-soft/80 rounded-xl p-8 text-center transition-colors">
+              <Upload className="w-10 h-10 text-accent/60 mx-auto mb-3" />
+              <p className="text-base font-semibold text-foreground mb-1">Drop files here or click to browse</p>
+              <p className="label-mono text-xs text-muted-foreground mb-4">Supports .md, .txt, .json files</p>
               
-              <div className="border-2 border-dashed border-black rounded-lg p-8 text-center">
-                <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" strokeWidth={2} />
-                <p className="text-lg font-bold text-black mb-2">Drop files here or click to browse</p>
-                <p className="text-sm text-gray-600 mb-4">Supports .md, .txt, .json files</p>
-                
-                <input
-                  type="file"
-                  multiple
-                  accept=".md,.txt,.json"
-                  onChange={handleFileUpload}
-                  className="hidden"
-                  id="file-upload"
-                  disabled={loading}
-                />
-                <label
-                  htmlFor="file-upload"
-                  className={`inline-flex items-center gap-2 px-6 py-3 bg-blue-200 border-2 border-black rounded-lg font-bold text-sm hover:bg-blue-300 transition shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] cursor-pointer ${
-                    loading ? 'opacity-50 cursor-not-allowed' : ''
-                  }`}
-                >
-                  {loading ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      Uploading...
-                    </>
-                  ) : (
-                    <>
-                      <Plus className="w-4 h-4" strokeWidth={2.5} />
-                      Choose Files
-                    </>
-                  )}
-                </label>
-              </div>
+              <input
+                type="file"
+                multiple
+                accept=".md,.txt,.json"
+                onChange={handleFileUpload}
+                className="hidden"
+                id="file-upload"
+                disabled={loading}
+              />
+              <label
+                htmlFor="file-upload"
+                className={`inline-flex items-center gap-2 px-5 py-2.5 bg-foreground text-background hover:bg-accent rounded-lg font-semibold text-xs uppercase tracking-wider transition cursor-pointer shadow-sm ${
+                  loading ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Uploading...
+                  </>
+                ) : (
+                  <>
+                    <Plus className="w-4 h-4" />
+                    Choose Files
+                  </>
+                )}
+              </label>
             </div>
           </div>
         )}
 
         {/* Push Existing Info Tab */}
         {activeTab === 'existing' && (
-          <div className="space-y-6">
-            <div className="bg-white border-2 border-black rounded-xl p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-              <h2 className="text-xl font-black text-black mb-4" style={{ fontFamily: 'Comic Sans MS, cursive' }}>
-                Push Existing Content
-              </h2>
+          <div className="bg-card border border-border rounded-xl p-6 shadow-sm space-y-4">
+            <h2 className="text-lg font-display font-bold text-foreground">
+              Push Existing Content
+            </h2>
 
-              <p className="text-sm text-gray-600 font-medium mb-6">
-                Push your existing projects, blogs, documentation, and code files to the knowledge base
-              </p>
+            <p className="text-sm text-muted-foreground">
+              Push your existing projects, blogs, documentation, and code files directly to the knowledge base
+            </p>
 
-              {/* Content Summary */}
-              {existingContent.length > 0 && (
-                <div className="mb-6 p-4 bg-gray-50 border-2 border-gray-300 rounded-lg">
-                  <p className="text-sm font-bold text-gray-700 mb-3">Content Summary:</p>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                    <div className="flex items-center gap-2">
-                      <FolderOpen className="w-4 h-4 text-blue-500" />
-                      <span><strong>Projects:</strong> {existingContent.filter(c => c.type === 'project').length}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <FileText className="w-4 h-4 text-green-500" />
-                      <span><strong>Blogs:</strong> {existingContent.filter(c => c.type === 'blog').length}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <BookOpen className="w-4 h-4 text-purple-500" />
-                      <span><strong>Docs:</strong> {existingContent.filter(c => c.type === 'documentation').length}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Code className="w-4 h-4 text-orange-500" />
-                      <span><strong>Code:</strong> {existingContent.filter(c => c.type === 'code').length}</span>
-                    </div>
+            {/* Content Summary */}
+            {existingContent.length > 0 && (
+              <div className="p-4 bg-background border border-border rounded-lg">
+                <p className="label-mono text-xs font-semibold text-muted-foreground uppercase mb-3">Content Summary:</p>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
+                  <div className="flex items-center gap-2 text-foreground font-medium">
+                    <FolderOpen className="w-4 h-4 text-accent" />
+                    <span>Projects: {existingContent.filter(c => c.type === 'project').length}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-foreground font-medium">
+                    <FileText className="w-4 h-4 text-accent" />
+                    <span>Blogs: {existingContent.filter(c => c.type === 'blog').length}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-foreground font-medium">
+                    <BookOpen className="w-4 h-4 text-accent" />
+                    <span>Docs: {existingContent.filter(c => c.type === 'documentation').length}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-foreground font-medium">
+                    <Code className="w-4 h-4 text-accent" />
+                    <span>Code: {existingContent.filter(c => c.type === 'code').length}</span>
                   </div>
                 </div>
-              )}
+              </div>
+            )}
 
-              {/* Action Buttons */}
-              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            {/* Action Buttons */}
+            <div className="flex flex-col sm:flex-row gap-3 pt-2">
+              <button
+                onClick={() => {
+                  if (existingContent.length === 0) {
+                    fetchExistingContent();
+                  } else {
+                    setShowExistingModal(true);
+                  }
+                }}
+                disabled={loading}
+                className="flex items-center justify-center gap-2 px-5 py-2.5 bg-foreground text-background hover:bg-accent rounded-lg font-semibold text-xs uppercase tracking-wider transition disabled:opacity-50"
+              >
+                {loading ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Database className="w-4 h-4" />
+                )}
+                {existingContent.length === 0 ? 'Load Content' : 'Select & Push Content'}
+              </button>
+
+              {existingContent.length > 0 && (
                 <button
                   onClick={() => {
-                    if (existingContent.length === 0) {
-                      fetchExistingContent();
-                    } else {
-                      setShowExistingModal(true);
-                    }
+                    const allSelected = existingContent.map(item => ({ ...item, selected: true }));
+                    setExistingContent(allSelected);
+                    processSelectedContent();
                   }}
-                  disabled={loading}
-                  className="flex items-center justify-center gap-2 px-6 py-3 bg-green-200 border-2 border-black rounded-lg font-bold text-sm hover:bg-green-300 transition shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] disabled:opacity-50"
+                  disabled={processingExisting}
+                  className="flex items-center justify-center gap-2 px-5 py-2.5 bg-cream-soft hover:bg-cream-deep border border-border text-foreground rounded-lg font-semibold text-xs uppercase tracking-wider transition disabled:opacity-50"
                 >
-                  {loading ? (
+                  {processingExisting ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
                   ) : (
-                    <Database className="w-4 h-4" strokeWidth={2.5} />
+                    <Upload className="w-4 h-4" />
                   )}
-                  {existingContent.length === 0 ? 'Load Content' : 'Select & Push Content'}
+                  Push All Content
                 </button>
-
-                {existingContent.length > 0 && (
-                  <button
-                    onClick={() => {
-                      // Select all and process directly
-                      const allSelected = existingContent.map(item => ({ ...item, selected: true }));
-                      setExistingContent(allSelected);
-                      processSelectedContent();
-                    }}
-                    disabled={processingExisting}
-                    className="flex items-center justify-center gap-2 px-6 py-3 bg-purple-200 border-2 border-black rounded-lg font-bold text-sm hover:bg-purple-300 transition shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] disabled:opacity-50"
-                  >
-                    {processingExisting ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                    ) : (
-                      <Upload className="w-4 h-4" strokeWidth={2.5} />
-                    )}
-                    Push All Content
-                  </button>
-                )}
-              </div>
-
-              {/* Loading State */}
-              {loading && existingContent.length === 0 && (
-                <div className="text-center py-8">
-                  <img src="/loading.gif" alt="Loading" className="w-12 h-12 object-contain mx-auto mb-3" />
-                  <p className="text-sm text-gray-600 font-medium">Loading existing content</p>
-                </div>
               )}
             </div>
+
+            {loading && existingContent.length === 0 && (
+              <div className="text-center py-8">
+                <Loader2 className="w-8 h-8 animate-spin text-accent mx-auto mb-2" />
+                <p className="text-xs text-muted-foreground">Loading existing content...</p>
+              </div>
+            )}
           </div>
         )}
 
         {/* Common Knowledge Base Files Section */}
-        <div className="bg-white border-2 border-black rounded-xl p-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-          <h2 className="text-xl font-black text-black mb-4" style={{ fontFamily: 'Comic Sans MS, cursive' }}>
+        <div className="bg-card border border-border rounded-xl p-6 shadow-sm space-y-4">
+          <h2 className="text-lg font-display font-bold text-foreground">
             Knowledge Base Files ({knowledgeBaseFiles.length})
           </h2>
 
           {knowledgeBaseFiles.length === 0 ? (
-            <div className="text-center py-8 border-2 border-dashed border-black rounded-lg">
-              <FileText className="w-12 h-12 text-gray-400 mx-auto mb-3" strokeWidth={2} />
-              <p className="text-base text-gray-600 font-medium">No files in knowledge base</p>
-              <p className="text-sm text-gray-500 mt-1">Upload files or push existing content to get started</p>
+            <div className="text-center py-8 border border-dashed border-border rounded-lg">
+              <FileText className="w-10 h-10 text-muted-foreground mx-auto mb-2 opacity-50" />
+              <p className="text-sm font-semibold text-foreground">No files in knowledge base</p>
+              <p className="text-xs text-muted-foreground mt-0.5">Upload files or push existing content to get started</p>
             </div>
           ) : (
-            <div className="space-y-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {knowledgeBaseFiles.map((file) => (
                 <div
                   key={file._id}
-                  className="flex items-center justify-between p-4 bg-white border-2 border-black rounded-lg shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+                  className="flex items-center justify-between p-3.5 bg-background border border-border rounded-lg hover:border-accent/40 transition-colors"
                 >
-                  <div className="flex items-center gap-3 flex-1 min-w-0">
-                    <FileText className="w-5 h-5 text-black flex-shrink-0" strokeWidth={2.5} />
-                    <div className="flex-1 min-w-0">
-                      <p className="font-bold text-black text-sm truncate">{file.fileName}</p>
-                      <p className="text-xs text-gray-600 font-medium">
-                        {file.fileType} • {formatFileSize(file.fileSize)} • {file.createdAt ? new Date(file.createdAt).toLocaleDateString() : 'No date'}
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-8 h-8 rounded bg-cream-deep text-accent flex items-center justify-center flex-shrink-0 font-mono text-xs font-bold">
+                      .{file.fileName.split('.').pop()}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="font-semibold text-foreground text-xs truncate">{file.fileName}</p>
+                      <p className="label-mono text-[10px] text-muted-foreground mt-0.5">
+                        {formatFileSize(file.fileSize)} • {file.createdAt ? new Date(file.createdAt).toLocaleDateString() : ''}
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1.5 ml-2 flex-shrink-0">
                     {getStatusIcon(file.status, file.vectorStatus)}
-                    <span className="text-xs font-medium text-gray-600 capitalize">
-                      {file.vectorStatus === 'uploaded' ? 'Ready' : file.status}
-                    </span>
                   </div>
                 </div>
               ))}

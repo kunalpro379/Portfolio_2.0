@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-
 const blogSchema = new mongoose.Schema({
   blogId: {
     type: String,
@@ -36,7 +35,7 @@ const blogSchema = new mongoose.Schema({
     url: String,
     filename: String
   }],
-  mdFiles: [String], // Azure Blob URLs
+  mdFiles: [String], 
   coverImage: {
     type: String,
     default: ''
@@ -66,9 +65,6 @@ const blogSchema = new mongoose.Schema({
     default: Date.now
   }
 });
-
-// Only index datetime and subject (blogId and slug have unique: true which creates indexes automatically)
 blogSchema.index({ datetime: -1 });
 blogSchema.index({ subject: 1 });
-
 export default mongoose.model('Blog', blogSchema, 'blogs');

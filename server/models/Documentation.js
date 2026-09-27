@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-
 const documentationSchema = new mongoose.Schema({
   docId: {
     type: String,
@@ -81,9 +80,6 @@ const documentationSchema = new mongoose.Schema({
     default: Date.now
   }
 });
-
-// Only index createdAt and subject since slug already has unique index
 documentationSchema.index({ createdAt: -1 });
 documentationSchema.index({ subject: 1 });
-
 export const Documentation = mongoose.model('Documentation', documentationSchema, 'documentation');
